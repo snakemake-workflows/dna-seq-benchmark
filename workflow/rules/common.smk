@@ -1,5 +1,10 @@
 repl_chr = "s/chr//"
-reads = expand("resources/reads/reads.{read}.fq", read=[1, 2])
+
+if config["custom-reads"]["activate"]:
+    reads = config["custom-reads"]["fastqs"]
+    assert len(reads) == 2, "Expecting paired end custom reads in two FASTQ files"
+else:
+    reads = expand("resources/reads/reads.{read}.fq", read=[1, 2])
 
 coverages = {
     "low": 1,
@@ -49,6 +54,24 @@ def get_cov_interval(name):
 
 def get_callset(wildcards):
     return config["variant-calls"][wildcards.callset]
+
+
+def get_target_bed_statement():
+    if config["custom-reads"]["activate"]:
+        bed = config["custom-reads"]["target-regions"]
+        return f"cat {bed}"
+    else:
+        return (
+            "curl --insecure -L"
+            " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed"
+        )
+
+
+def get_liftover_statement(wildcards, input, output):
+    if not config["custom-reads"]["activate"] or config["custom-reads"]["hg19"]:
+        return f"| liftOver /dev/stdin {input.liftover} {output} /dev/null"
+    else:
+        return f"> {output}"
 
 
 wildcard_constraints:

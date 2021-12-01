@@ -1,2 +1,11 @@
 variant-calls:
   dummy: "resources/variants/truth.vcf"
+
+custom-reads:
+  activate: false
+  fastqs:
+    - path/to/1.fq
+    - path/to/2.fq
+  target-regions: path/to/regions.bed
+  # whether given target regions are on hg19
+  hg19: false

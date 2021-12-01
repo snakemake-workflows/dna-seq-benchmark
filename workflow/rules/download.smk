@@ -58,14 +58,15 @@ rule get_target_bed:
         liftover="resources/reference/liftover.chain.gz",
     output:
         pipe("resources/regions/target-regions.raw.bed"),
+    params:
+        get_bed=get_target_bed_statement(),
+        liftover=get_liftover_statement,
     log:
         "logs/get-target-bed.log",
     conda:
         "../envs/tools.yaml"
     shell:
-        "(curl --insecure -L"
-        " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed |"
-        " liftOver /dev/stdin {input.liftover} {output} /dev/null) 2> {log}"
+        "({params.get_bed} {params.liftover}) 2> {log}"
 
 
 rule postprocess_target_bed:

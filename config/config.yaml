@@ -3,3 +3,13 @@ variant-calls:
   # from different pipelines or different configurations of the same pipeline.
   # Multiple entries are possible.
   <callset>: <path>
+
+# Optional: paths to custom read data, instead of downloading public exome dataset.
+custom-reads:
+  activate: false
+  fastqs:
+    - path/to/1.fq
+    - path/to/2.fq
+  target-regions: path/to/regions.bed
+  # whether given target regions are on hg19
+  hg19: false
