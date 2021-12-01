@@ -7,5 +7,8 @@ custom-reads:
     - path/to/1.fq
     - path/to/2.fq
   target-regions: path/to/regions.bed
-  # whether given target regions are on hg19
   hg19: false
+
+limit-regions:
+  activate: true
+  bed: config/limit-regions.bed

@@ -1,14 +1,19 @@
 rule get_reads:
+    input:
+        regions=get_limit_regions(),
     output:
         r1=reads[0],
         r2=reads[1],
+    params:
+        limit=get_read_limit_param,
     log:
         "logs/download-reads.log",
     conda:
         "../envs/tools.yaml"
     shell:
         "(samtools view -f3 -u"
-        " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam |"
+        " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam"
+        " {params.limit} |"
         " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
 
 
@@ -188,12 +193,14 @@ rule stratify_regions:
         confidence="resources/regions/confidence-regions.bed",
         target="resources/regions/target-regions.bed",
         coverage="results/coverage/coverage.quantized.bed.gz",
+        limit_regions=get_limit_regions(),
     output:
         "resources/regions/test-regions.cov-{cov}.bed",
+    params:
+        intersect_limit=get_limit_regions_intersect_statement,
+        cov_label=get_cov_label,
     log:
         "logs/stratify-regions/{cov}.log",
-    params:
-        cov_label=get_cov_label,
     conda:
         "../envs/tools.yaml"
     shell:
@@ -201,4 +208,5 @@ rule stratify_regions:
         " -a {input.confidence}"
         " -b <(zcat {input.coverage} | grep '{params.cov_label}') |"
         " bedtools intersect -a /dev/stdin -b {input.target}"
+        " {params.intersect_limit}"
         ") > {output} 2> {log}"

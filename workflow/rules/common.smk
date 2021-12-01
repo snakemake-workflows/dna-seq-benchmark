@@ -74,5 +74,26 @@ def get_liftover_statement(wildcards, input, output):
         return f"> {output}"
 
 
+def get_limit_regions():
+    if config["limit-regions"]["activate"]:
+        return config["limit-regions"]["bed"]
+    else:
+        return []
+
+
+def get_read_limit_param(wildcards, input):
+    if input.regions:
+        return f"-L {input.regions}"
+    else:
+        return ""
+
+
+def get_limit_regions_intersect_statement(wildcards, input):
+    if input.limit_regions:
+        return f"bedtools -a /dev/stdin -b {input.limit_regions} |"
+    else:
+        return ""
+
+
 wildcard_constraints:
     callset="|".join(config["variant-calls"]),
