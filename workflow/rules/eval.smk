@@ -7,6 +7,8 @@ rule normalize_calls:
         "results/normalized-variants/{callset}.vcf.gz"
     params:
         lambda w, input: f"--atomize -f {input.genome} --rm-dup exact -Oz"
+    log:
+        "logs/normalize-calls/{callset}.log"
     conda:
         "../envs/tools.yaml"
     wrapper:
@@ -42,6 +44,8 @@ rule bcftools_index:
         "resources/variants/truth.cov-{cov}.vcf.gz",
     output:
         "resources/variants/truth.cov-{cov}.vcf.gz.csi",
+    log:
+        "logs/bcftools-index/truth.{cov}.log"
     wrapper:
         "0.80.1/bio/bcftools/index"
 
