@@ -82,14 +82,14 @@ def get_limit_regions():
 
 
 def get_read_limit_param(wildcards, input):
-    if input.regions:
+    if input.get("regions"):
         return f"-L {input.regions}"
     else:
         return ""
 
 
 def get_limit_regions_intersect_statement(wildcards, input):
-    if input.limit_regions:
+    if input.get("limit_regions"):
         return f"bedtools -a /dev/stdin -b {input.limit_regions} |"
     else:
         return ""
