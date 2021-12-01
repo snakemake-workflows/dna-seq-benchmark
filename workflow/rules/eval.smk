@@ -4,11 +4,11 @@ rule normalize_calls:
         genome="resources/reference/genome.fasta",
         genome_index="resources/reference/genome.fasta.fai",
     output:
-        "results/normalized-variants/{callset}.vcf.gz"
+        "results/normalized-variants/{callset}.vcf.gz",
     params:
-        lambda w, input: f"--atomize -f {input.genome} --rm-dup exact -Oz"
+        lambda w, input: f"--atomize -f {input.genome} --rm-dup exact -Oz",
     log:
-        "logs/normalize-calls/{callset}.log"
+        "logs/normalize-calls/{callset}.log",
     conda:
         "../envs/tools.yaml"
     wrapper:
@@ -45,7 +45,7 @@ rule bcftools_index:
     output:
         "resources/variants/truth.cov-{cov}.vcf.gz.csi",
     log:
-        "logs/bcftools-index/truth.{cov}.log"
+        "logs/bcftools-index/truth.{cov}.log",
     wrapper:
         "0.80.1/bio/bcftools/index"
 
@@ -96,13 +96,13 @@ rule collect_stratifications:
 
 rule plot_precision_recall:
     input:
-        "results/report/{callset}.tsv"
+        "results/report/{callset}.tsv",
     output:
-        "results/report/{callset}.plot.svg"
+        "results/report/{callset}.plot.svg",
     params:
-        cov_labels=get_plot_cov_labels()
+        cov_labels=get_plot_cov_labels(),
     log:
-        "logs/plot-precision-recall/{callset}.log"
+        "logs/plot-precision-recall/{callset}.log",
     conda:
         "../envs/stats.yaml"
     notebook:

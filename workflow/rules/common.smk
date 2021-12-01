@@ -7,6 +7,7 @@ coverages = {
     "high": 30,
 }
 
+
 def get_mosdepth_quantize():
     return ":".join(map(str, sorted(coverages.values()))) + ":"
 
@@ -17,6 +18,7 @@ def get_plot_cov_labels():
         if upper:
             return f"{lower}-{upper-1}"
         return f"≥{lower}"
+
     return {name: label(name) for name in coverages}
 
 
@@ -50,4 +52,4 @@ def get_callset(wildcards):
 
 
 wildcard_constraints:
-    callset="|".join(config["variant-calls"])
+    callset="|".join(config["variant-calls"]),
