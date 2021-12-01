@@ -1,4 +1,5 @@
 variant-calls:
-  # listing of names and paths of variant call results
+  # Listing of callsets and corresponding paths, representing variant call results
+  # from different pipelines or different configurations of the same pipeline.
   # Multiple entries are possible.
-  <name>: <path>
+  <callset>: <path>

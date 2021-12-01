@@ -4,14 +4,20 @@ include: "rules/common.smk"
 include: "rules/download.smk"
 
 
-if "results" in config:
+if "variant-calls" in config:
 
     include: "rules/eval.smk"
 
     rule eval:
         input:
-            "results/report/all.tsv",
-            "results/report/all.plot.svg",
+            expand(
+                [
+                    "results/report/{callset}.tsv",
+                    "results/report/{callset}.plot.svg",
+                ],
+                callset=config["variant-calls"]
+            )
+
 
 
 rule download:

@@ -1,1 +1,2 @@
-results: "resources/variants/truth.vcf"
+variant-calls:
+  dummy: "resources/variants/truth.vcf"

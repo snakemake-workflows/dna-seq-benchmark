@@ -1,10 +1,10 @@
 rule normalize_calls:
     input:
-        config["results"],
+        get_callset,
         genome="resources/reference/genome.fasta",
         genome_index="resources/reference/genome.fasta.fai",
     output:
-        "results/normalized-variants/all.vcf.gz"
+        "results/normalized-variants/{callset}.vcf.gz"
     params:
         lambda w, input: f"--atomize -f {input.genome} --rm-dup exact -Oz"
     conda:
@@ -29,12 +29,12 @@ rule stratify_truth:
 
 use rule stratify_truth as stratify_results with:
     input:
-        variants="results/normalized-variants/all.vcf.gz",
+        variants="results/normalized-variants/{callset}.vcf.gz",
         regions="resources/regions/test-regions.cov-{cov}.bed",
     output:
-        "results/stratified-variants/{cov}.vcf.gz",
+        "results/stratified-variants/{callset}/{cov}.vcf.gz",
     log:
-        "logs/stratify-results.{cov}.log",
+        "logs/stratify-results/{callset}/{cov}.log",
 
 
 rule bcftools_index:
@@ -50,12 +50,12 @@ rule benchmark_variants:
     input:
         truth="resources/variants/truth.cov-{cov}.vcf.gz",
         truth_idx="resources/variants/truth.cov-{cov}.vcf.gz.csi",
-        query="results/stratified-variants/{cov}.vcf.gz",
+        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         genome="resources/reference/genome.fasta",
         genome_index="resources/reference/genome.fasta.fai",
     output:
         multiext(
-            "results/hap.py/report-cov-{cov}",
+            "results/hap.py/{callset}/{cov}/report",
             ".runinfo.json",
             ".vcf.gz",
             ".summary.csv",
@@ -70,20 +70,20 @@ rule benchmark_variants:
         prefix=get_io_prefix(lambda input, output: output[0]),
         engine="vcfeval",
     log:
-        "logs/happy.{cov}.log",
+        "logs/hap.py/{callset}/{cov}.log",
     wrapper:
         "0.80.1/bio/hap.py/hap.py"
 
 
 rule collect_stratifications:
     input:
-        expand("results/hap.py/report-cov-{cov}.summary.csv", cov=coverages),
+        expand("results/hap.py/{{callset}}/{cov}/report.summary.csv", cov=coverages),
     output:
-        "results/report/all.tsv",
+        "results/report/{callset}.tsv",
     params:
         coverages=coverages,
     log:
-        "logs/collect-stratifications.log",
+        "logs/collect-stratifications/{callset}.log",
     conda:
         "../envs/stats.yaml"
     script:
@@ -92,13 +92,13 @@ rule collect_stratifications:
 
 rule plot_precision_recall:
     input:
-        "results/report/all.tsv"
+        "results/report/{callset}.tsv"
     output:
-        "results/report/all.plot.svg"
+        "results/report/{callset}.plot.svg"
     params:
         cov_labels=get_plot_cov_labels()
     log:
-        "logs/plot-precision-recall.log"
+        "logs/plot-precision-recall/{callset}.log"
     conda:
         "../envs/stats.yaml"
     notebook:

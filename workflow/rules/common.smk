@@ -43,3 +43,11 @@ def get_cov_interval(name):
         upper_bound = min(greater)
 
     return threshold, upper_bound
+
+
+def get_callset(wildcards):
+    return config["variant-calls"][wildcards.callset]
+
+
+wildcard_constraints:
+    callset="|".join(config["variant-calls"])
