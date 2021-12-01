@@ -1,4 +1,22 @@
-# Main entrypoint of the workflow. 
-# Please follow the best practices: 
-# https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
-# in particular regarding the standardized folder structure mentioned there. 
+include: "rules/common.smk"
+include: "rules/download.smk"
+
+
+rule download:
+    input:
+        reads,
+        expand("benchmark/test-regions.cov-{cov}.bed", cov=["low", "callable"]),
+        "reference/reference.fasta",
+        "reference/reference.fasta.fai",
+        "benchmark/truth.vcf",
+        "benchmark/target-regions.bed",
+
+
+if "results" in config:
+
+    include: "rules/eval.smk"
+
+    rule eval:
+        input:
+            "report.tsv",
+            "report.plot.svg",
