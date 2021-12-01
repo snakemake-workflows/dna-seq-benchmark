@@ -43,7 +43,7 @@ rule bcftools_index:
     output:
         "resources/variants/truth.cov-{cov}.vcf.gz.csi",
     wrapper:
-        "v0.80.1/bio/bcftools/index"
+        "0.80.1/bio/bcftools/index"
 
 
 rule benchmark_variants:
