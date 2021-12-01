@@ -1,15 +1,7 @@
+configfile: "config/config.yaml"
+
 include: "rules/common.smk"
 include: "rules/download.smk"
-
-
-rule download:
-    input:
-        reads,
-        expand("benchmark/test-regions.cov-{cov}.bed", cov=["low", "callable"]),
-        "reference/reference.fasta",
-        "reference/reference.fasta.fai",
-        "benchmark/truth.vcf",
-        "benchmark/target-regions.bed",
 
 
 if "results" in config:
@@ -18,5 +10,15 @@ if "results" in config:
 
     rule eval:
         input:
-            "report.tsv",
-            "report.plot.svg",
+            "results/report/all.tsv",
+            "results/report/all.plot.svg",
+
+
+rule download:
+    input:
+        reads,
+        expand("resources/regions/test-regions.cov-{cov}.bed", cov=coverages.keys()),
+        "resources/reference/genome.fasta",
+        "resources/reference/genome.fasta.fai",
+        "resources/variants/truth.vcf",
+        "resources/regions/target-regions.bed",

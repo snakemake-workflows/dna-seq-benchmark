@@ -1,0 +1,4 @@
+variant-calls:
+  # listing of names and paths of variant call results
+  # Multiple entries are possible.
+  <name>: <path>

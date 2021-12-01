@@ -14,7 +14,7 @@ rule get_reads:
 
 rule get_truth:
     output:
-        "benchmark/truth.vcf",
+        "resources/variants/truth.vcf",
     log:
         "logs/get-truth.log",
     params:
@@ -29,7 +29,7 @@ rule get_truth:
 
 rule get_confidence_bed:
     output:
-        "benchmark/confidence-regions.bed",
+        "resources/regions/confidence-regions.bed",
     log:
         "logs/get-confidence-regions.log",
     params:
@@ -44,7 +44,7 @@ rule get_confidence_bed:
 
 rule get_liftover_track:
     output:
-        "benchmark/liftover.chain.gz",
+        "resources/reference/liftover.chain.gz",
     log:
         "logs/get-liftover-track.log",
     conda:
@@ -55,9 +55,9 @@ rule get_liftover_track:
 
 rule get_target_bed:
     input:
-        liftover="benchmark/liftover.chain.gz",
+        liftover="resources/reference/liftover.chain.gz",
     output:
-        pipe("benchmark/target-regions.raw.bed"),
+        pipe("resources/regions/target-regions.raw.bed"),
     log:
         "logs/get-target-bed.log",
     conda:
@@ -70,9 +70,9 @@ rule get_target_bed:
 
 rule postprocess_target_bed:
     input:
-        "benchmark/target-regions.raw.bed",
+        "resources/regions/target-regions.raw.bed",
     output:
-        "benchmark/target-regions.bed",
+        "resources/regions/target-regions.bed",
     log:
         "logs/fix-target-bed.log",
     params:
@@ -85,7 +85,7 @@ rule postprocess_target_bed:
 
 rule get_reference:
     output:
-        "reference/reference.fasta",
+        "resources/reference/genome.fasta",
     params:
         species="homo_sapiens",
         datatype="dna",
@@ -99,9 +99,9 @@ rule get_reference:
 
 rule samtools_faidx:
     input:
-        "reference/reference.fasta",
+        "resources/reference/genome.fasta",
     output:
-        "reference/reference.fasta.fai",
+        "resources/reference/genome.fasta.fai",
     log:
         "logs/samtools-faidx.log",
     wrapper:
@@ -110,9 +110,9 @@ rule samtools_faidx:
 
 rule bwa_index:
     input:
-        "reference/reference.fasta",
+        "resources/reference/genome.fasta",
     output:
-        multiext("reference/reference", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        multiext("reference/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     log:
         "logs/bwa-index.log",
     params:
@@ -124,9 +124,9 @@ rule bwa_index:
 rule bwa_mem:
     input:
         reads=reads,
-        index=multiext("reference/reference", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        index=rules.bwa_index.output,
     output:
-        "reads/mapped.bam",
+        "results/read-alignments/all.bam",
     log:
         "logs/bwa-mem.log",
     params:
@@ -140,10 +140,10 @@ rule bwa_mem:
 
 rule mark_duplicates:
     input:
-        "reads/mapped.bam",
+        "results/read-alignments/all.bam",
     output:
-        bam="reads/mapped.dedup.bam",
-        metrics="reads/dedup.metrics.txt",
+        bam="results/read-alignments/all.dedup.bam",
+        metrics="results/read-alignments/dedup.metrics.txt",
     log:
         "logs/picard-dedup.log",
     params:
@@ -156,9 +156,9 @@ rule mark_duplicates:
 
 rule samtools_index:
     input:
-        "reads/mapped.dedup.bam",
+        "results/read-alignments/all.dedup.bam",
     output:
-        "reads/mapped.dedup.bam.bai",
+        "results/read-alignments/all.dedup.bam.bai",
     log:
         "logs/samtools-index.log",
     wrapper:
@@ -167,11 +167,11 @@ rule samtools_index:
 
 rule mosdepth:
     input:
-        bam="reads/mapped.dedup.bam",
-        bai="reads/mapped.dedup.bam.bai",
+        bam="results/read-alignments/all.dedup.bam",
+        bai="results/read-alignments/all.dedup.bam.bai",
     output:
-        "coverage/coverage.mosdepth.global.dist.txt",
-        "coverage/coverage.quantized.bed.gz",
+        "results/coverage/coverage.mosdepth.global.dist.txt",
+        "results/coverage/coverage.quantized.bed.gz",
         summary="coverage/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
     log:
         "logs/mosdepth.log",
@@ -184,11 +184,11 @@ rule mosdepth:
 
 rule stratify_regions:
     input:
-        confidence="benchmark/confidence-regions.bed",
-        target="benchmark/target-regions.bed",
-        coverage="coverage/coverage.quantized.bed.gz",
+        confidence="resources/regions/confidence-regions.bed",
+        target="resources/regions/target-regions.bed",
+        coverage="results/coverage/coverage.quantized.bed.gz",
     output:
-        "benchmark/test-regions.cov-{cov}.bed",
+        "resources/regions/test-regions.cov-{cov}.bed",
     log:
         "logs/stratify-regions/{cov}.log",
     params:

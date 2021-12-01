@@ -1,10 +1,10 @@
 rule normalize_calls:
     input:
         config["results"],
-        genome="reference/reference.fasta",
-        genome_index="reference/reference.fasta.fai",
+        genome="resources/reference/genome.fasta",
+        genome_index="resources/reference/genome.fasta.fai",
     output:
-        "normalized-results/all.vcf.gz"
+        "results/normalized-variants/all.vcf.gz"
     params:
         lambda w, input: f"--atomize -f {input.genome} --rm-dup exact -Oz"
     conda:
@@ -15,10 +15,10 @@ rule normalize_calls:
 
 rule stratify_truth:
     input:
-        variants="benchmark/truth.vcf",
-        regions="benchmark/test-regions.cov-{cov}.bed",
+        variants="resources/variants/truth.vcf",
+        regions="resources/regions/test-regions.cov-{cov}.bed",
     output:
-        "benchmark/truth.cov-{cov}.vcf.gz",
+        "resources/variants/truth.cov-{cov}.vcf.gz",
     log:
         "logs/stratify-truth.{cov}.log",
     conda:
@@ -29,33 +29,33 @@ rule stratify_truth:
 
 use rule stratify_truth as stratify_results with:
     input:
-        variants="normalized-results/all.vcf.gz",
-        regions="benchmark/test-regions.cov-{cov}.bed",
+        variants="results/normalized-variants/all.vcf.gz",
+        regions="resources/regions/test-regions.cov-{cov}.bed",
     output:
-        "stratified-results/{cov}.vcf.gz",
+        "results/stratified-variants/{cov}.vcf.gz",
     log:
         "logs/stratify-results.{cov}.log",
 
 
 rule bcftools_index:
     input:
-        "benchmark/truth.cov-{cov}.vcf.gz",
+        "resources/variants/truth.cov-{cov}.vcf.gz",
     output:
-        "benchmark/truth.cov-{cov}.vcf.gz.csi",
+        "resources/variants/truth.cov-{cov}.vcf.gz.csi",
     wrapper:
         "v0.80.1/bio/bcftools/index"
 
 
 rule benchmark_variants:
     input:
-        truth="benchmark/truth.cov-{cov}.vcf.gz",
-        truth_idx="benchmark/truth.cov-{cov}.vcf.gz.csi",
-        query="stratified-results/{cov}.vcf.gz",
-        genome="reference/reference.fasta",
-        genome_index="reference/reference.fasta.fai",
+        truth="resources/variants/truth.cov-{cov}.vcf.gz",
+        truth_idx="resources/variants/truth.cov-{cov}.vcf.gz.csi",
+        query="results/stratified-variants/{cov}.vcf.gz",
+        genome="resources/reference/genome.fasta",
+        genome_index="resources/reference/genome.fasta.fai",
     output:
         multiext(
-            "report-cov-{cov}",
+            "results/hap.py/report-cov-{cov}",
             ".runinfo.json",
             ".vcf.gz",
             ".summary.csv",
@@ -77,9 +77,9 @@ rule benchmark_variants:
 
 rule collect_stratifications:
     input:
-        expand("report-cov-{cov}.summary.csv", cov=coverages),
+        expand("results/hap.py/report-cov-{cov}.summary.csv", cov=coverages),
     output:
-        "report.tsv",
+        "results/report/all.tsv",
     params:
         coverages=coverages,
     log:
@@ -92,9 +92,9 @@ rule collect_stratifications:
 
 rule plot_precision_recall:
     input:
-        "report.tsv"
+        "results/report/all.tsv"
     output:
-        "report.plot.svg"
+        "results/report/all.plot.svg"
     params:
         cov_labels=get_plot_cov_labels()
     log:
