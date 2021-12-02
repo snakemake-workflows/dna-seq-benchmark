@@ -59,7 +59,7 @@ rule benchmark_variants:
         genome_index="resources/reference/genome.fasta.fai",
     output:
         multiext(
-            "results/hap.py/{callset}/{cov}/report",
+            "results/happy/{callset}/{cov}/report",
             ".runinfo.json",
             ".vcf.gz",
             ".summary.csv",
@@ -74,14 +74,14 @@ rule benchmark_variants:
         prefix=get_io_prefix(lambda input, output: output[0]),
         engine="vcfeval",
     log:
-        "logs/hap.py/{callset}/{cov}.log",
+        "logs/happy/{callset}/{cov}.log",
     wrapper:
         "0.80.1/bio/hap.py/hap.py"
 
 
 rule collect_stratifications:
     input:
-        expand("results/hap.py/{{callset}}/{cov}/report.summary.csv", cov=coverages),
+        expand("results/happy/{{callset}}/{cov}/report.summary.csv", cov=coverages),
     output:
         "results/report/{callset}.tsv",
     params:
