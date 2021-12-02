@@ -178,7 +178,7 @@ rule mosdepth:
     output:
         "results/coverage/coverage.mosdepth.global.dist.txt",
         "results/coverage/coverage.quantized.bed.gz",
-        summary="coverage/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
+        summary="results/coverage/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
     log:
         "logs/mosdepth.log",
     params:
