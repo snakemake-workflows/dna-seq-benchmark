@@ -7,8 +7,10 @@ custom-reads:
     - path/to/1.fq
     - path/to/2.fq
   target-regions: path/to/regions.bed
-  hg19: false
+  grch37: false
 
 limit-regions:
   activate: true
   bed: config/limit-regions.bed
+
+grch37: false
