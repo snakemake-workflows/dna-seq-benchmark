@@ -4,6 +4,9 @@ if config["custom-reads"]["activate"]:
     reads = config["custom-reads"]["fastqs"]
     assert len(reads) == 2, "Expecting paired end custom reads in two FASTQ files"
 else:
+    assert not config[
+        "grch37"
+    ], "grch37 must be set to false in the config if no custom reads are given"
     reads = expand("resources/reads/reads.{read}.fq", read=[1, 2])
 
 coverages = {
@@ -25,6 +28,20 @@ def get_plot_cov_labels():
         return f"≥{lower}"
 
     return {name: label(name) for name in coverages}
+
+
+def get_truth_url():
+    if config["grch37"]:
+        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz"
+    else:
+        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz"
+
+
+def get_confidence_bed_url():
+    if config["grch37"]:
+        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.bed"
+    else:
+        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed"
 
 
 def get_io_prefix(getter):
@@ -68,7 +85,9 @@ def get_target_bed_statement():
 
 
 def get_liftover_statement(wildcards, input, output):
-    if not config["custom-reads"]["activate"] or config["custom-reads"]["hg19"]:
+    if not config["custom-reads"]["activate"] or (
+        config["custom-reads"]["grch37"] and not config["grch37"]
+    ):
         return f"| liftOver /dev/stdin {input.liftover} {output} /dev/null"
     else:
         return f"> {output}"

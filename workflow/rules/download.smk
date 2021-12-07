@@ -24,12 +24,13 @@ rule get_truth:
         "logs/get-truth.log",
     params:
         repl_chr=repl_chr,
+        url=get_truth_url(),
     conda:
         "../envs/tools.yaml"
     shell:
-        "bcftools view "
-        "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz "
-        " | sed {params.repl_chr} > {output} 2> {log}"
+        "(bcftools view {params.url}"
+        " | sed {params.repl_chr} > {output}"
+        ") 2> {log}"
 
 
 rule get_confidence_bed:
@@ -39,12 +40,13 @@ rule get_confidence_bed:
         "logs/get-confidence-regions.log",
     params:
         repl_chr=repl_chr,
+        url=get_confidence_bed_url(),
     conda:
         "../envs/tools.yaml"
     shell:
-        "curl --insecure -L "
-        "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed | "
-        "sed {params.repl_chr} > {output} 2> {log}"
+        "(curl --insecure -L {params.url}"
+        " | sed {params.repl_chr} > {output}"
+        ") 2> {log}"
 
 
 rule get_liftover_track:
@@ -95,7 +97,7 @@ rule get_reference:
     params:
         species="homo_sapiens",
         datatype="dna",
-        build="GRCh38",
+        build="GRCh37" if config["grch37"] else "GRCh38",
         release="104",
     log:
         "logs/get-genome.log",
