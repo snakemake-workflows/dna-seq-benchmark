@@ -19,4 +19,5 @@ limit-regions:
   activate: false
   bed: path/to/regions.bed
 
+# Set to true to run analysis on GRCh37 instead of GRCh38
 grch37: false
