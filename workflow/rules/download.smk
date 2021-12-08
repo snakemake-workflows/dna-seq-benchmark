@@ -64,7 +64,7 @@ rule get_target_bed:
     input:
         liftover="resources/reference/liftover.chain.gz",
     output:
-        pipe("resources/regions/target-regions.raw.bed"),
+        "resources/regions/target-regions.raw.bed",
     params:
         get_bed=get_target_bed_statement(),
         liftover=get_liftover_statement,
