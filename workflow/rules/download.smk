@@ -2,8 +2,8 @@ rule get_reads:
     input:
         regions=get_limit_regions(),
     output:
-        r1=reads[0],
-        r2=reads[1],
+        r1=public_reads[0],
+        r2=public_reads[1],
     params:
         limit=get_read_limit_param,
     log:
@@ -131,7 +131,7 @@ rule bwa_index:
 
 rule bwa_mem:
     input:
-        reads=reads,
+        reads=get_bwa_input(),
         index=rules.bwa_index.output,
     output:
         "results/read-alignments/all.bam",

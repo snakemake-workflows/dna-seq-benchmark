@@ -1,19 +1,25 @@
 repl_chr = "s/chr//"
 
 if config["custom-reads"]["activate"]:
-    reads = config["custom-reads"]["fastqs"]
-    assert len(reads) == 2, "Expecting paired end custom reads in two FASTQ files"
+    assert len(config["custom-reads"]["fastqs"]) == 2, "Expecting paired end custom reads in two FASTQ files"
 else:
     assert not config.get(
         "grch37"
     ), "grch37 must be set to false in the config if no custom reads are given"
-    reads = expand("resources/reads/reads.{read}.fq", read=[1, 2])
+    public_reads = expand("resources/reads/reads.{read}.fq", read=[1, 2])
 
 coverages = {
     "low": 1,
     "medium": 10,
     "high": 30,
 }
+
+
+def get_bwa_input(wildcards):
+    if config["custom-reads"]["activate"]:
+        return config["custom-reads"]["fastqs"]
+    else:
+        return public_reads
 
 
 def get_mosdepth_quantize():
