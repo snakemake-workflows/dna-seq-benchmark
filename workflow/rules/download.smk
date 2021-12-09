@@ -1,4 +1,4 @@
-if config["custom-reads"]["activate"]:
+if not config["custom-reads"]["activate"]:
 
     rule get_reads:
         input:
