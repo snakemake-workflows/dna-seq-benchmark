@@ -22,7 +22,7 @@ if "variant-calls" in config:
 
 rule download:
     input:
-        reads,
+        reads if config["custom-reads"]["activate"] else [],
         expand("resources/regions/test-regions.cov-{cov}.bed", cov=coverages.keys()),
         "resources/reference/genome.fasta",
         "resources/reference/genome.fasta.fai",
