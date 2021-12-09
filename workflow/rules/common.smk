@@ -17,7 +17,7 @@ coverages = {
 }
 
 
-def get_bwa_input(wildcards):
+def get_bwa_input():
     if config["custom-reads"]["activate"]:
         return config["custom-reads"]["fastqs"]
     else:
