@@ -1,7 +1,9 @@
 repl_chr = "s/chr//"
 
 if config["custom-reads"]["activate"]:
-    assert len(config["custom-reads"]["fastqs"]) == 2, "Expecting paired end custom reads in two FASTQ files"
+    assert (
+        len(config["custom-reads"]["fastqs"]) == 2
+    ), "Expecting paired end custom reads in two FASTQ files"
 else:
     assert not config.get(
         "grch37"
