@@ -1,20 +1,22 @@
-rule get_reads:
-    input:
-        regions=get_limit_regions(),
-    output:
-        r1=public_reads[0],
-        r2=public_reads[1],
-    params:
-        limit=get_read_limit_param,
-    log:
-        "logs/download-reads.log",
-    conda:
-        "../envs/tools.yaml"
-    shell:
-        "(samtools view -f3 -u"
-        " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam"
-        " {params.limit} |"
-        " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
+if config["custom-reads"]["activate"]:
+
+    rule get_reads:
+        input:
+            regions=get_limit_regions(),
+        output:
+            r1=public_reads[0],
+            r2=public_reads[1],
+        params:
+            limit=get_read_limit_param,
+        log:
+            "logs/download-reads.log",
+        conda:
+            "../envs/tools.yaml"
+        shell:
+            "(samtools view -f3 -u"
+            " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam"
+            " {params.limit} |"
+            " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
 
 
 rule get_truth:
