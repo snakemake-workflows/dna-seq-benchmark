@@ -208,13 +208,14 @@ rule stratify_regions:
     conda:
         "../envs/tools.yaml"
     shell:
-        # The intersection can generate duplicate entries if
+        # The intersection can generate duplicate or overlapping entries if
         # the target regions bed contains overlapping entries.
-        # Hence it is important to have a final uniq to ensure that
-        # these duplicate lines are removed.
+        # Hence it is important to have a final bedtools merge to ensure that
+        # these overlapping lines are removed.
         "(bedtools intersect"
         " -a {input.confidence}"
         " -b <(zcat {input.coverage} | grep '{params.cov_label}') |"
         " bedtools intersect -a /dev/stdin -b {input.target}"
-        " {params.intersect_limit}"
-        ") | uniq > {output} 2> {log}"
+        " {params.intersect_limit} |"
+        " bedtools merge -i /dev/stdin"
+        ") > {output} 2> {log}"
