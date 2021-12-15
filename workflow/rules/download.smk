@@ -217,5 +217,6 @@ rule stratify_regions:
         " -b <(zcat {input.coverage} | grep '{params.cov_label}') |"
         " bedtools intersect -a /dev/stdin -b {input.target}"
         " {params.intersect_limit} |"
+        " sort -k1,1 -k2,2n |"
         " bedtools merge -i /dev/stdin"
         ") > {output} 2> {log}"
