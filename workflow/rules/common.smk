@@ -122,5 +122,6 @@ def get_limit_regions_intersect_statement(wildcards, input):
         return ""
 
 
-wildcard_constraints:
-    callset="|".join(config["variant-calls"]),
+if "variant-calls" in config:
+    wildcard_constraints:
+        callset="|".join(config["variant-calls"]),
