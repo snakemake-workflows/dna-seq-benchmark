@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.1](https://www.github.com/snakemake-workflows/benchmark-giab/compare/v1.0.0...v1.0.1) (2021-12-20)
+
+
+### Bug Fixes
+
+* allow missing variant-calls key ([1c9c853](https://www.github.com/snakemake-workflows/benchmark-giab/commit/1c9c85349f5e2530fe71fa315a3dd7e2b74ae441))
+
 ## 1.0.0 (2021-12-20)
 
 
