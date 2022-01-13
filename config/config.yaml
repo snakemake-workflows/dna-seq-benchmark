@@ -2,22 +2,27 @@ variant-calls:
   # Listing of callsets and corresponding paths, representing variant call results
   # from different pipelines or different configurations of the same pipeline.
   # Multiple entries are possible.
-  <callset>: <path>
+  <callset>: 
+    path: <path>
+    # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
+    benchmark: giab-NA12878-exome
 
-# Optional: paths to custom read data, instead of downloading public exome dataset.
-custom-reads:
-  activate: false
-  fastqs:
-    - path/to/1.fq
-    - path/to/2.fq
-  target-regions: path/to/regions.bed
-  # whether given target regions are on hg19
-  grch37: false
+# Optional custom benchmarks
+custom-benchmarks:
+  my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
+    # Truth genome to consider (for now only NA12878 allowed, TODO: CHM)
+    genome: NA12878
+    fastqs:
+      - path/to/1.fq
+      - path/to/2.fq
+    target-regions: path/to/regions.bed
+    # whether given target regions are on hg19
+    grch37: false
 
 # Optional: limit testing and downloading to given regions
 limit-regions:
   activate: false
   bed: path/to/regions.bed
 
-# Set to true to run analysis on GRCh37 instead of GRCh38
+# whether evaluation shall happen on grch37
 grch37: false

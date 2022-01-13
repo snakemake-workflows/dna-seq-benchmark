@@ -1,14 +1,20 @@
+from urllib.parse import urlparse
+
+benchmarks = dict(config.get("custom-benchmarks", dict()))
+benchmarks["giab-NA12878-exome"] = {
+    "genome": "NA12878",
+    "fastqs": expand("resources/reads/reads.{read}.fq", read=[1, 2]),
+    "target-regions": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed",
+    "grch37": True,
+}
+
+
+if any(callset["benchmark"] == "giab-NA12878-exome" for _, callset in config.get("variant-calls", dict()).items()) and config.get("grch37"):
+    raise ValueError("grch37 must be set to false in the config if giab-NA12878-exome benchmark is used")
+
+
 repl_chr = "s/chr//"
 
-if config["custom-reads"]["activate"]:
-    assert (
-        len(config["custom-reads"]["fastqs"]) == 2
-    ), "Expecting paired end custom reads in two FASTQ files"
-else:
-    assert not config.get(
-        "grch37"
-    ), "grch37 must be set to false in the config if no custom reads are given"
-    public_reads = expand("resources/reads/reads.{read}.fq", read=[1, 2])
 
 coverages = {
     "low": 1,
@@ -17,11 +23,8 @@ coverages = {
 }
 
 
-def get_bwa_input():
-    if config["custom-reads"]["activate"]:
-        return config["custom-reads"]["fastqs"]
-    else:
-        return public_reads
+def get_bwa_input(wildcards):
+    return get_benchmark(wildcards.benchmark)["fastqs"]
 
 
 def get_mosdepth_quantize():
@@ -38,7 +41,7 @@ def get_plot_cov_labels():
     return {name: label(name) for name in coverages}
 
 
-def get_truth_url():
+def get_na12878_truth_url():
     if config.get("grch37"):
         return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz"
     else:
@@ -78,24 +81,22 @@ def get_cov_interval(name):
 
 
 def get_callset(wildcards):
-    return config["variant-calls"][wildcards.callset]
+    return config["variant-calls"][wildcards.callset]["path"]
 
 
-def get_target_bed_statement():
-    if config["custom-reads"]["activate"]:
-        bed = config["custom-reads"]["target-regions"]
-        return f"cat {bed}"
+def get_target_bed_statement(wildcards):
+    target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
+
+    if urlparse(target_bed).scheme == "":
+        return f"cat {target_bed}"
     else:
-        return (
-            "curl --insecure -L"
-            " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed"
-        )
+        return f"curl --insecure -L {target_bed}"
 
 
 def get_liftover_statement(wildcards, input, output):
-    if not config["custom-reads"]["activate"] or (
-        config["custom-reads"]["grch37"] and not config.get("grch37")
-    ):
+    benchmark = get_benchmark(wildcards.benchmark)
+
+    if benchmark["grch37"] and not config.get("grch37"):
         return f"| liftOver /dev/stdin {input.liftover} {output} /dev/null"
     else:
         return f"> {output}"
@@ -120,6 +121,39 @@ def get_limit_regions_intersect_statement(wildcards, input):
         return f"| bedtools intersect -a /dev/stdin -b {input.limit_regions}"
     else:
         return ""
+
+
+def get_benchmark(benchmark):
+    try:
+        return benchmarks[benchmark]
+    except KeyError:
+        raise ValueError(f"Benchmark name {benchmark} does not occur in the custom-benchmarks section.")
+
+
+def get_benchmark_truth(wildcards):
+    genome = get_benchmark(wildcards.benchmark)["genome"]
+    return f"resources/variants/{genome}.truth.vcf"
+
+
+def get_stratified_truth(suffix=""):
+    def inner(wildcards):
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        return f"results/variants/{benchmark}.truth.cov-{{cov}}.vcf.gz{suffix}",
+    return inner
+
+
+def get_confidence_regions(wildcards):
+    benchmark = get_benchmark(wildcards.benchmark)
+    if benchmark["genome"] == "NA12878":
+        return "resources/regions/NA12898.confidence-regions.bed"
+    else:
+        # TODO add CHM support
+        raise ValueError(f"Unsupported genome {benchmark['genome']}")
+
+
+def get_test_regions(wildcards):
+    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+    return f"resources/regions/{benchmark}/test-regions.cov-{{cov}}.bed"
 
 
 if "variant-calls" in config:
