@@ -1,9 +1,9 @@
 rule replace_contig_names:
     input:
         calls=get_raw_callset,
-        repl_file=get_rename_contig_file
+        repl_file=get_rename_contig_file,
     output:
-        "results/normalized-variants/{callset}.replaced-contigs.bcf"
+        "results/normalized-variants/{callset}.replaced-contigs.bcf",
     conda:
         "../envs/tools.yaml"
     shell:

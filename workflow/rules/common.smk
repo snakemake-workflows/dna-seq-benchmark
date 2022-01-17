@@ -9,8 +9,13 @@ benchmarks["giab-NA12878-exome"] = {
 }
 
 
-if any(callset["benchmark"] == "giab-NA12878-exome" for _, callset in config.get("variant-calls", dict()).items()) and config.get("grch37"):
-    raise ValueError("grch37 must be set to false in the config if giab-NA12878-exome benchmark is used")
+if any(
+    callset["benchmark"] == "giab-NA12878-exome"
+    for _, callset in config.get("variant-calls", dict()).items()
+) and config.get("grch37"):
+    raise ValueError(
+        "grch37 must be set to false in the config if giab-NA12878-exome benchmark is used"
+    )
 
 
 repl_chr = "s/chr//"
@@ -136,7 +141,9 @@ def get_benchmark(benchmark):
     try:
         return benchmarks[benchmark]
     except KeyError:
-        raise ValueError(f"Benchmark name {benchmark} does not occur in the custom-benchmarks section.")
+        raise ValueError(
+            f"Benchmark name {benchmark} does not occur in the custom-benchmarks section."
+        )
 
 
 def get_benchmark_truth(wildcards):
@@ -147,7 +154,8 @@ def get_benchmark_truth(wildcards):
 def get_stratified_truth(suffix=""):
     def inner(wildcards):
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-        return f"results/variants/{benchmark}.truth.cov-{{cov}}.vcf.gz{suffix}",
+        return (f"results/variants/{benchmark}.truth.cov-{{cov}}.vcf.gz{suffix}",)
+
     return inner
 
 
@@ -170,5 +178,6 @@ def get_rename_contig_file(wildcards):
 
 
 if "variant-calls" in config:
+
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
