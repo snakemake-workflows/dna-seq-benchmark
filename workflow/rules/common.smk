@@ -62,9 +62,17 @@ def get_confidence_bed_url():
 
 def get_io_prefix(getter):
     def inner(wildcards, input, output):
+
         return getter(input, output).split(".")[0]
 
     return inner
+
+
+def get_happy_prefix(wildcards, output):
+    runinfo_suffix = ".runinfo.json"
+    for f in output:
+        if f.endswith(runinfo_suffix):
+            return f[:-len(runinfo_suffix)]
 
 
 def get_cov_label(wildcards):

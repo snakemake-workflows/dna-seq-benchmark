@@ -86,7 +86,7 @@ rule benchmark_variants:
             ".roc.Locations.SNP.csv.gz",
         ),
     params:
-        prefix=get_io_prefix(lambda input, output: output[0]),
+        prefix=get_happy_prefix,
         engine="vcfeval",
     log:
         "logs/happy/{callset}/{cov}.log",
