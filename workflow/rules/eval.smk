@@ -1,3 +1,16 @@
+rule replace_contig_names:
+    input:
+        calls=get_raw_callset,
+        repl_file=get_replace_contig_file
+    output:
+        "results/normalized-variants/{callset}.replaced-contigs.bcf"
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
+        "-Ob -o {output} 2> {log}"
+
+
 rule normalize_calls:
     input:
         get_callset,

@@ -81,7 +81,16 @@ def get_cov_interval(name):
 
 
 def get_callset(wildcards):
-    return config["variant-calls"][wildcards.callset]["path"]
+    callset = config["variant-calls"][wildcards.callset]
+    if "rename-contigs" in callset:
+        return "results/normalized-variants/{callset}.replaced-contigs.bcf"
+    else:
+        return get_raw_callset(wildcards)
+
+
+def get_raw_callset(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    return callset["path"]
 
 
 def get_target_bed_statement(wildcards):
@@ -154,6 +163,10 @@ def get_confidence_regions(wildcards):
 def get_test_regions(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
     return f"resources/regions/{benchmark}/test-regions.cov-{{cov}}.bed"
+
+
+def get_rename_contig_file(wildcards):
+    return config["variant-calls"][wildcards.callset].get("rename-contigs")
 
 
 if "variant-calls" in config:
