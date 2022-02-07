@@ -1,3 +1,18 @@
+rule rename_contigs:
+    input:
+        calls=get_raw_callset,
+        repl_file=get_rename_contig_file,
+    output:
+        "results/normalized-variants/{callset}.replaced-contigs.bcf",
+    log:
+        "logs/rename-contigs/{callset}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
+        "-Ob -o {output} 2> {log}"
+
+
 rule normalize_calls:
     input:
         get_callset,
@@ -17,12 +32,12 @@ rule normalize_calls:
 
 rule stratify_truth:
     input:
-        variants="resources/variants/truth.vcf",
-        regions="resources/regions/test-regions.cov-{cov}.bed",
+        variants=get_benchmark_truth,
+        regions="resources/regions/{benchmark}/test-regions.cov-{cov}.bed",
     output:
-        "resources/variants/truth.cov-{cov}.vcf.gz",
+        "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz",
     log:
-        "logs/stratify-truth.{cov}.log",
+        "logs/stratify-truth.{benchmark}.{cov}.log",
     conda:
         "../envs/tools.yaml"
     shell:
@@ -32,7 +47,7 @@ rule stratify_truth:
 use rule stratify_truth as stratify_results with:
     input:
         variants="results/normalized-variants/{callset}.vcf.gz",
-        regions="resources/regions/test-regions.cov-{cov}.bed",
+        regions=get_test_regions,
     output:
         "results/stratified-variants/{callset}/{cov}.vcf.gz",
     log:
@@ -41,19 +56,19 @@ use rule stratify_truth as stratify_results with:
 
 rule bcftools_index:
     input:
-        "resources/variants/truth.cov-{cov}.vcf.gz",
+        "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz",
     output:
-        "resources/variants/truth.cov-{cov}.vcf.gz.csi",
+        "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz.csi",
     log:
-        "logs/bcftools-index/truth.{cov}.log",
+        "logs/bcftools-index/{benchmark}.truth.{cov}.log",
     wrapper:
         "0.80.1/bio/bcftools/index"
 
 
 rule benchmark_variants:
     input:
-        truth="resources/variants/truth.cov-{cov}.vcf.gz",
-        truth_idx="resources/variants/truth.cov-{cov}.vcf.gz.csi",
+        truth=get_stratified_truth(),
+        truth_idx=get_stratified_truth(".csi"),
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         genome="resources/reference/genome.fasta",
         genome_index="resources/reference/genome.fasta.fai",
@@ -71,7 +86,7 @@ rule benchmark_variants:
             ".roc.Locations.SNP.csv.gz",
         ),
     params:
-        prefix=get_io_prefix(lambda input, output: output[0]),
+        prefix=get_happy_prefix,
         engine="vcfeval",
     log:
         "logs/happy/{callset}/{cov}.log",

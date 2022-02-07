@@ -1,32 +1,30 @@
-if not config["custom-reads"]["activate"]:
-
-    rule get_reads:
-        input:
-            regions=get_limit_regions(),
-        output:
-            r1=public_reads[0],
-            r2=public_reads[1],
-        params:
-            limit=get_read_limit_param,
-        log:
-            "logs/download-reads.log",
-        conda:
-            "../envs/tools.yaml"
-        shell:
-            "(samtools view -f3 -u"
-            " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam"
-            " {params.limit} |"
-            " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
+rule get_reads:
+    input:
+        regions=get_limit_regions(),
+    output:
+        r1="resources/reads/reads.1.fq",
+        r2="resources/reads/reads.2.fq",
+    params:
+        limit=get_read_limit_param,
+    log:
+        "logs/download-reads.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "(samtools view -f3 -u"
+        " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam"
+        " {params.limit} |"
+        " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
 
 
 rule get_truth:
     output:
-        "resources/variants/truth.vcf",
+        "resources/variants/NA12878.truth.vcf",
     log:
-        "logs/get-truth.log",
+        "logs/get-truth/NA12898.log",
     params:
         repl_chr=repl_chr,
-        url=get_truth_url(),
+        url=get_na12878_truth_url(),
     conda:
         "../envs/tools.yaml"
     shell:
@@ -37,9 +35,9 @@ rule get_truth:
 
 rule get_confidence_bed:
     output:
-        "resources/regions/confidence-regions.bed",
+        "resources/regions/NA12898.confidence-regions.bed",
     log:
-        "logs/get-confidence-regions.log",
+        "logs/get-confidence-regions/NA12898.log",
     params:
         repl_chr=repl_chr,
         url=get_confidence_bed_url(),
@@ -66,12 +64,12 @@ rule get_target_bed:
     input:
         liftover="resources/reference/liftover.chain.gz",
     output:
-        "resources/regions/target-regions.raw.bed",
+        "resources/regions/{benchmark}/target-regions.raw.bed",
     params:
-        get_bed=get_target_bed_statement(),
+        get_bed=get_target_bed_statement,
         liftover=get_liftover_statement,
     log:
-        "logs/get-target-bed.log",
+        "logs/get-target-bed/{benchmark}.log",
     conda:
         "../envs/tools.yaml"
     shell:
@@ -80,11 +78,11 @@ rule get_target_bed:
 
 rule postprocess_target_bed:
     input:
-        "resources/regions/target-regions.raw.bed",
+        "resources/regions/{benchmark}/target-regions.raw.bed",
     output:
-        "resources/regions/target-regions.bed",
+        "resources/regions/{benchmark}/target-regions.bed",
     log:
-        "logs/fix-target-bed.log",
+        "logs/fix-target-bed/{benchmark}.log",
     params:
         repl_chr=repl_chr,
     conda:
@@ -133,12 +131,12 @@ rule bwa_index:
 
 rule bwa_mem:
     input:
-        reads=get_bwa_input(),
+        reads=get_bwa_input,
         index=rules.bwa_index.output,
     output:
-        "results/read-alignments/all.bam",
+        "results/read-alignments/{benchmark}.bam",
     log:
-        "logs/bwa-mem.log",
+        "logs/bwa-mem/{benchmark}.log",
     params:
         index=get_io_prefix(lambda input, output: input.index[0]),
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
@@ -150,12 +148,12 @@ rule bwa_mem:
 
 rule mark_duplicates:
     input:
-        "results/read-alignments/all.bam",
+        "results/read-alignments/{benchmark}.bam",
     output:
-        bam="results/read-alignments/all.dedup.bam",
-        metrics="results/read-alignments/dedup.metrics.txt",
+        bam="results/read-alignments/{benchmark}.dedup.bam",
+        metrics="results/read-alignments/{benchmark}.dedup.metrics.txt",
     log:
-        "logs/picard-dedup.log",
+        "logs/picard-dedup/{benchmark}.log",
     params:
         extra="REMOVE_DUPLICATES=true",
     resources:
@@ -166,25 +164,25 @@ rule mark_duplicates:
 
 rule samtools_index:
     input:
-        "results/read-alignments/all.dedup.bam",
+        "results/read-alignments/{benchmark}.dedup.bam",
     output:
-        "results/read-alignments/all.dedup.bam.bai",
+        "results/read-alignments/{benchmark}.dedup.bam.bai",
     log:
-        "logs/samtools-index.log",
+        "logs/samtools-index/{benchmark}.log",
     wrapper:
         "0.79.0/bio/samtools/index"
 
 
 rule mosdepth:
     input:
-        bam="results/read-alignments/all.dedup.bam",
-        bai="results/read-alignments/all.dedup.bam.bai",
+        bam="results/read-alignments/{benchmark}.dedup.bam",
+        bai="results/read-alignments/{benchmark}.dedup.bam.bai",
     output:
-        "results/coverage/coverage.mosdepth.global.dist.txt",
-        "results/coverage/coverage.quantized.bed.gz",
-        summary="results/coverage/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
+        "results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
+        "results/coverage/{benchmark}/coverage.quantized.bed.gz",
+        summary="results/coverage/{benchmark}/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
     log:
-        "logs/mosdepth.log",
+        "logs/mosdepth/{benchmark}.log",
     params:
         extra="--no-per-base --mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize(),
@@ -194,17 +192,17 @@ rule mosdepth:
 
 rule stratify_regions:
     input:
-        confidence="resources/regions/confidence-regions.bed",
-        target="resources/regions/target-regions.bed",
-        coverage="results/coverage/coverage.quantized.bed.gz",
+        confidence=get_confidence_regions,
+        target="resources/regions/{benchmark}/target-regions.bed",
+        coverage="results/coverage/{benchmark}/coverage.quantized.bed.gz",
         limit_regions=get_limit_regions(),
     output:
-        "resources/regions/test-regions.cov-{cov}.bed",
+        "resources/regions/{benchmark}/test-regions.cov-{cov}.bed",
     params:
         intersect_limit=get_limit_regions_intersect_statement,
         cov_label=get_cov_label,
     log:
-        "logs/stratify-regions/{cov}.log",
+        "logs/stratify-regions/{benchmark}/{cov}.log",
     conda:
         "../envs/tools.yaml"
     shell:

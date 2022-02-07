@@ -18,13 +18,3 @@ if "variant-calls" in config:
                 ],
                 callset=config["variant-calls"],
             ),
-
-
-rule download:
-    input:
-        [] if config["custom-reads"]["activate"] else public_reads,
-        expand("resources/regions/test-regions.cov-{cov}.bed", cov=coverages.keys()),
-        "resources/reference/genome.fasta",
-        "resources/reference/genome.fasta.fai",
-        "resources/variants/truth.vcf",
-        "resources/regions/target-regions.bed",
