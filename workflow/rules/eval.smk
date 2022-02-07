@@ -5,7 +5,7 @@ rule rename_contigs:
     output:
         "results/normalized-variants/{callset}.replaced-contigs.bcf",
     log:
-        "logs/rename-contigs/{callset}.log"
+        "logs/rename-contigs/{callset}.log",
     conda:
         "../envs/tools.yaml"
     shell:
