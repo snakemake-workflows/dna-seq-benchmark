@@ -1,0 +1,1 @@
+Precision and recall stratified by depth of MAPQ 60 reads over the variants.

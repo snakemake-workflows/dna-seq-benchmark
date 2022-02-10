@@ -113,7 +113,11 @@ rule plot_precision_recall:
     input:
         "results/report/{callset}.tsv",
     output:
-        "results/report/{callset}.plot.svg",
+        report(
+            "results/report/{callset}.plot.svg",
+            caption="../report/precision-recall-plot.rst",
+            category="Precision/Recall",
+        ),
     params:
         cov_labels=get_plot_cov_labels(),
     log:
