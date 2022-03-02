@@ -2,29 +2,43 @@ rule get_reads:
     input:
         regions=get_limit_regions(),
     output:
-        r1="resources/reads/reads.1.fq",
-        r2="resources/reads/reads.2.fq",
+        r1="resources/reads/{benchmark}.1.fq",
+        r2="resources/reads/{benchmark}.2.fq",
     params:
         limit=get_read_limit_param,
+        bam_url=get_benchmark_bam_url,
     log:
         "logs/download-reads.log",
     conda:
         "../envs/tools.yaml"
     shell:
         "(samtools view -f3 -u"
-        " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam"
+        " {params.bam_url}"
         " {params.limit} |"
         " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
 
 
-rule get_truth:
+rule get_archive:
     output:
-        "resources/variants/NA12878.truth.vcf",
+        directory("resources/archive/{genome}"),
+    params:
+        url=get_archive_url,
     log:
-        "logs/get-truth/NA12898.log",
+        "logs/get-archive/{genome}.log",
+    shell:
+        "(curl -L {params.url} | tar -xf -C {output} --strip-components 1) 2> {log}"
+
+
+rule get_truth:
+    input:
+        archive=get_archive_input,
+    output:
+        "resources/variants/{genome}.{build}.truth.vcf",
+    log:
+        "logs/get-truth/{genome}.{build}.log",
     params:
         repl_chr=repl_chr,
-        url=get_na12878_truth_url(),
+        url=get_truth_url,
     conda:
         "../envs/tools.yaml"
     shell:
@@ -34,19 +48,19 @@ rule get_truth:
 
 
 rule get_confidence_bed:
+    input:
+        archive=get_archive_input,
     output:
-        "resources/regions/NA12898.confidence-regions.bed",
+        "resources/regions/{genome}.{build}.confidence-regions.bed",
     log:
-        "logs/get-confidence-regions/NA12898.log",
+        "logs/get-confidence-regions/{genome}.{build}.log",
     params:
         repl_chr=repl_chr,
-        url=get_confidence_bed_url(),
+        cmd=get_confidence_bed_cmd,
     conda:
         "../envs/tools.yaml"
     shell:
-        "(curl --insecure -L {params.url}"
-        " | sed {params.repl_chr} > {output}"
-        ") 2> {log}"
+        "({params.cmd} | sed {params.repl_chr} > {output}) 2> {log}"
 
 
 rule get_liftover_track:

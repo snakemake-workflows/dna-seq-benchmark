@@ -1,11 +1,43 @@
 from urllib.parse import urlparse
 
 benchmarks = dict(config.get("custom-benchmarks", dict()))
+
 benchmarks["giab-NA12878-exome"] = {
     "genome": "NA12878",
-    "fastqs": expand("resources/reads/reads.{read}.fq", read=[1, 2]),
+    "bam-url": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam",
     "target-regions": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed",
     "grch37": True,
+}
+
+benchmarks["chm-eval"] = {
+    "genome": "CHM-eval",
+    "bam-url": "ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341793/CHM1_CHM13_3.bam",
+    "target-regions": None,
+    "grch37": False,
+}
+
+genomes = {
+    "NA12878": {
+        "truth": {
+            "grch37": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz",
+            "grch38": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz",
+        },
+        "confidence-regions": {
+            "grch37": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.bed",
+            "grch38": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed",
+        },
+    },
+    "CHM-eval": {
+        "archive": "https://github.com/lh3/CHM-eval/releases/download/v0.5/CHM-evalkit-20180222.tar",
+        "truth": {
+            "grch38": "full.38.vcf.gz",
+            "grch37": "full.37m.vcf.gz",
+        },
+        "confidence-regions": {
+            "grch38": "full.38.bed.gz",
+            "grch37": "full.37m.bed.gz",
+        },
+    },
 }
 
 
@@ -28,8 +60,28 @@ coverages = {
 }
 
 
+def get_archive_input(wildcards):
+    genome = genomes[wildcards.genome]
+    if "archive" in genome:
+        return f"resources/archives/{wildcards.genome}"
+    else:
+        return []
+
+
+def get_benchmark_bam_url(wildcards):
+    return get_benchmark(wildcards.benchmark)["bam-url"]
+
+
 def get_bwa_input(wildcards):
-    return get_benchmark(wildcards.benchmark)["fastqs"]
+    benchmark = get_benchmark(wildcards.benchmark)
+    if "bam-url" in benchmark:
+        return expand(
+            "resources/reads/{benchmark}.{read}.fq",
+            read=[1, 2],
+            benchmark=wildcards.benchmark,
+        )
+    else:
+        return benchmark["fastqs"]
 
 
 def get_mosdepth_quantize():
@@ -46,18 +98,22 @@ def get_plot_cov_labels():
     return {name: label(name) for name in coverages}
 
 
-def get_na12878_truth_url():
-    if config.get("grch37"):
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz"
+def get_truth_url(wildcards, input):
+    genome = genomes[wildcards.genome]
+    truth = genome["truth"][wildcards.build]
+    if input.archive:
+        return f"{input.archive}/{truth}"
     else:
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz"
+        return truth
 
 
-def get_confidence_bed_url():
-    if config.get("grch37"):
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.bed"
+def get_confidence_bed_cmd(wildcards, input):
+    genome = genomes[wildcards.genome]
+    bed = genome["confidence-regions"][wildcards.build]
+    if input.archive:
+        return f"cat {input.archive}/{bed}"
     else:
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed"
+        return f"curl --insecure -L {bed}"
 
 
 def get_io_prefix(getter):
