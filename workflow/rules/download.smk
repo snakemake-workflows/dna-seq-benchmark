@@ -8,7 +8,7 @@ rule get_reads:
         limit=get_read_limit_param,
         bam_url=get_benchmark_bam_url,
     log:
-        "logs/download-reads.log",
+        "logs/download-reads/{benchmark}.log",
     conda:
         "../envs/tools.yaml"
     shell:
@@ -20,7 +20,7 @@ rule get_reads:
 
 rule get_archive:
     output:
-        directory("resources/archive/{genome}"),
+        directory("resources/archives/{genome}"),
     params:
         url=get_archive_url,
     log:
@@ -33,9 +33,9 @@ rule get_truth:
     input:
         archive=get_archive_input,
     output:
-        "resources/variants/{genome}.{build}.truth.vcf",
+        "resources/variants/{genome}.truth.vcf",
     log:
-        "logs/get-truth/{genome}.{build}.log",
+        "logs/get-truth/{genome}.log",
     params:
         repl_chr=repl_chr,
         url=get_truth_url,
@@ -51,9 +51,9 @@ rule get_confidence_bed:
     input:
         archive=get_archive_input,
     output:
-        "resources/regions/{genome}.{build}.confidence-regions.bed",
+        "resources/regions/{genome}.confidence-regions.bed",
     log:
-        "logs/get-confidence-regions/{genome}.{build}.log",
+        "logs/get-confidence-regions/{genome}.log",
     params:
         repl_chr=repl_chr,
         cmd=get_confidence_bed_cmd,
@@ -207,7 +207,7 @@ rule mosdepth:
 rule stratify_regions:
     input:
         confidence=get_confidence_regions,
-        target="resources/regions/{benchmark}/target-regions.bed",
+        target=get_target_regions,
         coverage="results/coverage/{benchmark}/coverage.quantized.bed.gz",
         limit_regions=get_limit_regions(),
     output:
@@ -215,6 +215,7 @@ rule stratify_regions:
     params:
         intersect_limit=get_limit_regions_intersect_statement,
         cov_label=get_cov_label,
+        intersect_target_regions=get_target_regions_intersect_statement,
     log:
         "logs/stratify-regions/{benchmark}/{cov}.log",
     conda:
@@ -227,8 +228,8 @@ rule stratify_regions:
         "(bedtools intersect"
         " -a {input.confidence}"
         " -b <(zcat {input.coverage} | grep '{params.cov_label}') |"
-        " bedtools intersect -a /dev/stdin -b {input.target}"
-        " {params.intersect_limit} |"
+        " {params.intersect_target_regions}"
+        " {params.intersect_limit}"
         " sort -k1,1 -k2,2n |"
         " bedtools merge -i /dev/stdin"
         ") > {output} 2> {log}"

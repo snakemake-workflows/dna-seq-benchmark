@@ -5,7 +5,7 @@ variant-calls:
   <callset>: 
     path: <path>
     # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
-    benchmark: giab-NA12878-exome
+    benchmark: giab-na12878-exome
     # Uncomment and point to file containing contig name replacements
     # as needed for 'bcftools annotate --rename-chrs'
     # rename-contigs: path/to/rename-contigs.txt
@@ -14,7 +14,7 @@ variant-calls:
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
     # Truth genome to consider (for now only NA12878 allowed, TODO: CHM)
-    genome: NA12878
+    genome: na12878
     fastqs:
       - path/to/1.fq
       - path/to/2.fq

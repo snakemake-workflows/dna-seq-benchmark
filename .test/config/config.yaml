@@ -1,12 +1,15 @@
 variant-calls:
-  dummy: 
-    path: "resources/variants/NA12878.truth.vcf"
-    benchmark: "giab-NA12878-exome"
+  dummy-giab: 
+    path: "resources/variants/na12878.truth.vcf"
+    benchmark: "giab-na12878-exome"
+  dummy-chm: 
+    path: "resources/variants/chm-eval.truth.vcf"
+    benchmark: "chm-eval"
 
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
     # Truth genome to consider (for now only NA12878 allowed, TODO: CHM)
-    genome: NA12878
+    genome: na12878
     fastqs:
       - path/to/1.fq
       - path/to/2.fq

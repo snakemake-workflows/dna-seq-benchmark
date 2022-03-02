@@ -1,45 +1,14 @@
 from urllib.parse import urlparse
 
-benchmarks = dict(config.get("custom-benchmarks", dict()))
+import yaml
 
-benchmarks["giab-na12878-exome"] = {
-    "genome": "na12878",
-    "bam-url": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam",
-    "target-regions": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed",
-    "grch37": True,
-}
+with open(workflow.source_path("../resources/presets.yaml")) as presets:
+    presets = yaml.load(presets, Loader=yaml.SafeLoader)
 
-benchmarks["chm-eval"] = {
-    "genome": "chm-eval",
-    "bam-url": "ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341793/CHM1_CHM13_3.bam",
-    "target-regions": None,
-    "grch37": False,
-}
+benchmarks = presets["benchmarks"]
+genomes = presets["genomes"]
 
-genomes = {
-    "na12878": {
-        "truth": {
-            "grch37": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz",
-            "grch38": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz",
-        },
-        "confidence-regions": {
-            "grch37": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.bed",
-            "grch38": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed",
-        },
-    },
-    "chm-eval": {
-        "archive": "https://github.com/lh3/CHM-eval/releases/download/v0.5/CHM-evalkit-20180222.tar",
-        "truth": {
-            "grch38": "full.38.vcf.gz",
-            "grch37": "full.37m.vcf.gz",
-        },
-        "confidence-regions": {
-            "grch38": "full.38.bed.gz",
-            "grch37": "full.37m.bed.gz",
-        },
-    },
-}
-
+benchmarks.update(config.get("custom-benchmarks", dict()))
 
 if any(
     callset["benchmark"] == "giab-NA12878-exome"
@@ -66,6 +35,11 @@ def get_archive_input(wildcards):
         return f"resources/archives/{wildcards.genome}"
     else:
         return []
+
+
+def get_archive_url(wildcards):
+    genome = genomes[wildcards.genome]
+    return genome["archive"]
 
 
 def get_benchmark_bam_url(wildcards):
@@ -100,7 +74,7 @@ def get_plot_cov_labels():
 
 def get_truth_url(wildcards, input):
     genome = genomes[wildcards.genome]
-    truth = genome["truth"][wildcards.build]
+    truth = genome["truth"][get_genome_build()]
     if input.archive:
         return f"{input.archive}/{truth}"
     else:
@@ -109,11 +83,19 @@ def get_truth_url(wildcards, input):
 
 def get_confidence_bed_cmd(wildcards, input):
     genome = genomes[wildcards.genome]
-    bed = genome["confidence-regions"][wildcards.build]
+    bed = genome["confidence-regions"][get_genome_build()]
+
     if input.archive:
         return f"cat {input.archive}/{bed}"
     else:
         return f"curl --insecure -L {bed}"
+
+
+def get_genome_build():
+    if config.get("grch37"):
+        return "grch37"
+    else:
+        return "grch38"
 
 
 def get_io_prefix(getter):
@@ -171,6 +153,21 @@ def get_target_bed_statement(wildcards):
         return f"curl --insecure -L {target_bed}"
 
 
+def get_target_regions(wildcards):
+    benchmark = get_benchmark(wildcards.benchmark)
+    if "target-regions" in benchmark:
+        return "resources/regions/{benchmark}/target-regions.bed"
+    else:
+        return []
+
+
+def get_target_regions_intersect_statement(wildcards, input):
+    if input.target:
+        return "bedtools intersect -a /dev/stdin -b {input.target} |"
+    else:
+        return ""
+
+
 def get_liftover_statement(wildcards, input, output):
     benchmark = get_benchmark(wildcards.benchmark)
 
@@ -196,7 +193,7 @@ def get_read_limit_param(wildcards, input):
 
 def get_limit_regions_intersect_statement(wildcards, input):
     if input.get("limit_regions"):
-        return f"| bedtools intersect -a /dev/stdin -b {input.limit_regions}"
+        return f"bedtools intersect -a /dev/stdin -b {input.limit_regions} |"
     else:
         return ""
 
@@ -225,11 +222,7 @@ def get_stratified_truth(suffix=""):
 
 def get_confidence_regions(wildcards):
     benchmark = get_benchmark(wildcards.benchmark)
-    if benchmark["genome"] == "NA12878":
-        return "resources/regions/NA12898.confidence-regions.bed"
-    else:
-        # TODO add CHM support
-        raise ValueError(f"Unsupported genome {benchmark['genome']}")
+    return f"resources/regions/{benchmark['genome']}.confidence-regions.bed"
 
 
 def get_test_regions(wildcards):
