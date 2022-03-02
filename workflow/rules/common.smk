@@ -2,22 +2,22 @@ from urllib.parse import urlparse
 
 benchmarks = dict(config.get("custom-benchmarks", dict()))
 
-benchmarks["giab-NA12878-exome"] = {
-    "genome": "NA12878",
+benchmarks["giab-na12878-exome"] = {
+    "genome": "na12878",
     "bam-url": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam",
     "target-regions": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed",
     "grch37": True,
 }
 
 benchmarks["chm-eval"] = {
-    "genome": "CHM-eval",
+    "genome": "chm-eval",
     "bam-url": "ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341793/CHM1_CHM13_3.bam",
     "target-regions": None,
     "grch37": False,
 }
 
 genomes = {
-    "NA12878": {
+    "na12878": {
         "truth": {
             "grch37": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz",
             "grch38": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz",
@@ -27,7 +27,7 @@ genomes = {
             "grch38": "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed",
         },
     },
-    "CHM-eval": {
+    "chm-eval": {
         "archive": "https://github.com/lh3/CHM-eval/releases/download/v0.5/CHM-evalkit-20180222.tar",
         "truth": {
             "grch38": "full.38.vcf.gz",
