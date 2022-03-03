@@ -25,6 +25,8 @@ rule get_archive:
         url=get_archive_url,
     log:
         "logs/get-archive/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
     shell:
         "(curl -L {params.url} | tar -xf -C {output} --strip-components 1) 2> {log}"
 
@@ -52,6 +54,8 @@ rule index_truthset:
         "resources/variants/{genome}/{truthset}.truth.bcf",
     output:
         "resources/variants/{genome}/{truthset}.truth.bcf.csi",
+    log:
+        "logs/index-truthset/{genome}/{truthset}.log",
     wrapper:
         "v1.2.0/bio/bcftools/index"
 
