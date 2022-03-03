@@ -54,7 +54,7 @@ use rule stratify_truth as stratify_results with:
         "logs/stratify-results/{callset}/{cov}.log",
 
 
-rule bcftools_index:
+rule index_stratified_truth:
     input:
         "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz",
     output:

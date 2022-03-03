@@ -33,9 +33,9 @@ rule get_truth:
     input:
         archive=get_archive_input,
     output:
-        "resources/variants/{genome}.truth.vcf",
+        "resources/variants/{genome}/{truthset}.truth.bcf",
     log:
-        "logs/get-truth/{genome}.log",
+        "logs/get-truth/{genome}/{truthset}.log",
     params:
         repl_chr=repl_chr,
         url=get_truth_url,
@@ -43,8 +43,31 @@ rule get_truth:
         "../envs/tools.yaml"
     shell:
         "(bcftools view {params.url}"
-        " | sed {params.repl_chr} > {output}"
+        " | sed {params.repl_chr} | bcftools view -Ob - > {output}"
         ") 2> {log}"
+
+
+rule index_truthset:
+    input:
+        "resources/variants/{genome}/{truthset}.truth.bcf",
+    output:
+        "resources/variants/{genome}/{truthset}.truth.bcf.csi",
+    wrapper:
+        "v1.2.0/bio/bcftools/index"
+
+
+rule merge_truthsets:
+    input:
+        bcf=get_truthsets(),
+        csi=get_truthsets(csi=True),
+    output:
+        "resources/variants/{genome}.merged.truth.bcf",
+    log:
+        "logs/merge-truthsets/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools concat -O b --allow-overlap {input} > {output} 2> {log}"
 
 
 rule get_confidence_bed:

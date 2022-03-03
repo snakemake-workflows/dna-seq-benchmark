@@ -10,6 +10,12 @@ benchmarks:
     bam-url: ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341793/CHM1_CHM13_3.bam
     grch37: false
 
+  seqc2-somatic-ea-n:
+    genome: seqc2-somatic
+    bam-url: http://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/WES/WES_EA_N_1.bwa.dedup.bam
+    target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
+    grch37: false
+
 genomes:
   na12878:
     truth:
@@ -26,3 +32,10 @@ genomes:
     confidence-regions:
       grch38: full.38.bed.gz
       grch37: full.37m.bed.gz
+  seqc2-somatic:
+    truth:
+      grch38:
+        snvs: ftp://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/release/v1.2/high-confidence_sSNV_in_HC_regions_v1.2.vcf.gz
+        indels: ftp://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/release/v1.2/high-confidence_sINDEL_in_HC_regions_v1.2.vcf.gz
+    confidence-regions:
+      grch38: ftp://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/release/v1.2/High-Confidence_Regions_v1.2.bed

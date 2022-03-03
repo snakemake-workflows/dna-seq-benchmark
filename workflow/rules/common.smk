@@ -75,10 +75,25 @@ def get_plot_cov_labels():
 def get_truth_url(wildcards, input):
     genome = genomes[wildcards.genome]
     truth = genome["truth"][get_genome_build()]
+    if isinstance(truth, dict):
+        truth = truth[wildcards.truthset]
     if input.archive:
         return f"{input.archive}/{truth}"
     else:
         return truth
+
+
+def get_truthsets(csi=False):
+    def inner(wildcards):
+        genome = genomes[wildcards.genome]
+        truthsets = genome["truth"][get_genome_build()]
+        return expand(
+            "resources/variants/{genome}/{truthset}.truth.bcf",
+            genome=wildcards.genome,
+            truthset=truthsets,
+        )
+
+    return inner
 
 
 def get_confidence_bed_cmd(wildcards, input):
@@ -208,8 +223,14 @@ def get_benchmark(benchmark):
 
 
 def get_benchmark_truth(wildcards):
-    genome = get_benchmark(wildcards.benchmark)["genome"]
-    return f"resources/variants/{genome}.truth.vcf"
+    genome_name = get_benchmark(wildcards.benchmark)["genome"]
+    genome = genomes[genome_name]
+
+    truthset = genome["truth"][get_genome_build()]
+    if isinstance(truthset, str):
+        return f"resources/variants/{genome_name}/all.truth.bcf"
+    else:
+        return f"resources/variants/{genome_name}.merged.truth.bcf"
 
 
 def get_stratified_truth(suffix=""):
