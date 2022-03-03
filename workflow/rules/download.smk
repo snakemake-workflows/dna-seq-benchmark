@@ -28,7 +28,7 @@ rule get_archive:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(curl -L {params.url} | tar -xf -C {output} --strip-components 1) 2> {log}"
+        "(mkdir -p {output}; curl -L {params.url} | tar -xf -C {output} --strip-components 1) 2> {log}"
 
 
 rule get_truth:
