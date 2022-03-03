@@ -44,7 +44,7 @@ rule get_truth:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(bcftools view {params.url}"
+        "ls {input.archive}; (bcftools view {params.url}"
         " | sed {params.repl_chr} | bcftools view -Ob - > {output}"
         ") 2> {log}"
 
