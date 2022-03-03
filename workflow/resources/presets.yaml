@@ -27,8 +27,8 @@ genomes:
   chm-eval:
     archive: https://github.com/lh3/CHM-eval/releases/download/v0.5/CHM-evalkit-20180222.tar
     truth:
-      grch38: full.38.vcf.gz,
-      grch37: full.37m.vcf.gz,
+      grch38: full.38.vcf.gz
+      grch37: full.37m.vcf.gz
     confidence-regions:
       grch38: full.38.bed.gz
       grch37: full.37m.bed.gz
