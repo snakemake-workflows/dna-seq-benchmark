@@ -189,6 +189,10 @@ def get_callset_labels(wildcards):
     return config["variant-calls"][wildcards.callset].get("labels")
 
 
+def get_callset_subcategory(wildcards):
+    return config["variant-calls"][wildcards.callset].get("subcategory")
+
+
 if "variant-calls" in config:
 
     wildcard_constraints:

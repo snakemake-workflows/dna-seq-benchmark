@@ -117,6 +117,7 @@ rule plot_precision_recall:
             "results/report/{callset}.plot.svg",
             caption="../report/precision-recall-plot.rst",
             category="Precision/Recall",
+            subcategory=get_callset_subcategory,
             labels=get_callset_labels,
         ),
     params:

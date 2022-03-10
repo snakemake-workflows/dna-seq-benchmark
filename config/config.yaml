@@ -8,6 +8,8 @@ variant-calls:
     labels:
       caller: freebayes
       site: University of Duisburg-Essen
+    # Optional subcategory for separating callsets in the report. Comment out if not needed.
+    subcategory: agilent
     path: <path>
     # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
     benchmark: giab-NA12878-exome
