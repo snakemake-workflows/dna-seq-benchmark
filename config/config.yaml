@@ -3,6 +3,11 @@ variant-calls:
   # from different pipelines or different configurations of the same pipeline.
   # Multiple entries are possible.
   <callset>: 
+    # Optional labels to describe callset in report. Comment out if not needed.
+    # Both labels and values thereof can be freely chosen.
+    labels:
+      caller: freebayes
+      site: University of Duisburg-Essen
     path: <path>
     # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
     benchmark: giab-NA12878-exome
