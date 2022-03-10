@@ -117,6 +117,7 @@ rule plot_precision_recall:
             "results/report/{callset}.plot.svg",
             caption="../report/precision-recall-plot.rst",
             category="Precision/Recall",
+            columns={"callset": "{callset}"},
         ),
     params:
         cov_labels=get_plot_cov_labels(),
