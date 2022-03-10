@@ -1,3 +1,8 @@
+from snakemake.utils import min_version
+
+# min_version("7.1") # TODO set min version once labels released
+
+
 configfile: "config/config.yaml"
 
 

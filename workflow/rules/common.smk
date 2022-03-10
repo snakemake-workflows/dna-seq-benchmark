@@ -185,6 +185,10 @@ def get_rename_contig_file(wildcards):
     return config["variant-calls"][wildcards.callset].get("rename-contigs")
 
 
+def get_callset_labels(wildcards):
+    return config["variant-calls"][wildcards.callset].get("labels")
+
+
 if "variant-calls" in config:
 
     wildcard_constraints:
