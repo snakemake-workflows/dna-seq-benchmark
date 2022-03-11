@@ -10,7 +10,7 @@ rule get_reads:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(samtools view -f3 -h"
+        "(set +o pipefail; samtools view -f3 -h"
         " {params.bam_url}"
         " {params.limit} |"
         " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
