@@ -17,8 +17,6 @@ custom-benchmarks:
     # whether given target regions are on hg19
     grch37: false
 
-limit-regions:
-  activate: true
-  bed: config/limit-regions.bed
+limit-reads: true
 
 grch37: false

@@ -192,23 +192,9 @@ def get_liftover_statement(wildcards, input, output):
         return f"> {output}"
 
 
-def get_limit_regions():
-    if config["limit-regions"]["activate"]:
-        return config["limit-regions"]["bed"]
-    else:
-        return []
-
-
 def get_read_limit_param(wildcards, input):
-    if input.get("regions"):
-        return f"-L {input.regions}"
-    else:
-        return ""
-
-
-def get_limit_regions_intersect_statement(wildcards, input):
-    if input.get("limit_regions"):
-        return f"bedtools intersect -a /dev/stdin -b {input.limit_regions} |"
+    if config.get("limit-reads"):
+        return "| head -n 1100"  # a bit more than 1000 reads because we also have the header
     else:
         return ""
 

@@ -1,6 +1,4 @@
 rule get_reads:
-    input:
-        regions=get_limit_regions(),
     output:
         r1="resources/reads/{benchmark}.1.fq",
         r2="resources/reads/{benchmark}.2.fq",
@@ -12,7 +10,7 @@ rule get_reads:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(samtools view -f3 -u"
+        "(samtools view -f3 -h"
         " {params.bam_url}"
         " {params.limit} |"
         " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
@@ -236,11 +234,9 @@ rule stratify_regions:
         confidence=get_confidence_regions,
         target=get_target_regions,
         coverage="results/coverage/{benchmark}/coverage.quantized.bed.gz",
-        limit_regions=get_limit_regions(),
     output:
         "resources/regions/{benchmark}/test-regions.cov-{cov}.bed",
     params:
-        intersect_limit=get_limit_regions_intersect_statement,
         cov_label=get_cov_label,
         intersect_target_regions=get_target_regions_intersect_statement,
     log:
@@ -256,7 +252,6 @@ rule stratify_regions:
         " -a {input.confidence}"
         " -b <(zcat {input.coverage} | grep '{params.cov_label}') |"
         " {params.intersect_target_regions}"
-        " {params.intersect_limit}"
         " sort -k1,1 -k2,2n |"
         " bedtools merge -i /dev/stdin"
         ") > {output} 2> {log}"
