@@ -13,7 +13,7 @@ rule get_reads:
         "(set +o pipefail; samtools view -f3 -h"
         " {params.bam_url}"
         " {params.limit} |"
-        " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
+        " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
 
 
 rule get_archive:
