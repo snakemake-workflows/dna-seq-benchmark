@@ -138,6 +138,7 @@ rule get_reference:
         datatype="dna",
         build="GRCh37" if config["grch37"] else "GRCh38",
         release="104",
+        chromosome="1" if config.get("limit-reads") else None,
     log:
         "logs/get-genome.log",
     wrapper:
