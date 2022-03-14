@@ -194,7 +194,7 @@ def get_liftover_statement(wildcards, input, output):
 
 def get_read_limit_param(wildcards, input):
     if config.get("limit-reads"):
-        return "| head -n 1100"  # a bit more than 1000 reads because we also have the header
+        return "| head -n 110000"  # a bit more than 100000 reads because we also have the header
     else:
         return ""
 
