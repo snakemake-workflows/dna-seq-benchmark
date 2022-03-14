@@ -244,7 +244,7 @@ def get_rename_contig_file(wildcards):
 def get_norm_params(wildcards, input):
     target = ""
     if config.get("limit-reads"):
-        target = "--target 1"
+        target = "--targets 1"
     return f"--atomize -f {input.genome} --check-ref s --rm-dup exact -Oz {target}"
 
 
