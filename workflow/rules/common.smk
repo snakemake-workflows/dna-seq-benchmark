@@ -248,6 +248,27 @@ def get_norm_params(wildcards, input):
     return f"--atomize -f {input.genome} --check-ref s --rm-dup exact -Oz {target}"
 
 
+def get_nonempty_coverages(wildcards):
+    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+
+    def isempty(cov):
+        stat = json.load(
+            checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[0]
+        )
+        return stat["isempty"]
+
+    return [cov for cov in coverages if not isempty(cov)]
+
+
+def get_collect_stratifications_input(wildcards):
+    import json
+
+    return expand(
+        "results/happy/{{callset}}/{cov}/report.summary.csv",
+        cov=get_nonempty_coverages(wildcards),
+    )
+
+
 if "variant-calls" in config:
 
     wildcard_constraints:
