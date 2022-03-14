@@ -252,9 +252,10 @@ def get_nonempty_coverages(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
 
     def isempty(cov):
-        stat = json.load(
-            checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[0]
-        )
+        with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
+            0
+        ].open() as f:
+            stat = json.load(f)
         return stat["isempty"]
 
     return [cov for cov in coverages if not isempty(cov)]
