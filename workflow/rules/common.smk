@@ -178,7 +178,7 @@ def get_target_regions(wildcards):
 
 def get_target_regions_intersect_statement(wildcards, input):
     if input.target:
-        return "bedtools intersect -a /dev/stdin -b {input.target} |"
+        return f"bedtools intersect -a /dev/stdin -b {input.target} |"
     else:
         return ""
 
