@@ -241,6 +241,13 @@ def get_rename_contig_file(wildcards):
     return config["variant-calls"][wildcards.callset].get("rename-contigs")
 
 
+def get_norm_params(wildcards, input):
+    target = ""
+    if config.get("limit-reads"):
+        target = "--target 1"
+    return f"--atomize -f {input.genome} --check-ref s --rm-dup exact -Oz {target}"
+
+
 if "variant-calls" in config:
 
     wildcard_constraints:

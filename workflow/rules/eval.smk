@@ -21,7 +21,7 @@ rule normalize_calls:
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     params:
-        lambda w, input: f"--atomize -f {input.genome} --check-ref s --rm-dup exact -Oz",
+        get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
     conda:

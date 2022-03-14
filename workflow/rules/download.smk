@@ -47,17 +47,6 @@ rule get_truth:
         ") 2> {log}"
 
 
-rule index_truthset:
-    input:
-        "resources/variants/{genome}/{truthset}.truth.bcf",
-    output:
-        "resources/variants/{genome}/{truthset}.truth.bcf.csi",
-    log:
-        "logs/index-truthset/{genome}/{truthset}.log",
-    wrapper:
-        "v1.2.0/bio/bcftools/index"
-
-
 rule merge_truthsets:
     input:
         bcf=get_truthsets(),
@@ -254,5 +243,5 @@ rule stratify_regions:
         " -b <(zcat {input.coverage} | grep '{params.cov_label}') |"
         " {params.intersect_target_regions}"
         " sort -k1,1 -k2,2n |"
-        " bedtools merge -i /dev/stdin"
+        " bedtools merge -i /dev/stdin "
         ") > {output} 2> {log}"
