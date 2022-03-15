@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.1.0...v1.2.0) (2022-03-15)
+
+
+### Features
+
+* Generalize towards being able to use other genomes than NA12878 ([#6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/6)) ([741d8df](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/741d8df8bca1753d830835a3aa07b966678fa297))
+
 ## [1.1.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.0.1...v1.1.0) (2022-02-10)
 
 
