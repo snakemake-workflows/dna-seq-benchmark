@@ -1,13 +1,14 @@
 from urllib.parse import urlparse
 
-benchmarks = dict(config.get("custom-benchmarks", dict()))
-benchmarks["giab-NA12878-exome"] = {
-    "genome": "NA12878",
-    "fastqs": expand("resources/reads/reads.{read}.fq", read=[1, 2]),
-    "target-regions": "ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed",
-    "grch37": True,
-}
+import yaml
 
+with open(workflow.source_path("../resources/presets.yaml")) as presets:
+    presets = yaml.load(presets, Loader=yaml.SafeLoader)
+
+benchmarks = presets["benchmarks"]
+genomes = presets["genomes"]
+
+benchmarks.update(config.get("custom-benchmarks", dict()))
 
 if any(
     callset["benchmark"] == "giab-NA12878-exome"
@@ -28,8 +29,33 @@ coverages = {
 }
 
 
+def get_archive_input(wildcards):
+    genome = genomes[wildcards.genome]
+    if "archive" in genome:
+        return f"resources/archives/{wildcards.genome}"
+    else:
+        return []
+
+
+def get_archive_url(wildcards):
+    genome = genomes[wildcards.genome]
+    return genome["archive"]
+
+
+def get_benchmark_bam_url(wildcards):
+    return get_benchmark(wildcards.benchmark)["bam-url"]
+
+
 def get_bwa_input(wildcards):
-    return get_benchmark(wildcards.benchmark)["fastqs"]
+    benchmark = get_benchmark(wildcards.benchmark)
+    if "bam-url" in benchmark:
+        return expand(
+            "resources/reads/{benchmark}.{read}.fq",
+            read=[1, 2],
+            benchmark=wildcards.benchmark,
+        )
+    else:
+        return benchmark["fastqs"]
 
 
 def get_mosdepth_quantize():
@@ -46,18 +72,45 @@ def get_plot_cov_labels():
     return {name: label(name) for name in coverages}
 
 
-def get_na12878_truth_url():
-    if config.get("grch37"):
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz"
+def get_truth_url(wildcards, input):
+    genome = genomes[wildcards.genome]
+    truth = genome["truth"][get_genome_build()]
+    if isinstance(truth, dict):
+        truth = truth[wildcards.truthset]
+    if input.archive:
+        return f"{input.archive}/{truth}"
     else:
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz"
+        return truth
 
 
-def get_confidence_bed_url():
-    if config.get("grch37"):
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.bed"
+def get_truthsets(csi=False):
+    def inner(wildcards):
+        genome = genomes[wildcards.genome]
+        truthsets = genome["truth"][get_genome_build()]
+        return expand(
+            "resources/variants/{genome}/{truthset}.truth.bcf",
+            genome=wildcards.genome,
+            truthset=truthsets,
+        )
+
+    return inner
+
+
+def get_confidence_bed_cmd(wildcards, input):
+    genome = genomes[wildcards.genome]
+    bed = genome["confidence-regions"][get_genome_build()]
+
+    if input.archive:
+        return f"cat {input.archive}/{bed}"
     else:
-        return "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed"
+        return f"curl --insecure -L {bed}"
+
+
+def get_genome_build():
+    if config.get("grch37"):
+        return "grch37"
+    else:
+        return "grch38"
 
 
 def get_io_prefix(getter):
@@ -115,6 +168,21 @@ def get_target_bed_statement(wildcards):
         return f"curl --insecure -L {target_bed}"
 
 
+def get_target_regions(wildcards):
+    benchmark = get_benchmark(wildcards.benchmark)
+    if "target-regions" in benchmark:
+        return "resources/regions/{benchmark}/target-regions.bed"
+    else:
+        return []
+
+
+def get_target_regions_intersect_statement(wildcards, input):
+    if input.target:
+        return f"bedtools intersect -a /dev/stdin -b {input.target} |"
+    else:
+        return ""
+
+
 def get_liftover_statement(wildcards, input, output):
     benchmark = get_benchmark(wildcards.benchmark)
 
@@ -124,23 +192,9 @@ def get_liftover_statement(wildcards, input, output):
         return f"> {output}"
 
 
-def get_limit_regions():
-    if config["limit-regions"]["activate"]:
-        return config["limit-regions"]["bed"]
-    else:
-        return []
-
-
 def get_read_limit_param(wildcards, input):
-    if input.get("regions"):
-        return f"-L {input.regions}"
-    else:
-        return ""
-
-
-def get_limit_regions_intersect_statement(wildcards, input):
-    if input.get("limit_regions"):
-        return f"| bedtools intersect -a /dev/stdin -b {input.limit_regions}"
+    if config.get("limit-reads"):
+        return "| head -n 110000"  # a bit more than 100000 reads because we also have the header
     else:
         return ""
 
@@ -155,8 +209,14 @@ def get_benchmark(benchmark):
 
 
 def get_benchmark_truth(wildcards):
-    genome = get_benchmark(wildcards.benchmark)["genome"]
-    return f"resources/variants/{genome}.truth.vcf"
+    genome_name = get_benchmark(wildcards.benchmark)["genome"]
+    genome = genomes[genome_name]
+
+    truthset = genome["truth"][get_genome_build()]
+    if isinstance(truthset, str):
+        return f"resources/variants/{genome_name}/all.truth.bcf"
+    else:
+        return f"resources/variants/{genome_name}.merged.truth.bcf"
 
 
 def get_stratified_truth(suffix=""):
@@ -169,11 +229,7 @@ def get_stratified_truth(suffix=""):
 
 def get_confidence_regions(wildcards):
     benchmark = get_benchmark(wildcards.benchmark)
-    if benchmark["genome"] == "NA12878":
-        return "resources/regions/NA12898.confidence-regions.bed"
-    else:
-        # TODO add CHM support
-        raise ValueError(f"Unsupported genome {benchmark['genome']}")
+    return f"resources/regions/{benchmark['genome']}.confidence-regions.bed"
 
 
 def get_test_regions(wildcards):
@@ -183,6 +239,35 @@ def get_test_regions(wildcards):
 
 def get_rename_contig_file(wildcards):
     return config["variant-calls"][wildcards.callset].get("rename-contigs")
+
+
+def get_norm_params(wildcards, input):
+    target = ""
+    if config.get("limit-reads"):
+        target = "--targets 1"
+    return f"--atomize -f {input.genome} --check-ref s --rm-dup exact -Oz {target}"
+
+
+def get_nonempty_coverages(wildcards):
+    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+
+    def isempty(cov):
+        with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
+            0
+        ].open() as f:
+            stat = json.load(f)
+        return stat["isempty"]
+
+    return [cov for cov in coverages if not isempty(cov)]
+
+
+def get_collect_stratifications_input(wildcards):
+    import json
+
+    return expand(
+        "results/happy/{{callset}}/{cov}/report.summary.csv",
+        cov=get_nonempty_coverages(wildcards),
+    )
 
 
 if "variant-calls" in config:

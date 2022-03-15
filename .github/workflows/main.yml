@@ -44,7 +44,7 @@ jobs:
       with:
         directory: .test
         snakefile: workflow/Snakefile
-        args: "eval --use-conda --show-failed-logs --cores 3 --conda-cleanup-pkgs cache --all-temp"
+        args: "results/report/dummy-giab.plot.svg results/report/dummy-chm.plot.svg --use-conda --show-failed-logs --cores 3 --conda-cleanup-pkgs cache"
 
     - name: Test report
       uses: snakemake/snakemake-github-action@v1.24.0

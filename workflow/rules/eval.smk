@@ -21,7 +21,7 @@ rule normalize_calls:
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     params:
-        lambda w, input: f"--atomize -f {input.genome} --rm-dup exact -Oz",
+        get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
     conda:
@@ -54,7 +54,7 @@ use rule stratify_truth as stratify_results with:
         "logs/stratify-results/{callset}/{cov}.log",
 
 
-rule bcftools_index:
+rule index_stratified_truth:
     input:
         "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz",
     output:
@@ -63,6 +63,19 @@ rule bcftools_index:
         "logs/bcftools-index/{benchmark}.truth.{cov}.log",
     wrapper:
         "0.80.1/bio/bcftools/index"
+
+
+checkpoint stat_truth:
+    input:
+        "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz",
+    output:
+        "results/variants/{benchmark}.truth.cov-{cov}.stats.json",
+    log:
+        "logs/stat-truth/{benchmark}.{cov}.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/stat-truth.py"
 
 
 rule benchmark_variants:
@@ -96,11 +109,11 @@ rule benchmark_variants:
 
 rule collect_stratifications:
     input:
-        expand("results/happy/{{callset}}/{cov}/report.summary.csv", cov=coverages),
+        get_collect_stratifications_input,
     output:
         "results/report/{callset}.tsv",
     params:
-        coverages=coverages,
+        coverages=get_nonempty_coverages,
     log:
         "logs/collect-stratifications/{callset}.log",
     conda:
