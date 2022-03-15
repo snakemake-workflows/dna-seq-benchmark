@@ -16,4 +16,4 @@ if snakemake.input:
 
     report.to_csv(snakemake.output[0], sep="\t", index=False)
 else:
-    pd.DataFrame({}).to_csv(snakemake.output[0], sep="\t", index=False)
+    pd.DataFrame({}).to_csv(snakemake.output[0], sep="\t")
