@@ -155,7 +155,7 @@ rule bwa_index:
     params:
         prefix=get_io_prefix(lambda input, output: output[0]),
     wrapper:
-        "0.79.0/bio/bwa/index"
+        "v1.4.0/bio/bwa/index"
 
 
 rule bwa_mem:
@@ -172,7 +172,7 @@ rule bwa_mem:
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "0.79.0/bio/bwa/mem"
+        "v1.4.0/bio/bwa/mem"
 
 
 rule mark_duplicates:
