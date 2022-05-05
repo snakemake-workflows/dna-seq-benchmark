@@ -170,7 +170,7 @@ rule bwa_mem:
     log:
         "logs/bwa-mem/{benchmark}.log",
     params:
-        index=get_io_prefix(lambda input, output: input.index[0]),
+        index=get_io_prefix(lambda input, output: input.idx[0]),
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
