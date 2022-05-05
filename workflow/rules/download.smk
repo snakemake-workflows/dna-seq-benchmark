@@ -150,7 +150,9 @@ rule bwa_index:
     input:
         "resources/reference/genome.fasta",
     output:
-        multiext("reference/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        idx=multiext(
+            "reference/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+        ),
     log:
         "logs/bwa-index.log",
     params:
@@ -162,7 +164,7 @@ rule bwa_index:
 rule bwa_mem:
     input:
         reads=get_bwa_input,
-        index=rules.bwa_index.output,
+        idx=rules.bwa_index.output,
     output:
         "results/read-alignments/{benchmark}.bam",
     log:
