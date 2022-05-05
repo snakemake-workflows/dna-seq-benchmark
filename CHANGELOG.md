@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.1...v1.3.2) (2022-05-05)
+
+
+### Bug Fixes
+
+* fix bwa wrapper inputs ([63e92f2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/63e92f23cb06b9dac6a2001877300496d3a28347))
+
 ### [1.3.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.0...v1.3.1) (2022-05-05)
 
 
