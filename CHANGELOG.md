@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.2.0...v1.3.0) (2022-05-05)
+
+
+### Features
+
+* report columns ([#9](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/9)) ([dd8f776](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/dd8f776a3037c2c15359d6ea7a4e891ea0880dd7))
+
+
+### Bug Fixes
+
+* define target bed as local input file if not a URL ([#8](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/8)) ([a2c9844](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/a2c9844659ec8e1f625fe2966a4a706bd04508c8))
+
 ## [1.2.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.1.0...v1.2.0) (2022-03-15)
 
 
