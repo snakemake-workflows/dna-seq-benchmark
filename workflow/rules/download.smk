@@ -1,52 +1,80 @@
 rule get_reads:
-    input:
-        regions=get_limit_regions(),
     output:
-        r1="resources/reads/reads.1.fq",
-        r2="resources/reads/reads.2.fq",
+        r1="resources/reads/{benchmark}.1.fq",
+        r2="resources/reads/{benchmark}.2.fq",
     params:
         limit=get_read_limit_param,
+        bam_url=get_benchmark_bam_url,
     log:
-        "logs/download-reads.log",
+        "logs/download-reads/{benchmark}.log",
     conda:
         "../envs/tools.yaml"
     shell:
-        "(samtools view -f3 -u"
-        " ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam"
+        "(set +o pipefail; samtools view -f3 -h"
+        " {params.bam_url}"
         " {params.limit} |"
-        " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -) 2> {log}"
+        " samtools sort -n -u | samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
+
+
+rule get_archive:
+    output:
+        directory("resources/archives/{genome}"),
+    params:
+        url=get_archive_url,
+    log:
+        "logs/get-archive/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "(mkdir -p {output}; curl -L {params.url} | tar -x -C {output} --strip-components 1) 2> {log}"
 
 
 rule get_truth:
+    input:
+        archive=get_archive_input,
     output:
-        "resources/variants/NA12878.truth.vcf",
+        "resources/variants/{genome}/{truthset}.truth.bcf",
     log:
-        "logs/get-truth/NA12898.log",
+        "logs/get-truth/{genome}/{truthset}.log",
     params:
         repl_chr=repl_chr,
-        url=get_na12878_truth_url(),
+        url=get_truth_url,
     conda:
         "../envs/tools.yaml"
     shell:
-        "(bcftools view {params.url}"
-        " | sed {params.repl_chr} > {output}"
+        "ls {input.archive}; (bcftools view {params.url}"
+        " | sed {params.repl_chr} | bcftools view -Ob - > {output}"
         ") 2> {log}"
+
+
+rule merge_truthsets:
+    input:
+        bcf=get_truthsets(),
+        csi=get_truthsets(csi=True),
+    output:
+        "resources/variants/{genome}.merged.truth.bcf",
+    log:
+        "logs/merge-truthsets/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools concat -O b --allow-overlap {input} > {output} 2> {log}"
 
 
 rule get_confidence_bed:
+    input:
+        archive=get_archive_input,
     output:
-        "resources/regions/NA12898.confidence-regions.bed",
+        "resources/regions/{genome}.confidence-regions.bed",
     log:
-        "logs/get-confidence-regions/NA12898.log",
+        "logs/get-confidence-regions/{genome}.log",
     params:
         repl_chr=repl_chr,
-        url=get_confidence_bed_url(),
+        cmd=get_confidence_bed_cmd,
     conda:
         "../envs/tools.yaml"
     shell:
-        "(curl --insecure -L {params.url}"
-        " | sed {params.repl_chr} > {output}"
-        ") 2> {log}"
+        "({params.cmd} | sed {params.repl_chr} > {output}) 2> {log}"
 
 
 rule get_liftover_track:
@@ -99,6 +127,7 @@ rule get_reference:
         datatype="dna",
         build="GRCh37" if config["grch37"] else "GRCh38",
         release="104",
+        chromosome="1" if config.get("limit-reads") else None,
     log:
         "logs/get-genome.log",
     wrapper:
@@ -193,14 +222,13 @@ rule mosdepth:
 rule stratify_regions:
     input:
         confidence=get_confidence_regions,
-        target="resources/regions/{benchmark}/target-regions.bed",
+        target=get_target_regions,
         coverage="results/coverage/{benchmark}/coverage.quantized.bed.gz",
-        limit_regions=get_limit_regions(),
     output:
         "resources/regions/{benchmark}/test-regions.cov-{cov}.bed",
     params:
-        intersect_limit=get_limit_regions_intersect_statement,
         cov_label=get_cov_label,
+        intersect_target_regions=get_target_regions_intersect_statement,
     log:
         "logs/stratify-regions/{benchmark}/{cov}.log",
     conda:
@@ -213,8 +241,7 @@ rule stratify_regions:
         "(bedtools intersect"
         " -a {input.confidence}"
         " -b <(zcat {input.coverage} | grep '{params.cov_label}') |"
-        " bedtools intersect -a /dev/stdin -b {input.target}"
-        " {params.intersect_limit} |"
+        " {params.intersect_target_regions}"
         " sort -k1,1 -k2,2n |"
-        " bedtools merge -i /dev/stdin"
+        " bedtools merge -i /dev/stdin "
         ") > {output} 2> {log}"
