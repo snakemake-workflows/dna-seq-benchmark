@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.0...v1.3.1) (2022-05-05)
+
+
+### Bug Fixes
+
+* use latest bwa wrapper to avoid issues with mamba pulling an old r-base package ([9a53ad0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/9a53ad0a877f47562eaf043f56dfad7b43c1abc2))
+
 ## [1.3.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.2.0...v1.3.0) (2022-05-05)
 
 
