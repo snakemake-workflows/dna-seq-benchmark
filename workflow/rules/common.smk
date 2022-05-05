@@ -253,6 +253,14 @@ def get_rename_contig_file(wildcards):
     return config["variant-calls"][wildcards.callset].get("rename-contigs")
 
 
+def get_callset_labels(wildcards):
+    return config["variant-calls"][wildcards.callset].get("labels")
+
+
+def get_callset_subcategory(wildcards):
+    return config["variant-calls"][wildcards.callset].get("subcategory")
+
+
 def get_norm_params(wildcards, input):
     target = ""
     if config.get("limit-reads"):
