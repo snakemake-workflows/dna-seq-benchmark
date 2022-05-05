@@ -159,10 +159,22 @@ def get_raw_callset(wildcards):
     return callset["path"]
 
 
+def is_local_file(path):
+    return urlparse(path).scheme == ""
+
+
+def get_target_bed_input(wildcards):
+    target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
+    if is_local_file(target_bed):
+        return target_bed
+    else:
+        return []
+
+
 def get_target_bed_statement(wildcards):
     target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
 
-    if urlparse(target_bed).scheme == "":
+    if is_local_file(target_bed):
         return f"cat {target_bed}"
     else:
         return f"curl --insecure -L {target_bed}"
