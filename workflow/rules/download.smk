@@ -90,6 +90,7 @@ rule get_liftover_track:
 
 rule get_target_bed:
     input:
+        target_bed=get_target_bed_input,
         liftover="resources/reference/liftover.chain.gz",
     output:
         "resources/regions/{benchmark}/target-regions.raw.bed",

@@ -159,10 +159,22 @@ def get_raw_callset(wildcards):
     return callset["path"]
 
 
+def is_local_file(path):
+    return urlparse(path).scheme == ""
+
+
+def get_target_bed_input(wildcards):
+    target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
+    if is_local_file(target_bed):
+        return target_bed
+    else:
+        return []
+
+
 def get_target_bed_statement(wildcards):
     target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
 
-    if urlparse(target_bed).scheme == "":
+    if is_local_file(target_bed):
         return f"cat {target_bed}"
     else:
         return f"curl --insecure -L {target_bed}"
@@ -239,6 +251,14 @@ def get_test_regions(wildcards):
 
 def get_rename_contig_file(wildcards):
     return config["variant-calls"][wildcards.callset].get("rename-contigs")
+
+
+def get_callset_labels(wildcards):
+    return config["variant-calls"][wildcards.callset].get("labels")
+
+
+def get_callset_subcategory(wildcards):
+    return config["variant-calls"][wildcards.callset].get("subcategory")
 
 
 def get_norm_params(wildcards, input):
