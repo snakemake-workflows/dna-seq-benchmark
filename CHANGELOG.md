@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.2...v1.3.3) (2022-05-05)
+
+
+### Bug Fixes
+
+* fix param ([7e82d84](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/7e82d843debdc960b91b7af1139ccebc93334c5e))
+
 ### [1.3.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.1...v1.3.2) (2022-05-05)
 
 
