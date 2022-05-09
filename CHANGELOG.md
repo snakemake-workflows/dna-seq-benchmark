@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.4](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.3...v1.3.4) (2022-05-09)
+
+
+### Bug Fixes
+
+* fix bwa index path ([56c1a29](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/56c1a29efce6da048bdc97cc21a6833d8ec58d9f))
+
 ### [1.3.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.2...v1.3.3) (2022-05-05)
 
 
