@@ -5,15 +5,18 @@ rule get_reads:
     params:
         limit=get_read_limit_param,
         bam_url=get_benchmark_bam_url,
+        sort_threads=lambda _, threads: max(threads - 2, 1)
     log:
         "logs/download-reads/{benchmark}.log",
     conda:
         "../envs/tools.yaml"
+    threads: 32
     shell:
         "(set +o pipefail; samtools view -f3 -h"
         " {params.bam_url}"
         " {params.limit} |"
-        " samtools sort -n -O BAM | samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
+        " samtools sort -n -O BAM --threads {params.sort_threads} | "
+        " samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
 
 
 rule get_archive:
