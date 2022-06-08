@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.4...v1.3.5) (2022-06-08)
+
+
+### Bug Fixes
+
+* fix samtools sort argument when retrieving reads ([05abcae](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/05abcae07941ed0f00f5d51adac8b9a2428e2cd6))
+
 ### [1.3.4](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.3...v1.3.4) (2022-05-09)
 
 
