@@ -5,3 +5,4 @@ dependencies:
   - alignoth =0.2
   - pysam =0.18
   - python =3.10
+  - vega-lite-cli =4.17
