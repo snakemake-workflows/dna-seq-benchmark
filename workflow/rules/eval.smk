@@ -122,6 +122,18 @@ rule collect_stratifications:
         "../scripts/collect-stratifications.py"
 
 
+rule plot_fns:
+    input:
+        vcf="results/happy/{callset}/{cov}/report.vcf.gz",
+        genome="resources/reference/genome.fasta",
+    output:
+        directory("results/report/{callset}/fns/{cov}"),
+    conda:
+        "../envs/alignoth.yaml"
+    script:
+        "../scripts/plot-fns.py"
+
+
 rule plot_precision_recall:
     input:
         "results/report/{callset}.tsv",
