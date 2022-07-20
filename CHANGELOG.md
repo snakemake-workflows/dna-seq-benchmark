@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.5...v1.3.6) (2022-07-20)
+
+
+### Bug Fixes
+
+* fix genotype-ignoring recall computation ([a83f00d](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/a83f00dc24132bee3dcf1452ceea20794118c0f8))
+
 ### [1.3.5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.4...v1.3.5) (2022-06-08)
 
 
