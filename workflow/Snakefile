@@ -24,3 +24,4 @@ if "variant-calls" in config:
                 ],
                 callset=config["variant-calls"],
             ),
+            "results/classified-subsets/high/all.FP.tsv"

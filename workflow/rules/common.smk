@@ -2,6 +2,12 @@ from urllib.parse import urlparse
 
 import yaml
 
+if "all" in config.get("variant-calls", dict()):
+    raise ValueError(
+        "A callset given in the variant-calls section of the config may not be called 'all'. "
+        "Please choose a different name."
+    )
+
 with open(workflow.source_path("../resources/presets.yaml")) as presets:
     presets = yaml.load(presets, Loader=yaml.SafeLoader)
 
@@ -288,6 +294,15 @@ def get_collect_stratifications_input(wildcards):
         "results/happy/{{callset}}/{cov}/report.summary.csv",
         cov=get_nonempty_coverages(wildcards),
     )
+
+
+def get_merged_classified_subsets_callsets(wildcards):
+    return [callset for callset, entries in config["variant-calls"].items() if entries["benchmark"] == wildcards.benchmark]
+
+
+def get_merged_classified_subsets_input(wildcards):
+    callsets = get_merged_classified_subsets_callsets(wildcards)
+    return expand("results/classified-subsets/{{cov}}/{callset}.{{type}}.tsv", callset=callsets)
 
 
 if "variant-calls" in config:

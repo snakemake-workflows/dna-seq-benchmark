@@ -141,3 +141,37 @@ rule plot_precision_recall:
         "../envs/stats.yaml"
     notebook:
         "../notebooks/plot-precision-recall.py.ipynb"
+
+
+rule collect_subsets:
+    input:
+        calls="results/happy/{callset}/{cov}/report.vcf.gz"
+    output:
+        "results/classified-subsets/{cov}/{callset}.{type,FP|FN}.tsv",
+    log:
+        "logs/vembrane/subsets/{cov}/{callset}.{type}.log"
+    params:
+        filter=lambda w: '\'FORMAT["BD"]["QUERY"] == "FP"\'' if w.type == "FP" else '\'FORMAT["BD"]["TRUTH"] == "FN"\''
+    conda:
+        "../envs/vembrane.yaml"
+    shell:
+        """
+        filtered=$(mktemp)
+        bcftools norm -m-any {input.calls} | vembrane filter {params.filter} > $filtered
+        vembrane table --header 'chromosome, position, ref_allele, alt_allele, true_genotype, predicted_genotype' \
+        'CHROM, POS, REF, ALT, FORMAT["BLT"]["TRUTH"], FORMAT["BLT"]["QUERY"]' $filtered > {output} 2> {log}
+        rm $filtered
+        """
+
+
+rule merge_subsets:
+    input:
+        get_merged_classified_subsets_input
+    output:
+        "results/merged-classified-subsets/{benchmark}/{cov}/all.{type,FP|FN}.tsv"
+    params:
+        callsets=get_merged_classified_subsets_callsets
+    conda:
+        "../envs/stats.yaml"
+    script:
+        "../scripts/merge-subsets.py"
