@@ -41,7 +41,9 @@ rule stratify_truth:
     conda:
         "../envs/tools.yaml"
     shell:
-        "bedtools intersect -b {input.regions} -a <(bcftools view {input.variants}) -wa -f 1.0 -header | bcftools view -Oz > {output} 2> {log}"
+        "(bedtools intersect -b {input.regions} -a "
+        "<(bcftools view {input.variants}) -wa -f 1.0 -header | "
+        "bcftools view -Oz > {output}) 2> {log}"
 
 
 use rule stratify_truth as stratify_results with:
