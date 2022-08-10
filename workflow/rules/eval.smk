@@ -145,14 +145,14 @@ rule plot_precision_recall:
 
 rule collect_subsets:
     input:
-        calls="results/happy/{callset}/{cov}/report.vcf.gz"
+        calls="results/happy/{callset}/{cov}/report.vcf.gz",
     output:
         "results/classified-subsets/{cov}/{callset}.{type,FP|FN}.tsv",
     log:
-        "logs/vembrane/subsets/{cov}/{callset}.{type}.log"
+        "logs/vembrane/subsets/{cov}/{callset}.{type}.log",
     params:
         #filter=lambda w: '\'FORMAT["BD"]["QUERY"] == "FP"\'' if w.type == "FP" else '\'FORMAT["BD"]["TRUTH"] == "FN"\''
-        filter=get_subset_filter
+        filter=get_subset_filter,
     conda:
         "../envs/vembrane.yaml"
     shell:
@@ -170,11 +170,11 @@ rule collect_subsets:
 
 rule merge_subsets:
     input:
-        get_merged_classified_subsets_input
+        get_merged_classified_subsets_input,
     output:
-        "results/merged-classified-subsets/{genome}/{cov}/all.{type,FP|FN}.tsv"
+        "results/merged-classified-subsets/{genome}/{cov}/all.{type,FP|FN}.tsv",
     params:
-        callsets=get_merged_classified_subsets_callsets
+        callsets=get_merged_classified_subsets_callsets,
     conda:
         "../envs/stats.yaml"
     script:
@@ -184,11 +184,11 @@ rule merge_subsets:
 rule render_subset_report_config:
     input:
         dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
-        template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml")
+        template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml"),
     output:
-        "results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml"
+        "results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml",
     log:
-        "logs/yte/datavzrd-config/{genome}/{cov}/{type}.log"
+        "logs/yte/datavzrd-config/{genome}/{cov}/{type}.log",
     template_engine:
         "yte"
 
@@ -201,12 +201,14 @@ rule report_subsets:
         report(
             directory("results/report/{genome}/{cov}/all.{type}"),
             htmlindex="index.html",
-            category=lambda w: "false positives" if w.type == "FP" else "false negatives",
+            category=lambda w: "false positives"
+            if w.type == "FP"
+            else "false negatives",
             subcategory=lambda w: w.genome,
             labels=lambda w: {"coverage": w.cov},
-        )
+        ),
     log:
-        "logs/datavzrd/{genome}/{cov}/{type}.log"
+        "logs/datavzrd/{genome}/{cov}/{type}.log",
     conda:
         "../envs/datavzrd.yaml"
     shell:

@@ -16,13 +16,17 @@ genomes = presets["genomes"]
 callsets = config.get("variant-calls", dict())
 
 benchmarks.update(config.get("custom-benchmarks", dict()))
-benchmarks = {name: entry for name, entry in benchmarks.items() if any(callset["benchmark"] == name for callset in callsets.values())}
+benchmarks = {
+    name: entry
+    for name, entry in benchmarks.items()
+    if any(callset["benchmark"] == name for callset in callsets.values())
+}
 
 genomes = {benchmark["genome"] for benchmark in benchmarks.values()}
 
+
 if any(
-    callset["benchmark"] == "giab-NA12878-exome"
-    for callset in callsets.values()
+    callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values()
 ) and config.get("grch37"):
     raise ValueError(
         "grch37 must be set to false in the config if giab-NA12878-exome benchmark is used"
@@ -301,12 +305,18 @@ def get_collect_stratifications_input(wildcards):
 
 
 def get_merged_classified_subsets_callsets(wildcards):
-    return [callset for callset, entries in config["variant-calls"].items() if benchmarks[entries["benchmark"]]["genome"] == wildcards.genome]
+    return [
+        callset
+        for callset, entries in config["variant-calls"].items()
+        if benchmarks[entries["benchmark"]]["genome"] == wildcards.genome
+    ]
 
 
 def get_merged_classified_subsets_input(wildcards):
     callsets = get_merged_classified_subsets_callsets(wildcards)
-    return expand("results/classified-subsets/{{cov}}/{callset}.{{type}}.tsv", callset=callsets)
+    return expand(
+        "results/classified-subsets/{{cov}}/{callset}.{{type}}.tsv", callset=callsets
+    )
 
 
 def get_subset_filter(wildcards):

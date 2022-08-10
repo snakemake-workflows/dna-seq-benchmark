@@ -15,7 +15,7 @@ rule index_vcf_variants:
     output:
         "{prefix}.vcf.gz.tbi",
     params:
-        extra="--tbi"
+        extra="--tbi",
     log:
         "logs/index-vcf-variants/{prefix}.log",
     wrapper:
