@@ -222,7 +222,7 @@ rule mosdepth:
         extra="--no-per-base --mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize(),
     wrapper:
-        "0.77.0/bio/mosdepth"
+        "v1.7.1/bio/mosdepth"
 
 
 rule stratify_regions:
