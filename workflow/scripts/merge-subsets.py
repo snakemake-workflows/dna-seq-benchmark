@@ -1,3 +1,7 @@
+import sys
+
+sys.stderr = open(snakemake.log[0], "w")
+
 import pandas as pd
 from scipy.cluster.hierarchy import ward, leaves_list
 from scipy.spatial.distance import pdist
