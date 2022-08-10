@@ -175,6 +175,8 @@ rule merge_subsets:
         "results/merged-classified-subsets/{genome}/{cov}/all.{type,FP|FN}.tsv",
     params:
         callsets=get_merged_classified_subsets_callsets,
+    log:
+        "logs/merge-substes/{genome}/{cov}/{type}.log"
     conda:
         "../envs/stats.yaml"
     script:
