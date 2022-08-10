@@ -178,7 +178,7 @@ rule merge_subsets:
     params:
         callsets=get_merged_classified_subsets_callsets,
     log:
-        "logs/merge-substes/{genome}/{cov}/{type}.log"
+        "logs/merge-substes/{genome}/{cov}/{type}.log",
     conda:
         "../envs/stats.yaml"
     script:
