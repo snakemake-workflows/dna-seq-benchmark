@@ -24,4 +24,9 @@ if "variant-calls" in config:
                 ],
                 callset=config["variant-calls"],
             ),
-            "results/classified-subsets/high/all.FP.tsv"
+            expand(
+                "results/report/{benchmark}/{cov}/all.{type}",
+                benchmark=benchmarks,
+                cov=coverages,
+                type=["FP", "FN"],
+            )

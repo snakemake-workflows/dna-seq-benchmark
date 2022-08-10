@@ -151,16 +151,17 @@ rule collect_subsets:
     log:
         "logs/vembrane/subsets/{cov}/{callset}.{type}.log"
     params:
-        filter=lambda w: '\'FORMAT["BD"]["QUERY"] == "FP"\'' if w.type == "FP" else '\'FORMAT["BD"]["TRUTH"] == "FN"\''
+        #filter=lambda w: '\'FORMAT["BD"]["QUERY"] == "FP"\'' if w.type == "FP" else '\'FORMAT["BD"]["TRUTH"] == "FN"\''
+        filter=get_subset_filter
     conda:
         "../envs/vembrane.yaml"
     shell:
         """
-        filtered=$(mktemp)
-        bcftools norm -m-any {input.calls} | vembrane filter {params.filter} > $filtered
+        (filtered=$(mktemp)
+        bcftools norm -m-any {input.calls} | vembrane filter {params.filter:q} > $filtered
         vembrane table --header 'chromosome, position, ref_allele, alt_allele, true_genotype, predicted_genotype' \
-        'CHROM, POS, REF, ALT, FORMAT["BLT"]["TRUTH"], FORMAT["BLT"]["QUERY"]' $filtered > {output} 2> {log}
-        rm $filtered
+        'CHROM, POS, REF, ALT, "{{}}/{{}}".format(*sorted(FORMAT["GT"]["TRUTH"])), "{{}}/{{}}".format(*sorted(FORMAT["GT"]["QUERY"]))' $filtered > {output}
+        rm $filtered) 2> {log}
         """
 
 
@@ -175,3 +176,35 @@ rule merge_subsets:
         "../envs/stats.yaml"
     script:
         "../scripts/merge-subsets.py"
+
+
+rule render_subset_report_config:
+    input:
+        dataset="results/merged-classified-subsets/{benchmark}/{cov}/all.{type}.tsv",
+        template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml")
+    output:
+        "results/datavzrd-config/{benchmark}/{cov}/all.{type}.config.yaml"
+    log:
+        "logs/yte/datavzrd-config/{benchmark}/{cov}/{type}.log"
+    template_engine:
+        "yte"
+
+
+rule report_subsets:
+    input:
+        dataset="results/merged-classified-subsets/{benchmark}/{cov}/all.{type}.tsv",
+        config="results/datavzrd-config/{benchmark}/{cov}/all.{type}.config.yaml",
+    output:
+        report(
+            directory("results/report/{benchmark}/{cov}/all.{type}"),
+            htmlindex="index.html",
+            category=lambda w: "false positives" if w.type == "FP" else "false negatives",
+            subcategory=lambda w: w.benchmark,
+            labels=lambda w: {"coverage": w.cov},
+        )
+    log:
+        "logs/datavzrd/{benchmark}/{cov}/{type}.log"
+    conda:
+        "../envs/datavzrd.yaml"
+    shell:
+        "datavzrd {input.config} --output {output} 2> {log}"

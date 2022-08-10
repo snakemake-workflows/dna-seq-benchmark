@@ -305,6 +305,17 @@ def get_merged_classified_subsets_input(wildcards):
     return expand("results/classified-subsets/{{cov}}/{callset}.{{type}}.tsv", callset=callsets)
 
 
+def get_subset_filter(wildcards):
+    if wildcards.type == "FP":
+        # FP
+        return 'is_hom_ref("TRUTH") and not is_hom_ref("QUERY")'
+    elif wildcards.type == "FN":
+        # FN
+        return 'not is_hom_ref("TRUTH") and is_hom_ref("QUERY")'
+    else:
+        raise ValueError(f"Unexpected value for wildcards.type: {wildcards.type}")
+
+
 if "variant-calls" in config:
 
     wildcard_constraints:
