@@ -13,12 +13,16 @@ with open(workflow.source_path("../resources/presets.yaml")) as presets:
 
 benchmarks = presets["benchmarks"]
 genomes = presets["genomes"]
+callsets = config.get("variant-calls", dict())
 
 benchmarks.update(config.get("custom-benchmarks", dict()))
+benchmarks = {name: entry for name, entry in benchmarks.items() if any(callset["benchmark"] == name for callset in callsets.values())}
+
+genomes = {benchmark["genome"] for benchmark in benchmarks.values()}
 
 if any(
     callset["benchmark"] == "giab-NA12878-exome"
-    for _, callset in config.get("variant-calls", dict()).items()
+    for callset in callsets.values()
 ) and config.get("grch37"):
     raise ValueError(
         "grch37 must be set to false in the config if giab-NA12878-exome benchmark is used"
@@ -297,7 +301,7 @@ def get_collect_stratifications_input(wildcards):
 
 
 def get_merged_classified_subsets_callsets(wildcards):
-    return [callset for callset, entries in config["variant-calls"].items() if entries["benchmark"] == wildcards.benchmark]
+    return [callset for callset, entries in config["variant-calls"].items() if benchmarks[entries["benchmark"]]["genome"] == wildcards.genome]
 
 
 def get_merged_classified_subsets_input(wildcards):
@@ -308,10 +312,10 @@ def get_merged_classified_subsets_input(wildcards):
 def get_subset_filter(wildcards):
     if wildcards.type == "FP":
         # FP
-        return 'is_hom_ref("TRUTH") and not is_hom_ref("QUERY")'
+        return 'is_hom_ref("TRUTH") and not is_hom_ref("QUERY") and not FORMAT["BD"]["QUERY"] == "N"'
     elif wildcards.type == "FN":
         # FN
-        return 'not is_hom_ref("TRUTH") and is_hom_ref("QUERY")'
+        return 'not is_hom_ref("TRUTH") and is_hom_ref("QUERY") and not FORMAT["BD"]["QUERY"] == "N"'
     else:
         raise ValueError(f"Unexpected value for wildcards.type: {wildcards.type}")
 

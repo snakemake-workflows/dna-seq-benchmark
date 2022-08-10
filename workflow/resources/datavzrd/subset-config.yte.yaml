@@ -4,7 +4,7 @@ __definitions__:
 __variables__:
   dataset_name: ?f"{wildcards.type}-calls"
 
-name: ?f"Subset of {wildcards.type} calls at loci with {wildcards.cov} coverage on benchmark {wildcards.benchmark} for all callsets."
+name: ?f"Subset of {wildcards.type} calls at loci with {wildcards.cov} coverage on genome {wildcards.genome} for all callsets."
 
 datasets:
   ?dataset_name:

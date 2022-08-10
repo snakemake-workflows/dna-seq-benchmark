@@ -160,7 +160,10 @@ rule collect_subsets:
         (filtered=$(mktemp)
         bcftools norm -m-any {input.calls} | vembrane filter {params.filter:q} > $filtered
         vembrane table --header 'chromosome, position, ref_allele, alt_allele, true_genotype, predicted_genotype' \
-        'CHROM, POS, REF, ALT, "{{}}/{{}}".format(*sorted(FORMAT["GT"]["TRUTH"])), "{{}}/{{}}".format(*sorted(FORMAT["GT"]["QUERY"]))' $filtered > {output}
+        'CHROM, POS, REF, ALT, \
+        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["TRUTH"])) if FORMAT["GT"]["TRUTH"] is not NA else ".", \
+        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["QUERY"])) if FORMAT["GT"]["QUERY"] is not NA else "."' \
+        $filtered > {output}
         rm $filtered) 2> {log}
         """
 
@@ -169,7 +172,7 @@ rule merge_subsets:
     input:
         get_merged_classified_subsets_input
     output:
-        "results/merged-classified-subsets/{benchmark}/{cov}/all.{type,FP|FN}.tsv"
+        "results/merged-classified-subsets/{genome}/{cov}/all.{type,FP|FN}.tsv"
     params:
         callsets=get_merged_classified_subsets_callsets
     conda:
@@ -180,30 +183,30 @@ rule merge_subsets:
 
 rule render_subset_report_config:
     input:
-        dataset="results/merged-classified-subsets/{benchmark}/{cov}/all.{type}.tsv",
+        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
         template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml")
     output:
-        "results/datavzrd-config/{benchmark}/{cov}/all.{type}.config.yaml"
+        "results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml"
     log:
-        "logs/yte/datavzrd-config/{benchmark}/{cov}/{type}.log"
+        "logs/yte/datavzrd-config/{genome}/{cov}/{type}.log"
     template_engine:
         "yte"
 
 
 rule report_subsets:
     input:
-        dataset="results/merged-classified-subsets/{benchmark}/{cov}/all.{type}.tsv",
-        config="results/datavzrd-config/{benchmark}/{cov}/all.{type}.config.yaml",
+        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
+        config="results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml",
     output:
         report(
-            directory("results/report/{benchmark}/{cov}/all.{type}"),
+            directory("results/report/{genome}/{cov}/all.{type}"),
             htmlindex="index.html",
             category=lambda w: "false positives" if w.type == "FP" else "false negatives",
-            subcategory=lambda w: w.benchmark,
+            subcategory=lambda w: w.genome,
             labels=lambda w: {"coverage": w.cov},
         )
     log:
-        "logs/datavzrd/{benchmark}/{cov}/{type}.log"
+        "logs/datavzrd/{genome}/{cov}/{type}.log"
     conda:
         "../envs/datavzrd.yaml"
     shell:

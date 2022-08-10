@@ -38,8 +38,9 @@ data = data.loc[
     data.isna().sum(axis="columns").sort_values().index,
 ]
 
-idx_rows = get_idx_sorted_by_clustering(data)
-idx_cols = get_idx_sorted_by_clustering(data.T)
-data = data.iloc[idx_rows, idx_cols]
+if not data.empty:
+    idx_rows = get_idx_sorted_by_clustering(data)
+    idx_cols = get_idx_sorted_by_clustering(data.T)
+    data = data.iloc[idx_rows, idx_cols]
 
 data.to_csv(snakemake.output[0], sep="\t")

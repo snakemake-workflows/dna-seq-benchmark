@@ -25,8 +25,8 @@ if "variant-calls" in config:
                 callset=config["variant-calls"],
             ),
             expand(
-                "results/report/{benchmark}/{cov}/all.{type}",
-                benchmark=benchmarks,
+                "results/report/{genome}/{cov}/all.{type}",
+                genome=genomes,
                 cov=coverages,
                 type=["FP", "FN"],
             )
