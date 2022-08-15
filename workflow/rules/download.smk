@@ -135,7 +135,7 @@ rule get_reference:
     log:
         "logs/get-genome.log",
     wrapper:
-        "0.79.0/bio/reference/ensembl-sequence"
+        "v1.7.2/bio/reference/ensembl-sequence"
 
 
 rule samtools_faidx:
@@ -146,7 +146,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "0.79.0/bio/samtools/faidx"
+        "v1.7.2/bio/samtools/faidx"
 
 
 rule bwa_index:
@@ -161,7 +161,7 @@ rule bwa_index:
     params:
         prefix=get_io_prefix(lambda input, output: output[0]),
     wrapper:
-        "v1.4.0/bio/bwa/index"
+        "v1.7.2/bio/bwa/index"
 
 
 rule bwa_mem:
@@ -178,7 +178,7 @@ rule bwa_mem:
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v1.4.0/bio/bwa/mem"
+        "v1.7.2/bio/bwa/mem"
 
 
 rule mark_duplicates:
@@ -194,7 +194,7 @@ rule mark_duplicates:
     resources:
         mem_mb=1024,
     wrapper:
-        "0.79.0/bio/picard/markduplicates"
+        "v1.7.2/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -205,7 +205,7 @@ rule samtools_index:
     log:
         "logs/samtools-index/{benchmark}.log",
     wrapper:
-        "0.79.0/bio/samtools/index"
+        "v1.7.2/bio/samtools/index"
 
 
 rule mosdepth:
@@ -222,7 +222,7 @@ rule mosdepth:
         extra="--no-per-base --mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize(),
     wrapper:
-        "0.77.0/bio/mosdepth"
+        "v1.7.2/bio/mosdepth"
 
 
 rule stratify_regions:

@@ -27,7 +27,7 @@ rule normalize_calls:
     conda:
         "../envs/tools.yaml"
     wrapper:
-        "0.80.2/bio/bcftools/norm"
+        "v1.7.2/bio/bcftools/norm"
 
 
 rule stratify_truth:
@@ -62,7 +62,7 @@ rule index_stratified_truth:
     log:
         "logs/bcftools-index/{benchmark}.truth.{cov}.log",
     wrapper:
-        "0.80.1/bio/bcftools/index"
+        "v1.7.2/bio/bcftools/index"
 
 
 checkpoint stat_truth:
@@ -104,7 +104,7 @@ rule benchmark_variants:
     log:
         "logs/happy/{callset}/{cov}.log",
     wrapper:
-        "0.80.1/bio/hap.py/hap.py"
+        "v1.7.2/bio/hap.py/hap.py"
 
 
 rule collect_stratifications:
