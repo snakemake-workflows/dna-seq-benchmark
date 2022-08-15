@@ -183,7 +183,7 @@ rule bwa_mem:
 
 rule mark_duplicates:
     input:
-        "results/read-alignments/{benchmark}.bam",
+        bams="results/read-alignments/{benchmark}.bam",
     output:
         bam="results/read-alignments/{benchmark}.dedup.bam",
         metrics="results/read-alignments/{benchmark}.dedup.metrics.txt",
