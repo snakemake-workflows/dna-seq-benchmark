@@ -190,7 +190,7 @@ rule mark_duplicates:
     log:
         "logs/picard-dedup/{benchmark}.log",
     params:
-        extra="REMOVE_DUPLICATES=true",
+        extra="--REMOVE_DUPLICATES true",
     resources:
         mem_mb=1024,
     wrapper:
