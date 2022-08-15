@@ -5,7 +5,7 @@ rule get_reads:
     params:
         limit=get_read_limit_param,
         bam_url=get_benchmark_bam_url,
-        sort_threads=lambda _, threads: max(threads - 2, 1)
+        sort_threads=lambda _, threads: max(threads - 2, 1),
     log:
         "logs/download-reads/{benchmark}.log",
     conda:
