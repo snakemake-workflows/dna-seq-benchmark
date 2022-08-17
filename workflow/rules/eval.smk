@@ -24,8 +24,6 @@ rule normalize_calls:
         get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
-    conda:
-        "../envs/tools.yaml"
     wrapper:
         "v1.7.2/bio/bcftools/norm"
 
