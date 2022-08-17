@@ -25,7 +25,7 @@ rule normalize_calls:
     log:
         "logs/normalize-calls/{callset}.log",
     wrapper:
-        "v1.7.2/bio/bcftools/norm"
+        "v1.8.0/bio/bcftools/norm"
 
 
 rule stratify_truth:
