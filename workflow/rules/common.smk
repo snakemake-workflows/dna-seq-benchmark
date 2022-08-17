@@ -265,7 +265,9 @@ def get_norm_params(wildcards, input):
     target = ""
     if config.get("limit-reads"):
         target = "--targets 1"
-    return f"--atomize -f {input.genome} --check-ref s --rm-dup exact -Oz {target}"
+    return (
+        f"--atomize -f {input.genome} --check-ref s --rm-dup exact -m-any -Oz {target}"
+    )
 
 
 def get_nonempty_coverages(wildcards):
