@@ -21,7 +21,7 @@ rule normalize_calls:
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     params:
-        get_norm_params,
+        extra=get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
     wrapper:
