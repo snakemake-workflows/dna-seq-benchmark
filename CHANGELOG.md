@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.7](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.6...v1.3.7) (2022-08-18)
+
+
+### Performance Improvements
+
+* update snakemake wrappers to v1.7.2 ([#19](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/19)) ([65ffae3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/65ffae30204e3337a807b254a31a91451a27550b))
+
 ### [1.3.6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.5...v1.3.6) (2022-07-20)
 
 
