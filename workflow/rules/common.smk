@@ -22,6 +22,12 @@ benchmarks = {
     if any(callset["benchmark"] == name for callset in callsets.values())
 }
 
+genomes = {
+    name: entry
+    for name, entry in genomes.items()
+    if any(benchmark["genome"] == name for benchmark in benchmarks.values())
+}
+
 
 if any(
     callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values()
