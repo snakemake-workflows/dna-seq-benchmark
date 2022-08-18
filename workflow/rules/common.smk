@@ -273,11 +273,11 @@ def get_callset_subcategory(wildcards):
     return config["variant-calls"][wildcards.callset].get("subcategory")
 
 
-def get_norm_params(wildcards, input):
+def get_norm_params(wildcards):
     target = ""
     if config.get("limit-reads"):
         target = "--targets 1"
-    return f"--atomize -f {input.genome} --check-ref s --rm-dup exact -Oz {target}"
+    return f"--atomize --check-ref s --rm-dup exact {target}"
 
 
 def get_nonempty_coverages(wildcards):

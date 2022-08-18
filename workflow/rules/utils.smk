@@ -6,7 +6,7 @@ rule index_variants:
     log:
         "logs/index-variants/{prefix}.log",
     wrapper:
-        "v1.2.0/bio/bcftools/index"
+        "v1.9.0/bio/bcftools/index"
 
 
 rule index_vcf_variants:
@@ -19,4 +19,4 @@ rule index_vcf_variants:
     log:
         "logs/index-vcf-variants/{prefix}.log",
     wrapper:
-        "v1.2.0/bio/bcftools/index"
+        "v1.9.0/bio/bcftools/index"

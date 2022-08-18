@@ -135,7 +135,7 @@ rule get_reference:
     log:
         "logs/get-genome.log",
     wrapper:
-        "0.79.0/bio/reference/ensembl-sequence"
+        "v1.7.2/bio/reference/ensembl-sequence"
 
 
 rule samtools_faidx:
@@ -146,7 +146,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "0.79.0/bio/samtools/faidx"
+        "v1.7.2/bio/samtools/faidx"
 
 
 rule bwa_index:
@@ -158,10 +158,8 @@ rule bwa_index:
         ),
     log:
         "logs/bwa-index.log",
-    params:
-        prefix=get_io_prefix(lambda input, output: output[0]),
     wrapper:
-        "v1.4.0/bio/bwa/index"
+        "v1.8.0/bio/bwa/index"
 
 
 rule bwa_mem:
@@ -173,28 +171,27 @@ rule bwa_mem:
     log:
         "logs/bwa-mem/{benchmark}.log",
     params:
-        index=get_io_prefix(lambda input, output: input.idx[0]),
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v1.4.0/bio/bwa/mem"
+        "v1.8.0/bio/bwa/mem"
 
 
 rule mark_duplicates:
     input:
-        "results/read-alignments/{benchmark}.bam",
+        bams="results/read-alignments/{benchmark}.bam",
     output:
         bam="results/read-alignments/{benchmark}.dedup.bam",
         metrics="results/read-alignments/{benchmark}.dedup.metrics.txt",
     log:
         "logs/picard-dedup/{benchmark}.log",
     params:
-        extra="REMOVE_DUPLICATES=true",
+        extra="--REMOVE_DUPLICATES true",
     resources:
         mem_mb=1024,
     wrapper:
-        "0.79.0/bio/picard/markduplicates"
+        "v1.7.2/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -205,7 +202,7 @@ rule samtools_index:
     log:
         "logs/samtools-index/{benchmark}.log",
     wrapper:
-        "0.79.0/bio/samtools/index"
+        "v1.7.2/bio/samtools/index"
 
 
 rule mosdepth:
