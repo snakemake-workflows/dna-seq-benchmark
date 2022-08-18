@@ -16,8 +16,8 @@ rule rename_contigs:
 rule normalize_calls:
     input:
         get_callset,
-        genome="resources/reference/genome.fasta",
-        genome_index="resources/reference/genome.fasta.fai",
+        ref="resources/reference/genome.fasta",
+        ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     params:
@@ -25,7 +25,7 @@ rule normalize_calls:
     log:
         "logs/normalize-calls/{callset}.log",
     wrapper:
-        "v1.8.0/bio/bcftools/norm"
+        "perf/update-bcftools-norm/bio/bcftools/norm"
 
 
 rule stratify_truth:
