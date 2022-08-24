@@ -24,9 +24,4 @@ if "variant-calls" in config:
                 ],
                 callset=config["variant-calls"],
             ),
-            expand(
-                "results/report/{genome}/{cov}/all.{type}",
-                genome=genomes,
-                cov=coverages,
-                type=["FP", "FN"],
-            ),
+            get_subset_reports

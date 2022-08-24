@@ -286,8 +286,8 @@ def get_norm_params(wildcards):
     return f"--atomize --check-ref s --rm-dup exact {target}"
 
 
-def get_nonempty_coverages(wildcards):
-    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+def _get_nonempty_coverages(callset):
+    benchmark = config["variant-calls"][callset]["benchmark"]
 
     def isempty(cov):
         with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
@@ -299,6 +299,10 @@ def get_nonempty_coverages(wildcards):
     return [cov for cov in coverages if not isempty(cov)]
 
 
+def get_nonempty_coverages(wildcards):
+    return _get_nonempty_coverages(wildcards.callset)
+
+
 def get_collect_stratifications_input(wildcards):
     import json
 
@@ -308,12 +312,26 @@ def get_collect_stratifications_input(wildcards):
     )
 
 
-def get_merged_classified_subsets_callsets(wildcards):
+def get_subset_reports(wildcards):
+    for genome in genomes:
+        yield from expand(
+            "results/report/{genome}/{cov}/all.{type}",
+            genome=genome,
+            cov={cov for callset in get_genome_callsets(genome) for cov in _get_nonempty_coverages(callset)},
+            type=["FP", "FN"],
+        )
+
+
+def get_genome_callsets(genome):
     return [
         callset
         for callset, entries in config["variant-calls"].items()
-        if benchmarks[entries["benchmark"]]["genome"] == wildcards.genome
+        if benchmarks[entries["benchmark"]]["genome"] == genome
     ]
+
+
+def get_merged_classified_subsets_callsets(wildcards):
+    return get_genome_callsets(wildcards.genome)
 
 
 def get_merged_classified_subsets_input(wildcards):
