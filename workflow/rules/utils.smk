@@ -6,4 +6,17 @@ rule index_variants:
     log:
         "logs/index-variants/{prefix}.log",
     wrapper:
-        "v1.7.2/bio/bcftools/index"
+        "v1.9.0/bio/bcftools/index"
+
+
+rule index_vcf_variants:
+    input:
+        "{prefix}.vcf.gz",
+    output:
+        "{prefix}.vcf.gz.tbi",
+    params:
+        extra="--tbi",
+    log:
+        "logs/index-vcf-variants/{prefix}.log",
+    wrapper:
+        "v1.9.0/bio/bcftools/index"

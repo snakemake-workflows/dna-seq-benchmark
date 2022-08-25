@@ -2,17 +2,35 @@ from urllib.parse import urlparse
 
 import yaml
 
+if "all" in config.get("variant-calls", dict()):
+    raise ValueError(
+        "A callset given in the variant-calls section of the config may not be called 'all'. "
+        "Please choose a different name."
+    )
+
 with open(workflow.source_path("../resources/presets.yaml")) as presets:
     presets = yaml.load(presets, Loader=yaml.SafeLoader)
 
 benchmarks = presets["benchmarks"]
 genomes = presets["genomes"]
+callsets = config.get("variant-calls", dict())
 
 benchmarks.update(config.get("custom-benchmarks", dict()))
+benchmarks = {
+    name: entry
+    for name, entry in benchmarks.items()
+    if any(callset["benchmark"] == name for callset in callsets.values())
+}
+
+genomes = {
+    name: entry
+    for name, entry in genomes.items()
+    if any(benchmark["genome"] == name for benchmark in benchmarks.values())
+}
+
 
 if any(
-    callset["benchmark"] == "giab-NA12878-exome"
-    for _, callset in config.get("variant-calls", dict()).items()
+    callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values()
 ) and config.get("grch37"):
     raise ValueError(
         "grch37 must be set to false in the config if giab-NA12878-exome benchmark is used"
@@ -268,8 +286,8 @@ def get_norm_params(wildcards):
     return f"--atomize --check-ref s --rm-dup exact {target}"
 
 
-def get_nonempty_coverages(wildcards):
-    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+def _get_nonempty_coverages(callset):
+    benchmark = config["variant-calls"][callset]["benchmark"]
 
     def isempty(cov):
         with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
@@ -281,6 +299,10 @@ def get_nonempty_coverages(wildcards):
     return [cov for cov in coverages if not isempty(cov)]
 
 
+def get_nonempty_coverages(wildcards):
+    return _get_nonempty_coverages(wildcards.callset)
+
+
 def get_collect_stratifications_input(wildcards):
     import json
 
@@ -288,6 +310,50 @@ def get_collect_stratifications_input(wildcards):
         "results/happy/{{callset}}/{cov}/report.summary.csv",
         cov=get_nonempty_coverages(wildcards),
     )
+
+
+def get_subset_reports(wildcards):
+    for genome in genomes:
+        yield from expand(
+            "results/report/{genome}/{cov}/all.{type}",
+            genome=genome,
+            cov={
+                cov
+                for callset in get_genome_callsets(genome)
+                for cov in _get_nonempty_coverages(callset)
+            },
+            type=["FP", "FN"],
+        )
+
+
+def get_genome_callsets(genome):
+    return [
+        callset
+        for callset, entries in config["variant-calls"].items()
+        if benchmarks[entries["benchmark"]]["genome"] == genome
+    ]
+
+
+def get_merged_classified_subsets_callsets(wildcards):
+    return get_genome_callsets(wildcards.genome)
+
+
+def get_merged_classified_subsets_input(wildcards):
+    callsets = get_merged_classified_subsets_callsets(wildcards)
+    return expand(
+        "results/classified-subsets/{{cov}}/{callset}.{{type}}.tsv", callset=callsets
+    )
+
+
+def get_subset_filter(wildcards):
+    if wildcards.type == "FP":
+        # FP
+        return 'is_hom_ref("TRUTH") and not is_hom_ref("QUERY") and not FORMAT["BD"]["QUERY"] == "N"'
+    elif wildcards.type == "FN":
+        # FN
+        return 'not is_hom_ref("TRUTH") and is_hom_ref("QUERY") and not FORMAT["BD"]["QUERY"] == "N"'
+    else:
+        raise ValueError(f"Unexpected value for wildcards.type: {wildcards.type}")
 
 
 if "variant-calls" in config:

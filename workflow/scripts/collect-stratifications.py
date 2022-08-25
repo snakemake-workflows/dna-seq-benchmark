@@ -1,6 +1,8 @@
-import pandas as pd
+import sys
 
 sys.stderr = open(snakemake.log[0], "w")
+
+import pandas as pd
 
 
 def load_data(f, coverage):

@@ -7,3 +7,4 @@ dependencies:
   - altair =4.1
   - altair_saver =0.5
   - jupyter =1.0
+  - scipy =1.9

@@ -39,7 +39,9 @@ rule stratify_truth:
     conda:
         "../envs/tools.yaml"
     shell:
-        "bedtools intersect -b {input.regions} -a <(bcftools view {input.variants}) -wa -f 1.0 -header | bcftools view -Oz > {output} 2> {log}"
+        "(bedtools intersect -b {input.regions} -a "
+        "<(bcftools view {input.variants}) -wa -f 1.0 -header | "
+        "bcftools view -Oz > {output}) 2> {log}"
 
 
 use rule stratify_truth as stratify_results with:
@@ -139,3 +141,77 @@ rule plot_precision_recall:
         "../envs/stats.yaml"
     notebook:
         "../notebooks/plot-precision-recall.py.ipynb"
+
+
+rule collect_subsets:
+    input:
+        calls="results/happy/{callset}/{cov}/report.vcf.gz",
+    output:
+        "results/classified-subsets/{cov}/{callset}.{type,FP|FN}.tsv",
+    log:
+        "logs/vembrane/subsets/{cov}/{callset}.{type}.log",
+    params:
+        #filter=lambda w: '\'FORMAT["BD"]["QUERY"] == "FP"\'' if w.type == "FP" else '\'FORMAT["BD"]["TRUTH"] == "FN"\''
+        filter=get_subset_filter,
+    conda:
+        "../envs/vembrane.yaml"
+    shell:
+        """
+        (filtered=$(mktemp)
+        bcftools norm -m-any {input.calls} | vembrane filter {params.filter:q} > $filtered
+        vembrane table --header 'chromosome, position, ref_allele, alt_allele, true_genotype, predicted_genotype' \
+        'CHROM, POS, REF, ALT, \
+        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["TRUTH"])) if FORMAT["GT"]["TRUTH"] is not NA else ".", \
+        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["QUERY"])) if FORMAT["GT"]["QUERY"] is not NA else "."' \
+        $filtered > {output}
+        rm $filtered) 2> {log}
+        """
+
+
+rule merge_subsets:
+    input:
+        get_merged_classified_subsets_input,
+    output:
+        "results/merged-classified-subsets/{genome}/{cov}/all.{type,FP|FN}.tsv",
+    params:
+        callsets=get_merged_classified_subsets_callsets,
+    log:
+        "logs/merge-substes/{genome}/{cov}/{type}.log",
+    conda:
+        "../envs/stats.yaml"
+    script:
+        "../scripts/merge-subsets.py"
+
+
+rule render_subset_report_config:
+    input:
+        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
+        template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml"),
+    output:
+        "results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml",
+    log:
+        "logs/yte/datavzrd-config/{genome}/{cov}/{type}.log",
+    template_engine:
+        "yte"
+
+
+rule report_subsets:
+    input:
+        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
+        config="results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml",
+    output:
+        report(
+            directory("results/report/{genome}/{cov}/all.{type}"),
+            htmlindex="index.html",
+            category=lambda w: "false positives"
+            if w.type == "FP"
+            else "false negatives",
+            subcategory=lambda w: w.genome,
+            labels=lambda w: {"coverage": w.cov},
+        ),
+    log:
+        "logs/datavzrd/{genome}/{cov}/{type}.log",
+    conda:
+        "../envs/datavzrd.yaml"
+    shell:
+        "datavzrd {input.config} --output {output} 2> {log}"
