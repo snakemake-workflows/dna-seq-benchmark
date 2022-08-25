@@ -16,17 +16,9 @@ genomes = presets["genomes"]
 callsets = config.get("variant-calls", dict())
 
 benchmarks.update(config.get("custom-benchmarks", dict()))
-benchmarks = {
-    name: entry
-    for name, entry in benchmarks.items()
-    if any(callset["benchmark"] == name for callset in callsets.values())
-}
+used_benchmarks = {callset["benchmark"] for callset in callsets.values()}
 
-genomes = {
-    name: entry
-    for name, entry in genomes.items()
-    if any(benchmark["genome"] == name for benchmark in benchmarks.values())
-}
+used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 
 if any(
@@ -313,7 +305,7 @@ def get_collect_stratifications_input(wildcards):
 
 
 def get_subset_reports(wildcards):
-    for genome in genomes:
+    for genome in used_genomes:
         yield from expand(
             "results/report/{genome}/{cov}/all.{type}",
             genome=genome,
