@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.6...v1.4.0) (2022-08-25)
+
+
+### Features
+
+* collect FP and FN calls and compare them across callsets ([#18](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/18)) ([cca4571](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/cca45715f6a0f373c109486fd44c013ff66efbe8))
+
+
+### Performance Improvements
+
+* update snakemake wrappers to v1.7.2 ([#19](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/19)) ([65ffae3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/65ffae30204e3337a807b254a31a91451a27550b))
+
 ### [1.3.6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.5...v1.3.6) (2022-07-20)
 
 
