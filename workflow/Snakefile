@@ -24,4 +24,4 @@ if "variant-calls" in config:
                 ],
                 callset=config["variant-calls"],
             ),
-            get_subset_reports
+            get_subset_reports,

@@ -317,7 +317,11 @@ def get_subset_reports(wildcards):
         yield from expand(
             "results/report/{genome}/{cov}/all.{type}",
             genome=genome,
-            cov={cov for callset in get_genome_callsets(genome) for cov in _get_nonempty_coverages(callset)},
+            cov={
+                cov
+                for callset in get_genome_callsets(genome)
+                for cov in _get_nonempty_coverages(callset)
+            },
             type=["FP", "FN"],
         )
 
