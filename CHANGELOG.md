@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.4.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.4.0...v1.4.1) (2022-08-25)
+
+
+### Bug Fixes
+
+* improved genome and benchmark parsing and collection ([#22](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/22)) ([07934ad](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/07934ad82b0276574bab603fa046f16ddaf97591))
+
 ## [1.4.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.3.6...v1.4.0) (2022-08-25)
 
 
