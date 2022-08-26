@@ -1,5 +1,6 @@
 channels:
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
-  - datavzrd =1.17
+  - datavzrd =1.19
