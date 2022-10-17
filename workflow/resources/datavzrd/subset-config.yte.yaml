@@ -16,15 +16,16 @@ views:
     dataset: ?dataset_name
     page-size: 50
     render-table:
-      true_genotype:
-        plot:
-          heatmap:
-            scale: ordinal
-            color-scheme: category10
-      ?for callset in columns[5:]:
-        ?callset:
+      columns:
+        true_genotype:
           plot:
             heatmap:
               scale: ordinal
               color-scheme: category10
-              aux-domain-columns: ?list(columns[5:])
+        ?for callset in columns[5:]:
+          ?callset:
+            plot:
+              heatmap:
+                scale: ordinal
+                color-scheme: category10
+                aux-domain-columns: ?list(columns[5:])

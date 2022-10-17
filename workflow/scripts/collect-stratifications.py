@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def load_data(f, coverage):
-    d = pd.read_csv(f)
+    d = pd.read_csv(f, sep="\t")
     d.insert(0, "coverage", coverage)
     return d
 

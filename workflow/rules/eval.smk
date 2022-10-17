@@ -107,11 +107,24 @@ rule benchmark_variants:
         "v1.7.2/bio/hap.py/hap.py"
 
 
+rule calc_precision_recall:
+    input:
+        "results/happy/{callset}/{cov}/report.vcf.gz"
+    output:
+        "results/precision-recall/callsets/{callset}/{cov}.tsv"
+    log:
+        "logs/calc-precision-recall/{callset}/{cov}.log"
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/calc-precision-recall.py"
+
+
 rule collect_stratifications:
     input:
         get_collect_stratifications_input,
     output:
-        "results/report/{callset}.tsv",
+        "results/precision-recall/callsets/{callset}.tsv",
     params:
         coverages=get_nonempty_coverages,
     log:
@@ -122,25 +135,46 @@ rule collect_stratifications:
         "../scripts/collect-stratifications.py"
 
 
-rule plot_precision_recall:
+rule collect_precision_recall:
     input:
-        "results/report/{callset}.tsv",
+        get_collect_precision_recall_input
     output:
-        report(
-            "results/report/{callset}.plot.svg",
-            caption="../report/precision-recall-plot.rst",
-            category="Precision/Recall",
-            subcategory=get_callset_subcategory,
-            labels=get_callset_labels,
-        ),
+        "results/precision-recall/benchmarks/{benchmark}.tsv"
     params:
-        cov_labels=get_plot_cov_labels(),
-    log:
-        "logs/plot-precision-recall/{callset}.log",
+        callsets=lambda w: get_benchmark_callsets(w.benchmark)
     conda:
         "../envs/stats.yaml"
-    notebook:
-        "../notebooks/plot-precision-recall.py.ipynb"
+    script:
+        "../scripts/collect-precision-recall.py"
+
+
+rule render_precision_recall_report_config:
+    input:
+        dataset="results/precision-recall/benchmarks/{benchmark}.tsv",
+        template=workflow.source_path("../resources/datavzrd/precision-recall-config.yte.yaml"),
+    output:
+        "results/datavzrd-config/precision-recall/{benchmark}/all.config.yaml",
+    log:
+        "logs/yte/datavzrd-config/precision-recall/{benchmark}.log",
+    template_engine:
+        "yte"
+
+
+rule report_precision_recall:
+    input:
+        config="results/datavzrd-config/precision-recall/{benchmark}/all.config.yaml",
+        table="results/precision-recall/benchmarks/{benchmark}.tsv"
+    output:
+        report(
+            directory("results/report/precision-recall/{benchmark}"),
+            htmlindex="index.html",
+            category="precision/recall",
+            labels={"benchmark": "{benchmark}"},
+        ),
+    log:
+        "logs/datavzrd/precision-recall/{benchmark}.log",
+    wrapper:
+        "v1.17.0/utils/datavzrd"
 
 
 rule collect_subsets:
@@ -188,9 +222,9 @@ rule render_subset_report_config:
         dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
         template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml"),
     output:
-        "results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml",
+        "results/datavzrd-config/subsets/{genome}/{cov}/all.{type}.config.yaml",
     log:
-        "logs/yte/datavzrd-config/{genome}/{cov}/{type}.log",
+        "logs/yte/datavzrd-config/subsets/{genome}/{cov}/{type}.log",
     template_engine:
         "yte"
 
@@ -198,10 +232,10 @@ rule render_subset_report_config:
 rule report_subsets:
     input:
         dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
-        config="results/datavzrd-config/{genome}/{cov}/all.{type}.config.yaml",
+        config="results/datavzrd-config/subsets/{genome}/{cov}/all.{type}.config.yaml",
     output:
         report(
-            directory("results/report/{genome}/{cov}/all.{type}"),
+            directory("results/report/fp-fn/{genome}/{cov}/all.{type}"),
             htmlindex="index.html",
             category=lambda w: "false positives"
             if w.type == "FP"
@@ -210,8 +244,6 @@ rule report_subsets:
             labels=lambda w: {"coverage": w.cov},
         ),
     log:
-        "logs/datavzrd/{genome}/{cov}/{type}.log",
-    conda:
-        "../envs/datavzrd.yaml"
-    shell:
-        "datavzrd {input.config} --output {output} 2> {log}"
+        "logs/datavzrd/fp-fn/{genome}/{cov}/{type}.log",
+    wrapper:
+        "v1.17.0/utils/datavzrd"

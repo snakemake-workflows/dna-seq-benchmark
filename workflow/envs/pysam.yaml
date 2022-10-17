@@ -5,3 +5,4 @@ channels:
 dependencies:
   - python =3.9
   - pysam =0.18
+  - pandas =1.3
