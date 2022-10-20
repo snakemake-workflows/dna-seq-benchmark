@@ -299,7 +299,7 @@ def get_collect_stratifications_input(wildcards):
     import json
 
     return expand(
-        "results/happy/{{callset}}/{cov}/report.summary.csv",
+        "results/precision-recall/callsets/{{callset}}/{cov}.{{vartype}}.tsv",
         cov=get_nonempty_coverages(wildcards),
     )
 
@@ -307,7 +307,7 @@ def get_collect_stratifications_input(wildcards):
 def get_subset_reports(wildcards):
     for genome in used_genomes:
         yield from expand(
-            "results/report/{genome}/{cov}/all.{type}",
+            "results/report/fp-fn/{genome}/{cov}/all.{type}",
             genome=genome,
             cov={
                 cov
@@ -316,6 +316,21 @@ def get_subset_reports(wildcards):
             },
             type=["FP", "FN"],
         )
+
+
+def get_benchmark_callsets(benchmark):
+    return [
+        callset
+        for callset, entries in config["variant-calls"].items()
+        if entries["benchmark"] == benchmark
+    ]
+
+
+def get_collect_precision_recall_input(wildcards):
+    callsets = get_benchmark_callsets(wildcards.benchmark)
+    return expand(
+        "results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets
+    )
 
 
 def get_genome_callsets(genome):

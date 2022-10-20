@@ -1,0 +1,53 @@
+__variables__:
+  green: "#74c476"
+  orange: "#fd8d3c"
+
+name: ?f"Precision/recall analysis of {wildcards.benchmark}"
+
+datasets:
+  results:
+    path: ?input.dataset
+    separator: "\t"
+
+views:
+  results:
+    dataset: results
+    desc: |
+      Precision and recall is calculated by matching variants between each callset 
+      and truth using hap.py with the vcfeval option, in combination with refined logic for counting hits.
+
+      Genotype mismatches are displayed in the "genotype mismatch rate" column.
+    render-table:
+      columns:
+        callset:
+          plot:
+            heatmap:
+              scale: ordinal
+              color-scheme: category20
+        precision:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        recall:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        genotype_mismatch_rate:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        coverage:
+          plot:
+            heatmap:
+              scale: ordinal
+              domain:
+                - low
+                - medium
+                - high
+              range:
+                - "#c6dbef"
+                - "#9ecae1"
+                - "#6baed6"
