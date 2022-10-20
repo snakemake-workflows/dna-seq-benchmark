@@ -304,17 +304,16 @@ def get_collect_stratifications_input(wildcards):
     )
 
 
-def get_subset_reports(wildcards):
+def get_fp_fn_reports(wildcards):
     for genome in used_genomes:
         yield from expand(
-            "results/report/fp-fn/{genome}/{cov}/all.{type}",
+            "results/report/fp-fn/{genome}/{cov}/all",
             genome=genome,
             cov={
                 cov
                 for callset in get_genome_callsets(genome)
                 for cov in _get_nonempty_coverages(callset)
             },
-            type=["FP", "FN"],
         )
 
 
@@ -347,20 +346,7 @@ def get_merged_classified_subsets_callsets(wildcards):
 
 def get_merged_classified_subsets_input(wildcards):
     callsets = get_merged_classified_subsets_callsets(wildcards)
-    return expand(
-        "results/classified-subsets/{{cov}}/{callset}.{{type}}.tsv", callset=callsets
-    )
-
-
-def get_subset_filter(wildcards):
-    if wildcards.type == "FP":
-        # FP
-        return 'is_hom_ref("TRUTH") and not is_hom_ref("QUERY") and not FORMAT["BD"]["QUERY"] == "N"'
-    elif wildcards.type == "FN":
-        # FN
-        return 'not is_hom_ref("TRUTH") and is_hom_ref("QUERY") and not FORMAT["BD"]["QUERY"] == "N"'
-    else:
-        raise ValueError(f"Unexpected value for wildcards.type: {wildcards.type}")
+    return expand("results/fp-fn/callsets/{{cov}}/{callset}.tsv", callset=callsets)
 
 
 if "variant-calls" in config:

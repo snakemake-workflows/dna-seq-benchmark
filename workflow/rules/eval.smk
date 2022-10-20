@@ -181,72 +181,61 @@ rule report_precision_recall:
         "v1.17.1/utils/datavzrd"
 
 
-rule collect_subsets:
+rule extract_fp_fn:
     input:
         calls="results/happy/{callset}/{cov}/report.vcf.gz",
     output:
-        "results/classified-subsets/{cov}/{callset}.{type,FP|FN}.tsv",
+        "results/fp-fn/callsets/{cov}/{callset}.tsv",
     log:
-        "logs/vembrane/subsets/{cov}/{callset}.{type}.log",
+        "logs/extract-fp-fn/{cov}/{callset}.log",
     params:
-        filter=get_subset_filter,
+        filter='FORMAT["BD"]["QUERY"] == "FP" or FORMAT["BD"]["TRUTH"] == "FN"',
     conda:
         "../envs/vembrane.yaml"
-    shell:
-        """
-        (filtered=$(mktemp)
-        bcftools norm -m-any {input.calls} | vembrane filter {params.filter:q} > $filtered
-        vembrane table --header 'chromosome, position, ref_allele, alt_allele, true_genotype, predicted_genotype' \
-        'CHROM, POS, REF, ALT, \
-        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["TRUTH"])) if FORMAT["GT"]["TRUTH"] is not NA else ".", \
-        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["QUERY"])) if FORMAT["GT"]["QUERY"] is not NA else "."' \
-        $filtered > {output}
-        rm $filtered) 2> {log}
-        """
+    script:
+        "../scripts/extract-fp-fn.py"
 
 
-rule merge_subsets:
+rule collect_fp_fn:
     input:
         get_merged_classified_subsets_input,
     output:
-        "results/merged-classified-subsets/{genome}/{cov}/all.{type,FP|FN}.tsv",
+        "results/fp-fn/genomes/{genome}/{cov}/all.tsv",
     params:
         callsets=get_merged_classified_subsets_callsets,
     log:
-        "logs/merge-substes/{genome}/{cov}/{type}.log",
+        "logs/collect-fp-fn/{genome}/{cov}.log",
     conda:
         "../envs/stats.yaml"
     script:
-        "../scripts/merge-subsets.py"
+        "../scripts/collect-fp-fn.py"
 
 
-rule render_subset_report_config:
+rule render_fp_fn_report_config:
     input:
-        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
-        template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml"),
+        dataset="results/fp-fn/genomes/{genome}/{cov}/all.tsv",
+        template=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
     output:
-        "results/datavzrd-config/subsets/{genome}/{cov}/all.{type}.config.yaml",
+        "results/datavzrd-config/fp-fn/{genome}/{cov}/all.config.yaml",
     log:
-        "logs/yte/datavzrd-config/subsets/{genome}/{cov}/{type}.log",
+        "logs/yte/datavzrd-config/fp-fn/{genome}/{cov}.log",
     template_engine:
         "yte"
 
 
-rule report_subsets:
+rule report_fp_fn:
     input:
-        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
-        config="results/datavzrd-config/subsets/{genome}/{cov}/all.{type}.config.yaml",
+        dataset="results/fp-fn/genomes/{genome}/{cov}/all.tsv",
+        config="results/datavzrd-config/fp-fn/{genome}/{cov}/all.config.yaml",
     output:
         report(
-            directory("results/report/fp-fn/{genome}/{cov}/all.{type}"),
+            directory("results/report/fp-fn/{genome}/{cov}/all"),
             htmlindex="index.html",
-            category=lambda w: "false positives"
-            if w.type == "FP"
-            else "false negatives",
+            category="FPs and FNs",
             subcategory=lambda w: w.genome,
             labels=lambda w: {"coverage": w.cov},
         ),
     log:
-        "logs/datavzrd/fp-fn/{genome}/{cov}/{type}.log",
+        "logs/datavzrd/fp-fn/{genome}/{cov}.log",
     wrapper:
         "v1.17.1/utils/datavzrd"

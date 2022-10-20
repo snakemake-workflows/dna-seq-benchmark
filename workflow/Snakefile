@@ -22,4 +22,4 @@ if "variant-calls" in config:
                 benchmark=used_benchmarks,
                 vartype=["snvs", "indels"],
             ),
-            get_subset_reports,
+            get_fp_fn_reports,
