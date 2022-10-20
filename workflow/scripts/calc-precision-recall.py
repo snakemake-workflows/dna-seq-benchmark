@@ -151,20 +151,30 @@ def collect_results(vartype):
     else:
         mismatched_genotype_rate = 0.0
 
-    return pd.DataFrame(
+    d = pd.DataFrame(
         {
-            "vartype": [vartype],
             "precision": [classifications_existence.precision()],
             "tp_query": [classifications_existence.tp_query],
             "fp": [classifications_existence.fp],
             "recall": [classifications_existence.recall()],
             "tp_truth": [classifications_existence.tp_truth],
             "fn": [classifications_existence.fn],
-            "mismatched_genotype_rate": [mismatched_genotype_rate],
+            "genotype_mismatch_rate": [mismatched_genotype_rate],
         }
     )
+    return d[
+        [
+            "precision",
+            "tp_query",
+            "fp",
+            "recall",
+            "tp_truth",
+            "fn",
+            "genotype_mismatch_rate",
+        ]
+    ]
 
 
-data = pd.concat([collect_results("SNP"), collect_results("INDEL")], axis="rows")
+vartype = "SNP" if snakemake.wildcards.vartype == "snvs" else "INDEL"
 
-data.to_csv(snakemake.output[0], sep="\t", index=False)
+collect_results(vartype).to_csv(snakemake.output[0], sep="\t", index=False)

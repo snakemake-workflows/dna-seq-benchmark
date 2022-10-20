@@ -18,7 +18,8 @@ if "variant-calls" in config:
     rule eval:
         input:
             expand(
-                "results/report/precision-recall/{benchmark}",
+                "results/report/precision-recall/{benchmark}/{vartype}",
                 benchmark=used_benchmarks,
+                vartype=["snvs", "indels"]
             ),
             get_subset_reports,

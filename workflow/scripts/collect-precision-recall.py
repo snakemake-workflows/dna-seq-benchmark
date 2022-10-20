@@ -3,7 +3,7 @@ import pandas as pd
 
 def load_data(path, callset):
     d = pd.read_csv(path, sep="\t")
-    d["callset"] = callset
+    d.insert(0, "callset", callset)
     return d
 
 
@@ -14,5 +14,6 @@ results = pd.concat(
     ],
     axis="rows",
 )
+results.sort_values("callset", inplace=True)
 
 results.to_csv(snakemake.output[0], sep="\t", index=False)

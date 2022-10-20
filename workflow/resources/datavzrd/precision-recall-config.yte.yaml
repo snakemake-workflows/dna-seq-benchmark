@@ -19,33 +19,35 @@ views:
       Genotype mismatches are displayed in the "genotype mismatch rate" column.
     render-table:
       columns:
+        callset:
+          plot:
+            heatmap:
+              scale: ordinal
+              color-scheme: category20
         precision:
+          precision: 3
           plot:
-            heatmap:
+            ticks:
               scale: linear
-              domain:
-                - 0
-                - 1
-              range:
-                - white
-                - ?green
         recall:
+          precision: 3
           plot:
-            heatmap:
+            ticks:
               scale: linear
-              domain:
-                - 0
-                - 1
-              range:
-                - white
-                - ?green
         genotype_mismatch_rate:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        coverage:
           plot:
             heatmap:
-              scale: linear
+              scale: ordinal
               domain:
-                - 0
-                - 1
+                - low
+                - medium
+                - high
               range:
-                - white
-                - ?orange
+                - "#c6dbef"
+                - "#9ecae1"
+                - "#6baed6"

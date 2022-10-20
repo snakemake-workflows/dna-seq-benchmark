@@ -299,7 +299,7 @@ def get_collect_stratifications_input(wildcards):
     import json
 
     return expand(
-        "results/precision-recall/callsets/{{callset}}/{cov}.tsv",
+        "results/precision-recall/callsets/{{callset}}/{cov}.{{vartype}}.tsv",
         cov=get_nonempty_coverages(wildcards),
     )
 
@@ -324,7 +324,7 @@ def get_benchmark_callsets(benchmark):
 
 def get_collect_precision_recall_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
-    return expand("results/precision-recall/callsets/{callset}.tsv", callset=callsets)
+    return expand("results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets)
 
 
 def get_genome_callsets(genome):

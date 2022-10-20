@@ -111,9 +111,9 @@ rule calc_precision_recall:
     input:
         "results/happy/{callset}/{cov}/report.vcf.gz"
     output:
-        "results/precision-recall/callsets/{callset}/{cov}.tsv"
+        snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
     log:
-        "logs/calc-precision-recall/{callset}/{cov}.log"
+        "logs/calc-precision-recall/{callset}/{cov}/{vartype}.log"
     conda:
         "../envs/pysam.yaml"
     script:
@@ -124,11 +124,11 @@ rule collect_stratifications:
     input:
         get_collect_stratifications_input,
     output:
-        "results/precision-recall/callsets/{callset}.tsv",
+        "results/precision-recall/callsets/{callset}.{vartype}.tsv",
     params:
         coverages=get_nonempty_coverages,
     log:
-        "logs/collect-stratifications/{callset}.log",
+        "logs/collect-stratifications/{callset}/{vartype}.log",
     conda:
         "../envs/stats.yaml"
     script:
@@ -139,7 +139,7 @@ rule collect_precision_recall:
     input:
         get_collect_precision_recall_input
     output:
-        "results/precision-recall/benchmarks/{benchmark}.tsv"
+        "results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv"
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark)
     conda:
@@ -150,31 +150,31 @@ rule collect_precision_recall:
 
 rule render_precision_recall_report_config:
     input:
-        dataset="results/precision-recall/benchmarks/{benchmark}.tsv",
+        dataset="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
         template=workflow.source_path("../resources/datavzrd/precision-recall-config.yte.yaml"),
     output:
-        "results/datavzrd-config/precision-recall/{benchmark}/all.config.yaml",
+        "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
     log:
-        "logs/yte/datavzrd-config/precision-recall/{benchmark}.log",
+        "logs/yte/datavzrd-config/precision-recall/{benchmark}/{vartype}.log",
     template_engine:
         "yte"
 
 
 rule report_precision_recall:
     input:
-        config="results/datavzrd-config/precision-recall/{benchmark}/all.config.yaml",
-        table="results/precision-recall/benchmarks/{benchmark}.tsv"
+        config="results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
+        table="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv"
     output:
         report(
-            directory("results/report/precision-recall/{benchmark}"),
+            directory("results/report/precision-recall/{benchmark}/{vartype}"),
             htmlindex="index.html",
             category="precision/recall",
-            labels={"benchmark": "{benchmark}"},
+            labels={"benchmark": "{benchmark}", "vartype": "{vartype}"},
         ),
     log:
-        "logs/datavzrd/precision-recall/{benchmark}.log",
+        "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
     wrapper:
-        "v1.17.0/utils/datavzrd"
+        "v1.17.1/utils/datavzrd"
 
 
 rule collect_subsets:
@@ -185,7 +185,6 @@ rule collect_subsets:
     log:
         "logs/vembrane/subsets/{cov}/{callset}.{type}.log",
     params:
-        #filter=lambda w: '\'FORMAT["BD"]["QUERY"] == "FP"\'' if w.type == "FP" else '\'FORMAT["BD"]["TRUTH"] == "FN"\''
         filter=get_subset_filter,
     conda:
         "../envs/vembrane.yaml"
@@ -246,4 +245,4 @@ rule report_subsets:
     log:
         "logs/datavzrd/fp-fn/{genome}/{cov}/{type}.log",
     wrapper:
-        "v1.17.0/utils/datavzrd"
+        "v1.17.1/utils/datavzrd"
