@@ -143,7 +143,7 @@ rule collect_precision_recall:
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark),
     log:
-        "logs/collect-precision-recall/{benchmark}/{vartype}.log"
+        "logs/collect-precision-recall/{benchmark}/{vartype}.log",
     conda:
         "../envs/stats.yaml"
     script:
