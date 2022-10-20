@@ -20,6 +20,6 @@ if "variant-calls" in config:
             expand(
                 "results/report/precision-recall/{benchmark}/{vartype}",
                 benchmark=used_benchmarks,
-                vartype=["snvs", "indels"]
+                vartype=["snvs", "indels"],
             ),
             get_subset_reports,

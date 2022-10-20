@@ -109,11 +109,11 @@ rule benchmark_variants:
 
 rule calc_precision_recall:
     input:
-        "results/happy/{callset}/{cov}/report.vcf.gz"
+        "results/happy/{callset}/{cov}/report.vcf.gz",
     output:
         snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
     log:
-        "logs/calc-precision-recall/{callset}/{cov}/{vartype}.log"
+        "logs/calc-precision-recall/{callset}/{cov}/{vartype}.log",
     conda:
         "../envs/pysam.yaml"
     script:
@@ -137,11 +137,13 @@ rule collect_stratifications:
 
 rule collect_precision_recall:
     input:
-        get_collect_precision_recall_input
+        get_collect_precision_recall_input,
     output:
-        "results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv"
+        "results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
     params:
-        callsets=lambda w: get_benchmark_callsets(w.benchmark)
+        callsets=lambda w: get_benchmark_callsets(w.benchmark),
+    log:
+        "logs/collect-precision-recall/{benchmark}/{vartype}.log"
     conda:
         "../envs/stats.yaml"
     script:
@@ -151,7 +153,9 @@ rule collect_precision_recall:
 rule render_precision_recall_report_config:
     input:
         dataset="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
-        template=workflow.source_path("../resources/datavzrd/precision-recall-config.yte.yaml"),
+        template=workflow.source_path(
+            "../resources/datavzrd/precision-recall-config.yte.yaml"
+        ),
     output:
         "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
     log:
@@ -163,7 +167,7 @@ rule render_precision_recall_report_config:
 rule report_precision_recall:
     input:
         config="results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
-        table="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv"
+        table="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
     output:
         report(
             directory("results/report/precision-recall/{benchmark}/{vartype}"),

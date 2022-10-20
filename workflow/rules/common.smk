@@ -319,12 +319,18 @@ def get_subset_reports(wildcards):
 
 
 def get_benchmark_callsets(benchmark):
-    return [callset for callset, entries in config["variant-calls"].items() if entries["benchmark"] == benchmark]
+    return [
+        callset
+        for callset, entries in config["variant-calls"].items()
+        if entries["benchmark"] == benchmark
+    ]
 
 
 def get_collect_precision_recall_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
-    return expand("results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets)
+    return expand(
+        "results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets
+    )
 
 
 def get_genome_callsets(genome):
