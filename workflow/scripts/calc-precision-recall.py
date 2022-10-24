@@ -1,3 +1,4 @@
+from collections import defaultdict
 import sys, os
 
 # sys.path.insert(0, os.path.dirname(__file__))
@@ -18,16 +19,21 @@ class Classifications:
         self.fn = 0
         self.fp = 0
         self.comparator = comparator
+        self.visited = defaultdict(set)
 
     def register(self, record):
         for c in self.comparator.classify(record):
-            if c is Class.TP_truth:
+            if c.variant in self.visited[c.cls]:
+                # skip if exactly this has been reported before, 
+                # see workflow/scripts/common/happy_report.py for explanation
+                continue
+            if c.cls is Class.TP_truth:
                 self.tp_truth += 1
-            elif c is Class.TP_query:
+            elif c.cls is Class.TP_query:
                 self.tp_query += 1
-            elif c is Class.FN:
+            elif c.cls is Class.FN:
                 self.fn += 1
-            elif c is Class.FP:
+            elif c.cls is Class.FP:
                 self.fp += 1
             else:
                 assert False, "unexpected case"
