@@ -19,14 +19,9 @@ class Classifications:
         self.fn = 0
         self.fp = 0
         self.comparator = comparator
-        self.visited = defaultdict(set)
 
     def register(self, record):
         for c in self.comparator.classify(record):
-            if c.variant in self.visited[c.cls]:
-                # skip if exactly this has been reported before, 
-                # see workflow/scripts/common/happy_report.py for explanation
-                continue
             if c.cls is Class.TP_truth:
                 self.tp_truth += 1
             elif c.cls is Class.TP_query:
