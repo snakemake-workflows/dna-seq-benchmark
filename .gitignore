@@ -2,3 +2,4 @@ results/**
 resources/**
 .snakemake
 .snakemake/**
+.test/**
