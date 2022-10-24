@@ -1,0 +1,32 @@
+__definitions__:
+  - import pandas as pd
+  - |
+    columns = pd.read_table(input.dataset, sep="\t", nrows=1).columns
+    genotype_columns = list(columns[4:])
+
+name: ?f"FP and FN calls at loci with {wildcards.cov} coverage on genome {wildcards.genome} for all callsets."
+
+datasets:
+  fp-fn-calls:
+    path: ?input.dataset
+    separator: "\t"
+
+views:
+  fp-fn-calls:
+    dataset: fp-fn-calls
+    page-size: 50
+    render-table:
+      columns:
+        true_genotype:
+          plot:
+            heatmap:
+              scale: ordinal
+              color-scheme: category10
+              aux-domain-columns: ?genotype_columns
+        ?for callset in genotype_columns[1:]:
+          ?callset:
+            plot:
+              heatmap:
+                scale: ordinal
+                color-scheme: category10
+                aux-domain-columns: ?genotype_columns
