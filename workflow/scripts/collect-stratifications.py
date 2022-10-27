@@ -5,9 +5,23 @@ sys.stderr = open(snakemake.log[0], "w")
 import pandas as pd
 
 
+def get_cov_label(coverage):
+    lower = snakemake.params.coverage_lower_bounds[coverage]
+    bounds = [
+        bound
+        for bound in snakemake.params.coverage_lower_bounds.values()
+        if bound > lower
+    ]
+    if bounds:
+        upper = min(bounds)
+        return f"{lower}..{upper}"
+    else:
+        return f"≥{lower}"
+
+
 def load_data(f, coverage):
     d = pd.read_csv(f, sep="\t")
-    d.insert(0, "coverage", coverage)
+    d.insert(0, "coverage", get_cov_label(coverage))
     return d
 
 

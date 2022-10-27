@@ -127,6 +127,7 @@ rule collect_stratifications:
         "results/precision-recall/callsets/{callset}.{vartype}.tsv",
     params:
         coverages=get_nonempty_coverages,
+        coverage_lower_bounds=coverages,
     log:
         "logs/collect-stratifications/{callset}/{vartype}.log",
     conda:
@@ -142,6 +143,7 @@ rule collect_precision_recall:
         "results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark),
+        labels=get_collect_precision_recall_labels,
     log:
         "logs/collect-precision-recall/{benchmark}/{vartype}.log",
     conda:
@@ -178,75 +180,71 @@ rule report_precision_recall:
     log:
         "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
     wrapper:
-        "v1.17.1/utils/datavzrd"
+        "v1.17.4/utils/datavzrd"
 
 
-rule collect_subsets:
+rule extract_fp_fn:
     input:
         calls="results/happy/{callset}/{cov}/report.vcf.gz",
     output:
-        "results/classified-subsets/{cov}/{callset}.{type,FP|FN}.tsv",
+        "results/fp-fn/callsets/{cov}/{callset}/{classification}.tsv",
     log:
-        "logs/vembrane/subsets/{cov}/{callset}.{type}.log",
-    params:
-        filter=get_subset_filter,
+        "logs/extract-fp-fn/{cov}/{callset}/{classification}.log",
     conda:
         "../envs/vembrane.yaml"
-    shell:
-        """
-        (filtered=$(mktemp)
-        bcftools norm -m-any {input.calls} | vembrane filter {params.filter:q} > $filtered
-        vembrane table --header 'chromosome, position, ref_allele, alt_allele, true_genotype, predicted_genotype' \
-        'CHROM, POS, REF, ALT, \
-        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["TRUTH"])) if FORMAT["GT"]["TRUTH"] is not NA else ".", \
-        "{{}}/{{}}".format(*sorted(FORMAT["GT"]["QUERY"])) if FORMAT["GT"]["QUERY"] is not NA else "."' \
-        $filtered > {output}
-        rm $filtered) 2> {log}
-        """
+    script:
+        "../scripts/extract-fp-fn.py"
 
 
-rule merge_subsets:
+rule collect_fp_fn:
     input:
-        get_merged_classified_subsets_input,
+        get_collect_fp_fn_input,
     output:
-        "results/merged-classified-subsets/{genome}/{cov}/all.{type,FP|FN}.tsv",
+        main="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting=directory(
+            "results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting"
+        ),
     params:
-        callsets=get_merged_classified_subsets_callsets,
+        callsets=get_collect_fp_fn_callsets,
+        labels=get_collect_fp_fn_labels,
+        label_names=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
     log:
-        "logs/merge-substes/{genome}/{cov}/{type}.log",
+        "logs/collect-fp-fn/{genome}/{cov}/{classification}.log",
     conda:
         "../envs/stats.yaml"
     script:
-        "../scripts/merge-subsets.py"
+        "../scripts/collect-fp-fn.py"
 
 
-rule render_subset_report_config:
+rule render_fp_fn_report_config:
     input:
-        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
-        template=workflow.source_path("../resources/datavzrd/subset-config.yte.yaml"),
+        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
+        template=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
     output:
-        "results/datavzrd-config/subsets/{genome}/{cov}/all.{type}.config.yaml",
+        "results/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.config.yaml",
+    params:
+        labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
     log:
-        "logs/yte/datavzrd-config/subsets/{genome}/{cov}/{type}.log",
+        "logs/yte/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.log",
     template_engine:
         "yte"
 
 
-rule report_subsets:
+rule report_fp_fn:
     input:
-        dataset="results/merged-classified-subsets/{genome}/{cov}/all.{type}.tsv",
-        config="results/datavzrd-config/subsets/{genome}/{cov}/all.{type}.config.yaml",
+        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
+        config="results/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.config.yaml",
     output:
         report(
-            directory("results/report/fp-fn/{genome}/{cov}/all.{type}"),
+            directory("results/report/fp-fn/{genome}/{cov}/{classification}"),
             htmlindex="index.html",
-            category=lambda w: "false positives"
-            if w.type == "FP"
-            else "false negatives",
+            category="{classification} variants",
             subcategory=lambda w: w.genome,
             labels=lambda w: {"coverage": w.cov},
         ),
     log:
-        "logs/datavzrd/fp-fn/{genome}/{cov}/{type}.log",
+        "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
     wrapper:
-        "v1.17.1/utils/datavzrd"
+        "v1.17.4/utils/datavzrd"
