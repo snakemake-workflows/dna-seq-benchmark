@@ -17,6 +17,7 @@ views:
       and truth using hap.py with the vcfeval option, in combination with refined logic for counting hits.
 
       Genotype mismatches are displayed in the "genotype mismatch rate" column.
+    page-size: 12
     render-table:
       columns:
         callset:
@@ -25,17 +26,17 @@ views:
               scale: ordinal
               color-scheme: category20
         precision:
-          precision: 3
+          precision: 2
           plot:
             ticks:
               scale: linear
         recall:
-          precision: 3
+          precision: 2
           plot:
             ticks:
               scale: linear
         genotype_mismatch_rate:
-          precision: 3
+          precision: 2
           plot:
             ticks:
               scale: linear

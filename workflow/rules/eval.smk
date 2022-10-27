@@ -127,6 +127,7 @@ rule collect_stratifications:
         "results/precision-recall/callsets/{callset}.{vartype}.tsv",
     params:
         coverages=get_nonempty_coverages,
+        coverage_lower_bounds=coverages,
     log:
         "logs/collect-stratifications/{callset}/{vartype}.log",
     conda:
@@ -142,6 +143,7 @@ rule collect_precision_recall:
         "results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark),
+        labels=get_collect_precision_recall_labels,
     log:
         "logs/collect-precision-recall/{benchmark}/{vartype}.log",
     conda:
@@ -178,18 +180,16 @@ rule report_precision_recall:
     log:
         "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
     wrapper:
-        "v1.17.3/utils/datavzrd"
+        "v1.17.4/utils/datavzrd"
 
 
 rule extract_fp_fn:
     input:
         calls="results/happy/{callset}/{cov}/report.vcf.gz",
     output:
-        "results/fp-fn/callsets/{cov}/{callset}.tsv",
+        "results/fp-fn/callsets/{cov}/{callset}/{classification}.tsv",
     log:
-        "logs/extract-fp-fn/{cov}/{callset}.log",
-    params:
-        filter='FORMAT["BD"]["QUERY"] == "FP" or FORMAT["BD"]["TRUTH"] == "FN"',
+        "logs/extract-fp-fn/{cov}/{callset}/{classification}.log",
     conda:
         "../envs/vembrane.yaml"
     script:
@@ -198,13 +198,16 @@ rule extract_fp_fn:
 
 rule collect_fp_fn:
     input:
-        get_merged_classified_subsets_input,
+        get_collect_fp_fn_input,
     output:
-        "results/fp-fn/genomes/{genome}/{cov}/all.tsv",
+        main="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting=directory("results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting"),
     params:
-        callsets=get_merged_classified_subsets_callsets,
+        callsets=get_collect_fp_fn_callsets,
+        labels=get_collect_fp_fn_labels,
+        label_names=lambda w: get_callset_labels(get_genome_callsets(w.genome)),
     log:
-        "logs/collect-fp-fn/{genome}/{cov}.log",
+        "logs/collect-fp-fn/{genome}/{cov}/{classification}.log",
     conda:
         "../envs/stats.yaml"
     script:
@@ -213,29 +216,33 @@ rule collect_fp_fn:
 
 rule render_fp_fn_report_config:
     input:
-        dataset="results/fp-fn/genomes/{genome}/{cov}/all.tsv",
+        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
         template=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
     output:
-        "results/datavzrd-config/fp-fn/{genome}/{cov}/all.config.yaml",
+        "results/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.config.yaml",
+    params:
+        labels=lambda w: get_callset_labels(get_genome_callsets(w.genome)),
     log:
-        "logs/yte/datavzrd-config/fp-fn/{genome}/{cov}.log",
+        "logs/yte/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.log",
     template_engine:
         "yte"
 
 
 rule report_fp_fn:
     input:
-        dataset="results/fp-fn/genomes/{genome}/{cov}/all.tsv",
-        config="results/datavzrd-config/fp-fn/{genome}/{cov}/all.config.yaml",
+        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
+        config="results/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.config.yaml",
     output:
         report(
-            directory("results/report/fp-fn/{genome}/{cov}/all"),
+            directory("results/report/fp-fn/{genome}/{cov}/{classification}"),
             htmlindex="index.html",
-            category="FPs and FNs",
+            category="{classification} variants",
             subcategory=lambda w: w.genome,
             labels=lambda w: {"coverage": w.cov},
         ),
     log:
-        "logs/datavzrd/fp-fn/{genome}/{cov}.log",
+        "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
     wrapper:
-        "v1.17.3/utils/datavzrd"
+        "v1.17.4/utils/datavzrd"

@@ -307,13 +307,14 @@ def get_collect_stratifications_input(wildcards):
 def get_fp_fn_reports(wildcards):
     for genome in used_genomes:
         yield from expand(
-            "results/report/fp-fn/{genome}/{cov}/all",
+            "results/report/fp-fn/{genome}/{cov}/{classification}",
             genome=genome,
             cov={
                 cov
                 for callset in get_genome_callsets(genome)
                 for cov in _get_nonempty_coverages(callset)
             },
+            classification=["fp", "fn"]
         )
 
 
@@ -333,23 +334,60 @@ def get_collect_precision_recall_input(wildcards):
 
 
 def get_genome_callsets(genome):
-    return [
+    return sorted(
         callset
         for callset, entries in config["variant-calls"].items()
         if benchmarks[entries["benchmark"]]["genome"] == genome
-    ]
+    )
 
 
-def get_merged_classified_subsets_callsets(wildcards):
+def get_callset_labels(callsets):
+    return sorted(
+        set(
+            label
+            for callset in callsets
+            for label in config["variant-calls"][callset]["labels"]
+        )
+    )
+
+
+def get_callset_label_entries(callsets):
+    labels = get_callset_labels(callsets)
+
+    def get_label_row(label):
+        def labelval(label, callset):
+            return config["variant-calls"][callset].get("labels", dict()).get(label)
+
+        return {
+            callset: labelval(label, callset)
+            for callset in callsets
+            if labelval(label, callset)
+        }
+    
+    return [get_label_row(label) for label in labels]
+
+
+def get_collect_fp_fn_callsets(wildcards):
     return get_genome_callsets(wildcards.genome)
 
 
-def get_merged_classified_subsets_input(wildcards):
-    callsets = get_merged_classified_subsets_callsets(wildcards)
-    return expand("results/fp-fn/callsets/{{cov}}/{callset}.tsv", callset=callsets)
+def get_collect_fp_fn_input(wildcards):
+    callsets = get_collect_fp_fn_callsets(wildcards)
+    return expand("results/fp-fn/callsets/{{cov}}/{callset}/{{classification}}.tsv", callset=callsets)
+
+
+def get_collect_fp_fn_labels(wildcards):
+    callsets = get_genome_callsets(wildcards.genome)
+    return get_callset_label_entries(callsets)
+
+
+def get_collect_precision_recall_labels(wildcards):
+    callsets = get_benchmark_callsets(wildcards.benchmark)
+    return get_callset_label_entries(callsets)
 
 
 if "variant-calls" in config:
 
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
+        classification="|".join(["fp", "fn"])

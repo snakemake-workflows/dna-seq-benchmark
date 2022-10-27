@@ -1,32 +1,92 @@
 __definitions__:
+  - import os
   - import pandas as pd
   - |
-    columns = pd.read_table(input.dataset, sep="\t", nrows=1).columns
-    genotype_columns = list(columns[4:])
+    columns = pd.read_table(input.main_dataset, sep="\t", nrows=1).columns
+    genotype_columns = list(columns[5:])
 
-name: ?f"FP and FN calls at loci with {wildcards.cov} coverage on genome {wildcards.genome} for all callsets."
+name: ?f"{wildcards.classification.upper()} calls at loci with {wildcards.cov} coverage on genome {wildcards.genome} for all callsets."
+default-view: main
 
 datasets:
-  fp-fn-calls:
-    path: ?input.dataset
+  main:
+    path: ?input.main_dataset
     separator: "\t"
+    headers: ?len(params.labels) + 1
+  ?for label in params.labels:
+    ?label:
+      path: ?os.path.join(input.dependency_sorting_datasets, f"{label}.tsv")
+      separator: "\t"
+      headers: 2
+  
 
 views:
-  fp-fn-calls:
-    dataset: fp-fn-calls
-    page-size: 50
-    render-table:
-      columns:
-        true_genotype:
-          plot:
-            heatmap:
-              scale: ordinal
-              color-scheme: category10
-              aux-domain-columns: ?genotype_columns
-        ?for callset in genotype_columns[1:]:
-          ?callset:
+  ?for view in ["main"] + params.labels:
+    __variables__:
+      labels: ?params.labels if view == "main" else [view]
+    ?view if view == "main" else f"by {view}":
+      ?if view == "main":
+        desc: |
+          The values 0/0, 0/1, and 1/1 represent the genotype (not present, heterozygous, homozygous).
+          If a callset does not have an entry, this means that the variant matches the truth.
+
+          Rows and columns are sorted according to an unsupervised hiearchical clustering with hamming distance and ward linkage.
+      ?else:
+        desc: |
+          ?f"""
+          Rows are sorted by their statistical dependency on {view}, which is determined by a 
+          [Chi² test](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.chi2.html).
+          The corresponding p-value and Benjamini-Hochberg corrected FDR is shown in the last two columns.
+          They represent the probability to observe an at least as strong dependency by chance.
+          Rows with highest dependency are shown first.
+
+          The values 0/0, 0/1, and 1/1 represent the genotype (not present, heterozygous, homozygous).
+          If a callset does not have an entry, this means that the variant matches the truth.
+          """
+      dataset: ?view
+      page-size: 12
+      render-table:
+        headers:
+          ?for i, label in enumerate(labels):
+            ?i + 1:
+              label: ?label
+              plot:
+                heatmap:
+                  scale: ordinal
+                  color-scheme: category20
+        columns:
+          true_genotype:
             plot:
               heatmap:
                 scale: ordinal
-                color-scheme: category10
-                aux-domain-columns: ?genotype_columns
+                domain:
+                  - "0/0"
+                  - "0/1"
+                  - "1/1"
+                range:
+                  - "#fdae6b"
+                  - "#c6dbef"
+                  - "#6baed6"
+          p-value dependency:
+            plot:
+              ticks:
+                scale: linear
+            optional: true
+          FDR dependency:
+            plot:
+              ticks:
+                scale: linear
+            optional: true
+          ?for callset in genotype_columns:
+            ?callset:
+              plot:
+                heatmap:
+                  scale: ordinal
+                  domain:
+                    - "0/0"
+                    - "0/1"
+                    - "1/1"
+                  range:
+                    - "#fdae6b"
+                    - "#c6dbef"
+                    - "#6baed6"
