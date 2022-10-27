@@ -263,10 +263,6 @@ def get_rename_contig_file(wildcards):
     return config["variant-calls"][wildcards.callset].get("rename-contigs")
 
 
-def get_callset_labels(wildcards):
-    return config["variant-calls"][wildcards.callset].get("labels")
-
-
 def get_callset_subcategory(wildcards):
     return config["variant-calls"][wildcards.callset].get("subcategory")
 
@@ -341,18 +337,18 @@ def get_genome_callsets(genome):
     )
 
 
-def get_callset_labels(callsets):
+def get_callsets_labels(callsets):
     return sorted(
         set(
             label
             for callset in callsets
-            for label in config["variant-calls"][callset]["labels"]
+            for label in config["variant-calls"][callset].get("labels", [])
         )
     )
 
 
 def get_callset_label_entries(callsets):
-    labels = get_callset_labels(callsets)
+    labels = get_callsets_labels(callsets)
 
     def get_label_row(label):
         def labelval(label, callset):

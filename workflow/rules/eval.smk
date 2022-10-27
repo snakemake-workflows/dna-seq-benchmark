@@ -207,7 +207,7 @@ rule collect_fp_fn:
     params:
         callsets=get_collect_fp_fn_callsets,
         labels=get_collect_fp_fn_labels,
-        label_names=lambda w: get_callset_labels(get_genome_callsets(w.genome)),
+        label_names=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
     log:
         "logs/collect-fp-fn/{genome}/{cov}/{classification}.log",
     conda:
@@ -224,7 +224,7 @@ rule render_fp_fn_report_config:
     output:
         "results/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.config.yaml",
     params:
-        labels=lambda w: get_callset_labels(get_genome_callsets(w.genome)),
+        labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
     log:
         "logs/yte/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.log",
     template_engine:
