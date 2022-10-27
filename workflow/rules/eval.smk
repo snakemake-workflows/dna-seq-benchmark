@@ -201,7 +201,9 @@ rule collect_fp_fn:
         get_collect_fp_fn_input,
     output:
         main="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
-        dependency_sorting=directory("results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting"),
+        dependency_sorting=directory(
+            "results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting"
+        ),
     params:
         callsets=get_collect_fp_fn_callsets,
         labels=get_collect_fp_fn_labels,

@@ -314,7 +314,7 @@ def get_fp_fn_reports(wildcards):
                 for callset in get_genome_callsets(genome)
                 for cov in _get_nonempty_coverages(callset)
             },
-            classification=["fp", "fn"]
+            classification=["fp", "fn"],
         )
 
 
@@ -363,7 +363,7 @@ def get_callset_label_entries(callsets):
             for callset in callsets
             if labelval(label, callset)
         }
-    
+
     return [get_label_row(label) for label in labels]
 
 
@@ -373,7 +373,10 @@ def get_collect_fp_fn_callsets(wildcards):
 
 def get_collect_fp_fn_input(wildcards):
     callsets = get_collect_fp_fn_callsets(wildcards)
-    return expand("results/fp-fn/callsets/{{cov}}/{callset}/{{classification}}.tsv", callset=callsets)
+    return expand(
+        "results/fp-fn/callsets/{{cov}}/{callset}/{{classification}}.tsv",
+        callset=callsets,
+    )
 
 
 def get_collect_fp_fn_labels(wildcards):
@@ -390,4 +393,4 @@ if "variant-calls" in config:
 
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
-        classification="|".join(["fp", "fn"])
+        classification="|".join(["fp", "fn"]),
