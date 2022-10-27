@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.4.1...v1.5.0) (2022-10-27)
+
+
+### Features
+
+* improved precision recall reporting ([#25](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/25)) ([5f5d18f](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/5f5d18f3bffa946174074e121d892d374b6ce51e))
+* improved, interactive reporting (FP/FN and precision/recall) ([#27](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/27)) ([df6e430](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/df6e4308f259bf7c79a6e4960df9c2c7bd8de1c0))
+
+
+### Performance Improvements
+
+* upgrade datavzrd ([d844bce](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/d844bce31fea29821bfd86ba694926ca6428be77))
+
 ### [1.4.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.4.0...v1.4.1) (2022-08-25)
 
 
