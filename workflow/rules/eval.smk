@@ -138,7 +138,8 @@ rule collect_stratifications:
 
 rule collect_precision_recall:
     input:
-        get_collect_precision_recall_input,
+        tables=get_collect_precision_recall_input,
+        common_src=common_src,
     output:
         "results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
     params:
@@ -198,7 +199,8 @@ rule extract_fp_fn:
 
 rule collect_fp_fn:
     input:
-        get_collect_fp_fn_input,
+        tables=get_collect_fp_fn_input,
+        common_src=common_src,
     output:
         main="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
         dependency_sorting=directory(

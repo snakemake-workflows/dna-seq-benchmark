@@ -41,7 +41,7 @@ def get_idx_sorted_by_clustering(data):
 data = pd.concat(
     [
         read_data(f, callset)
-        for f, callset in zip(snakemake.input, snakemake.params.callsets)
+        for f, callset in zip(snakemake.input.tables, snakemake.params.callsets)
     ],
     axis="columns",
 )

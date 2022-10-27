@@ -10,7 +10,7 @@ def load_data(path, callset):
 results = pd.concat(
     [
         load_data(f, callset)
-        for f, callset in zip(snakemake.input, snakemake.params.callsets)
+        for f, callset in zip(snakemake.input.tables, snakemake.params.callsets)
     ],
     axis="rows",
 )
