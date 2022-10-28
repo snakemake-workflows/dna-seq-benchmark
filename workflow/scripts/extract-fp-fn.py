@@ -10,7 +10,7 @@ import pysam
 from common.happy_report import CompareExistence, Class, is_het
 
 cmp = CompareExistence()
-varfile = pysam.VariantFile(snakemake.input[0])
+varfile = pysam.VariantFile(snakemake.input.calls)
 
 with open(snakemake.output[0], "w", newline="") as outfile:
     writer = csv.writer(outfile, delimiter="\t")

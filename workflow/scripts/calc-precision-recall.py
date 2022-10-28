@@ -50,7 +50,7 @@ def collect_results(vartype):
     classifications_exact = Classifications(CompareExactGenotype(vartype))
     classifications_existence = Classifications(CompareExistence(vartype))
 
-    for record in pysam.VariantFile(snakemake.input[0]):
+    for record in pysam.VariantFile(snakemake.input.calls):
         classifications_exact.register(record)
         classifications_existence.register(record)
 
