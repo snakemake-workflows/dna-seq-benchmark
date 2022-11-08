@@ -50,6 +50,7 @@ data = data.loc[
     data.isna().sum(axis="columns").sort_values().index,
 ]
 
+data = data.dropna(how="all")
 
 if not data.empty:
     idx_rows = get_idx_sorted_by_clustering(data)
@@ -82,38 +83,40 @@ os.makedirs(snakemake.output.dependency_sorting, exist_ok=True)
 
 # for each label, calculate mutual information and sort FP/FN entries in descending order
 for label_idx, label in enumerate(snakemake.params.label_names):
-    # oe = OrdinalEncoder()
-    # le = LabelEncoder()
-    # feature matrix: genotypes, transposed into samples x features, replace NA with False (match)
-    # and any genotype with True (mismatch with truth).
-    feature_matrix = data.reset_index(drop=True).T.copy()
-    feature_matrix[~pd.isna(feature_matrix)] = True
-    feature_matrix[pd.isna(feature_matrix)] = False
+    outdata = data.copy(deep=True)
+    if not data.empty:
+        # oe = OrdinalEncoder()
+        # le = LabelEncoder()
+        # feature matrix: genotypes, transposed into samples x features, replace NA with False (match)
+        # and any genotype with True (mismatch with truth).
+        feature_matrix = data.reset_index(drop=True).T.copy()
+        feature_matrix[~pd.isna(feature_matrix)] = True
+        feature_matrix[pd.isna(feature_matrix)] = False
 
-    # target vector: label values, converted into factors
-    target_vector = label_df.loc[label]
+        # target vector: label values, converted into factors
+        target_vector = label_df.loc[label]
 
-    # ignore any NA in the target vector and correspondingly remove the rows in the feature matrix
-    not_na_target_vector = target_vector[~pd.isna(target_vector)]
-    feature_matrix = feature_matrix.loc[not_na_target_vector.index]
+        # ignore any NA in the target vector and correspondingly remove the rows in the feature matrix
+        not_na_target_vector = target_vector[~pd.isna(target_vector)]
+        feature_matrix = feature_matrix.loc[not_na_target_vector.index]
 
-    # calculate mutual information for 100 times and take the mean for each feature
-    _, pvals = chi2(feature_matrix, not_na_target_vector)
-    sorted_idx = np.argsort(pvals)
+        # calculate mutual information for 100 times and take the mean for each feature
+        _, pvals = chi2(feature_matrix, not_na_target_vector)
+        sorted_idx = np.argsort(pvals)
 
-    _, fdr = fdrcorrection(pvals)
+        _, fdr = fdrcorrection(pvals)
 
-    # clone data
-    sorted_data = data.copy(deep=True)
+        # clone data
+        sorted_data = data.copy(deep=True)
 
-    # sort by label
-    sorted_target_vector = target_vector.sort_values()
-    sorted_data = sorted_data[sorted_target_vector.index]
+        # sort by label
+        sorted_target_vector = target_vector.sort_values()
+        sorted_data = sorted_data[sorted_target_vector.index]
 
-    # add mutual information
-    sorted_data.insert(0, "FDR dependency", np.around(fdr, 3))
-    sorted_data.insert(0, "p-value dependency", np.around(pvals, 3))
+        # add mutual information
+        sorted_data.insert(0, "FDR dependency", np.around(fdr, 3))
+        sorted_data.insert(0, "p-value dependency", np.around(pvals, 3))
 
-    sorted_data = sorted_data.iloc[sorted_idx]
+        outdata = sorted_data.iloc[sorted_idx]
     outpath = os.path.join(snakemake.output.dependency_sorting, f"{label}.tsv")
-    store(sorted_data, outpath, label_idx=label_idx)
+    store(outdata, outpath, label_idx=label_idx)
