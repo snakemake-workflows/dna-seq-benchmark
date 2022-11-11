@@ -83,7 +83,7 @@ os.makedirs(snakemake.output.dependency_sorting, exist_ok=True)
 
 # for each label, calculate mutual information and sort FP/FN entries in descending order
 for label_idx, label in enumerate(snakemake.params.label_names):
-    outdata = data.copy(deep=True)
+    outdata = data
     if not data.empty:
         # oe = OrdinalEncoder()
         # le = LabelEncoder()
