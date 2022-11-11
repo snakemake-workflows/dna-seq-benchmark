@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.5.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.5.0...v1.5.1) (2022-11-11)
+
+
+### Bug Fixes
+
+* add common to source files ([f4c9d0b](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/f4c9d0bb646bb689c2bc34a8a357b95807f2408d))
+* drop empty rows ([#29](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/29)) ([87b85dc](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/87b85dc62ca281faff5118c88d035bcaf26949af))
+* Use common module as input for the correct rules. This fixes the deployment of this workflow as a module. ([7a00a2f](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/7a00a2fc7b722a66e6670f220e035ee46133a7bf))
+
 ## [1.5.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.4.1...v1.5.0) (2022-10-27)
 
 
