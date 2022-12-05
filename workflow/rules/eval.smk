@@ -198,6 +198,9 @@ rule extract_fp_fn:
         "../scripts/extract-fp-fn.py"
 
 
+# TODO: if one of the input callsets has all sites as FN, the resulting merged table
+# becomes empty. This needs to be fixed, but is not super urgent because it is not realistic to
+# happen in reality.
 rule collect_fp_fn:
     input:
         tables=get_collect_fp_fn_input,
