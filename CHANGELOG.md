@@ -1,5 +1,18 @@
 # Changelog
 
+### [1.6.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.0...v1.6.1) (2023-01-10)
+
+
+### Bug Fixes
+
+* sort stratifications ([efa4b7b](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/efa4b7bc3f168c9b02d3e93bf49f3652eeb2445d))
+
+
+### Performance Improvements
+
+* latest datavzrd ([ff8687c](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/ff8687c0c60ac8fe88ec8d6bd1a0de6267846908))
+* update to latest datavzrd ([645bfb7](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/645bfb7e138f33ade64be9375db34e1a6f8ae2a9))
+
 ## [1.6.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.5.1...v1.6.0) (2023-01-10)
 
 
