@@ -41,7 +41,7 @@ coverages = {
 
 common_src = [
     workflow.source_path("../scripts/common/__init__.py"),
-    workflow.source_path("../scripts/common/happy_report.py"),
+    workflow.source_path("../scripts/common/classification.py"),
 ]
 
 
@@ -396,3 +396,5 @@ if "variant-calls" in config:
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
         classification="|".join(["fp", "fn"]),
+        comparison="genotype|existence",
+        vartype="snvs|indels",

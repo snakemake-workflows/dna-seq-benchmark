@@ -9,7 +9,7 @@ from enum import Enum
 import pandas as pd
 import pysam
 
-from common.happy_report import CompareExactGenotype, CompareExistence, Class
+from common.classification import CompareExactGenotype, CompareExistence, Class
 
 
 class Classifications:
@@ -90,6 +90,7 @@ def collect_results(vartype):
     ]
 
 
-vartype = "SNP" if snakemake.wildcards.vartype == "snvs" else "INDEL"
+assert snakemake.wildcards.vartype in ["snvs", "indels"]
+vartype = "SNV" if snakemake.wildcards.vartype == "snvs" else "INDEL"
 
 collect_results(vartype).to_csv(snakemake.output[0], sep="\t", index=False)

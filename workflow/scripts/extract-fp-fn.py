@@ -7,7 +7,7 @@ sys.stderr = open(snakemake.log[0], "w")
 import csv
 import pysam
 
-from common.happy_report import CompareExistence, Class, is_het
+from common.classification import CompareExistence, Class, is_het
 
 cmp = CompareExistence()
 varfile = pysam.VariantFile(snakemake.input.calls)
