@@ -85,7 +85,7 @@ rule generate_sdf:
     output:
         directory("resources/reference/genome-sdf"),
     log:
-        "logs/rtg-tools/sdf.log"
+        "logs/rtg-tools/sdf.log",
     conda:
         "../envs/rtg-tools.yaml"
     shell:
@@ -100,11 +100,11 @@ rule benchmark_variants:
         query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
         genome="resources/reference/genome-sdf",
     output:
-        "results/vcfeval/{callset}/{cov}/output.vcf.gz"
+        "results/vcfeval/{callset}/{cov}/output.vcf.gz",
     log:
-        "logs/vcfeval/{callset}/{cov}.log"
+        "logs/vcfeval/{callset}/{cov}.log",
     params:
-        output=lambda w, output: os.path.dirname(output[0])
+        output=lambda w, output: os.path.dirname(output[0]),
     conda:
         "../envs/rtg-tools.yaml"
     threads: 32
