@@ -41,7 +41,7 @@ coverages = {
 
 common_src = [
     workflow.source_path("../scripts/common/__init__.py"),
-    workflow.source_path("../scripts/common/happy_report.py"),
+    workflow.source_path("../scripts/common/classification.py"),
 ]
 
 
