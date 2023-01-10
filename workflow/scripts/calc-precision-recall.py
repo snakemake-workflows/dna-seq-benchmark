@@ -9,7 +9,7 @@ from enum import Enum
 import pandas as pd
 import pysam
 
-from workflow.scripts.common.classification import CompareExactGenotype, CompareExistence, Class
+from common.classification import CompareExactGenotype, CompareExistence, Class
 
 
 class Classifications:
