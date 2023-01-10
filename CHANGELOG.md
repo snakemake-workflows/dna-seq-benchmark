@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.5.1...v1.6.0) (2023-01-10)
+
+
+### Features
+
+* replace hap.py with direct use of vcfeval ([#30](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/30)) ([75113fa](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/75113fafc8aaf797cdd05f3652c327ef0b301e26))
+
 ### [1.5.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.5.0...v1.5.1) (2022-11-11)
 
 
