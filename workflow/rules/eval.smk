@@ -78,38 +78,46 @@ checkpoint stat_truth:
         "../scripts/stat-truth.py"
 
 
-rule benchmark_variants:
+rule generate_sdf:
     input:
-        truth=get_stratified_truth(),
-        truth_idx=get_stratified_truth(".csi"),
-        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         genome="resources/reference/genome.fasta",
         genome_index="resources/reference/genome.fasta.fai",
     output:
-        multiext(
-            "results/happy/{callset}/{cov}/report",
-            ".runinfo.json",
-            ".vcf.gz",
-            ".summary.csv",
-            ".extended.csv",
-            ".metrics.json.gz",
-            ".roc.all.csv.gz",
-            ".roc.Locations.INDEL.csv.gz",
-            ".roc.Locations.INDEL.PASS.csv.gz",
-            ".roc.Locations.SNP.csv.gz",
-        ),
-    params:
-        prefix=get_happy_prefix,
-        engine="vcfeval",
+        directory("resources/reference/genome-sdf"),
     log:
-        "logs/happy/{callset}/{cov}.log",
-    wrapper:
-        "v1.7.2/bio/hap.py/hap.py"
+        "logs/rtg-tools/sdf.log"
+    conda:
+        "../envs/rtg-tools.yaml"
+    shell:
+        "rtg format --output {output} {input.genome} &> {log}"
+
+
+rule benchmark_variants:
+    input:
+        truth=get_stratified_truth(),
+        truth_idx=get_stratified_truth(".tbi"),
+        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
+        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
+        genome="resources/reference/genome-sdf",
+    output:
+        "results/vcfeval/{callset}/{cov}/output.vcf.gz"
+    log:
+        "logs/vcfeval/{callset}/{cov}.log"
+    params:
+        output=lambda w, output: os.path.dirname(output[0])
+    conda:
+        "../envs/rtg-tools.yaml"
+    threads: 32
+    shell:
+        "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records "
+        "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
+        "--output {params.output} --template {input.genome} &> {log}"
 
 
 rule calc_precision_recall:
     input:
-        calls="results/happy/{callset}/{cov}/report.vcf.gz",
+        calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
+        idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
         common_src=common_src,
     output:
         snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
@@ -186,7 +194,7 @@ rule report_precision_recall:
 
 rule extract_fp_fn:
     input:
-        calls="results/happy/{callset}/{cov}/report.vcf.gz",
+        calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
         common_src=common_src,
     output:
         "results/fp-fn/callsets/{cov}/{callset}/{classification}.tsv",

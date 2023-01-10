@@ -52,7 +52,19 @@ def get_decision(record, sample):
 
 
 def get_vartypes(record):
-    return record.samples[0]["BVT"], record.samples[1]["BVT"]
+    ref_allele = record.alleles[0]
+    alts_truth = alt_alleles(record, 0)
+    alts_query = alt_alleles(record, 1)
+    is_snv = lambda alt: len(alt) == 1 and len(ref_allele) == 1
+    def vartype(alts):
+        _is_snv = set(map(is_snv, alts))
+        if not _is_snv:
+            return None
+        # we expect different types
+        #assert len(_is_snv) == 1, f"{record.pos}, {_is_snv}"
+        return "SNV" if all(_is_snv) else "INDEL"
+    
+    return vartype(alts_truth), vartype(alts_query)
 
 
 def alt_alleles(record, sample):

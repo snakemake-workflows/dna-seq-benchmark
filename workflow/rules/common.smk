@@ -396,3 +396,5 @@ if "variant-calls" in config:
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
         classification="|".join(["fp", "fn"]),
+        comparison="genotype|existence",
+        vartype="snvs|indels",
