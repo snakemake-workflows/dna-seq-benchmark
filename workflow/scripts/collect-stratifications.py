@@ -33,5 +33,17 @@ if snakemake.input:
     report.to_csv(snakemake.output[0], sep="\t", index=False)
 else:
     pd.DataFrame(
-        {col: [] for col in ["coverage", "precision", "tp_query", "fp", "recall", "tp_truth", "fn", "genotype_mismatch_rate"]}
+        {
+            col: []
+            for col in [
+                "coverage",
+                "precision",
+                "tp_query",
+                "fp",
+                "recall",
+                "tp_truth",
+                "fn",
+                "genotype_mismatch_rate",
+            ]
+        }
     ).to_csv(snakemake.output[0], sep="\t")
