@@ -80,13 +80,21 @@ views:
           ?for callset in genotype_columns:
             ?callset:
               plot:
-                heatmap:
-                  scale: ordinal
-                  domain:
-                    - "0/0"
-                    - "0/1"
-                    - "1/1"
-                  range:
-                    - "#fdae6b"
-                    - "#c6dbef"
-                    - "#6baed6"
+                ?if wildcards.classification == "fp":
+                  heatmap:
+                    scale: ordinal
+                    domain:
+                      - "0/0"
+                      - "0/1"
+                      - "1/1"
+                    range:
+                      - "#fdae6b"
+                      - "#c6dbef"
+                      - "#6baed6"
+                ?else:
+                  heatmap:
+                    scale: ordinal
+                    domain:
+                      - FN
+                    range:
+                      - "#6baed6"
