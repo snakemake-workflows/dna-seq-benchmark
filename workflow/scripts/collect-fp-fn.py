@@ -29,6 +29,9 @@ def read_data(f, callset):
     ), f"bug: not expecting any duplicates in FP/FN table {f}"
 
     data.columns = [callset]
+
+    if snakemake.wildcards.classification == "fn":
+        data.loc[:, callset] = "FN"
     return data
 
 
