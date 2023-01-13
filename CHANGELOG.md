@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.6.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.1...v1.6.2) (2023-01-13)
+
+
+### Bug Fixes
+
+* correct columns in case of empty precision recall ([#33](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/33)) ([03e60da](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/03e60da54e5b55ed8036e3fa9416bb0a27817a05))
+* display of false negatives ([#35](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/35)) ([b3feca6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/b3feca6698f4279a1027f202ccf97a96992410d8))
+
 ### [1.6.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.0...v1.6.1) (2023-01-10)
 
 
