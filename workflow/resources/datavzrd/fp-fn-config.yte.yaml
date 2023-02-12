@@ -8,6 +8,8 @@ __definitions__:
 name: ?f"{wildcards.classification.upper()} calls at loci with {wildcards.cov} coverage on genome {wildcards.genome} for all callsets."
 default-view: main
 
+webview-controls: true
+
 datasets:
   main:
     path: ?input.main_dataset
@@ -50,6 +52,7 @@ views:
           ?for i, label in enumerate(labels):
             ?i + 1:
               label: ?label
+              ellipsis: 4
               plot:
                 heatmap:
                   scale: ordinal

@@ -4,6 +4,8 @@ __variables__:
 
 name: ?f"Precision/recall analysis of {wildcards.benchmark}"
 
+webview-controls: true
+
 datasets:
   results:
     path: ?input.dataset
