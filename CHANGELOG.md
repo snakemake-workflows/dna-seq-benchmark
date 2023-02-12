@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.6.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.2...v1.6.3) (2023-02-12)
+
+
+### Bug Fixes
+
+* polish reports ([947a176](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/947a176fda49b64c2fcb098d07c4967a78f6d306))
+
 ### [1.6.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.1...v1.6.2) (2023-01-13)
 
 
