@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.6.4](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.3...v1.6.4) (2023-02-12)
+
+
+### Bug Fixes
+
+* use resources to set sort threads ([ed5bca0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/ed5bca0a49672b61a50b324128aaa81d03ffea65))
+
 ### [1.6.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.2...v1.6.3) (2023-02-12)
 
 
