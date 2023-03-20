@@ -107,7 +107,7 @@ for label_idx, label in enumerate(snakemake.params.label_names):
         _, pvals = chi2(feature_matrix, not_na_target_vector)
         sorted_idx = np.argsort(pvals)
 
-        _, fdr = fdrcorrection(pvals)
+        _, fdr = fdrcorrection(pvals, method="n") # use Benjamini/Yekutieli as variants might be both positively or negatively correlated
 
         # clone data
         sorted_data = data.copy(deep=True)
