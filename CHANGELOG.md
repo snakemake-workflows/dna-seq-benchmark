@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.6.5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.4...v1.6.5) (2023-03-20)
+
+
+### Bug Fixes
+
+* use Benjamini/Yekutieli method for FDR correction ([9391a1a](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/9391a1acbbab6a1d0f7b76060720997c36ffdaf2))
+
 ### [1.6.4](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.3...v1.6.4) (2023-02-12)
 
 
