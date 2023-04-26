@@ -116,10 +116,12 @@ def get_confidence_bed_cmd(wildcards, input):
     genome = genomes[wildcards.genome]
     bed = genome["confidence-regions"][get_genome_build()]
 
+    unpack_cmd = "| zcat " if bed.endswith(".gz") else ""
+
     if input.archive:
-        return f"cat {input.archive}/{bed}"
+        return f"cat {input.archive}/{bed} {unpack_cmd}"
     else:
-        return f"curl --insecure -L {bed}"
+        return f"curl --insecure -L {bed} {unpack_cmd}"
 
 
 def get_genome_build():
@@ -236,8 +238,8 @@ def get_benchmark(benchmark):
         )
 
 
-def get_benchmark_truth(wildcards):
-    genome_name = get_benchmark(wildcards.benchmark)["genome"]
+def get_genome_truth(wildcards):
+    genome_name = wildcards.genome
     genome = genomes[genome_name]
 
     truthset = genome["truth"][get_genome_build()]
@@ -245,6 +247,11 @@ def get_benchmark_truth(wildcards):
         return f"resources/variants/{genome_name}/all.truth.bcf"
     else:
         return f"resources/variants/{genome_name}.merged.truth.bcf"
+
+
+def get_benchmark_truth(wildcards):
+    genome = get_benchmark(wildcards.benchmark)["genome"]
+    return f"resources/variants/{genome}/all.truth.norm.bcf"
 
 
 def get_stratified_truth(suffix=""):

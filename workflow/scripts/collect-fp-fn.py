@@ -103,7 +103,7 @@ for label_idx, label in enumerate(snakemake.params.label_names):
         not_na_target_vector = target_vector[~pd.isna(target_vector)]
         feature_matrix = feature_matrix.loc[not_na_target_vector.index]
 
-        # calculate mutual information for 100 times and take the mean for each feature
+        # perfom chi² test against each feature
         _, pvals = chi2(feature_matrix, not_na_target_vector)
         sorted_idx = np.argsort(pvals)
 
@@ -116,10 +116,14 @@ for label_idx, label in enumerate(snakemake.params.label_names):
         sorted_target_vector = target_vector.sort_values()
         sorted_data = sorted_data[sorted_target_vector.index]
 
-        # add mutual information
+        # add pvalue and FDR
         sorted_data.insert(0, "FDR dependency", np.around(fdr, 3))
         sorted_data.insert(0, "p-value dependency", np.around(pvals, 3))
 
         outdata = sorted_data.iloc[sorted_idx]
+
+        # only keep significant entries
+        outdata = outdata.loc[outdata["FDR dependency"] <= 0.05]
+        
     outpath = os.path.join(snakemake.output.dependency_sorting, f"{label}.tsv")
     store(outdata, outpath, label_idx=label_idx)
