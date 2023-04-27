@@ -289,6 +289,7 @@ def get_norm_params(wildcards):
 
 def get_mosdepth_input(bai=False):
     ext = ".bai" if bai else ""
+
     def inner(wildcards):
         benchmark = get_benchmark(wildcards.benchmark)
         bam = benchmark.get("bam")
@@ -298,6 +299,7 @@ def get_mosdepth_input(bai=False):
             return bam + ext
         else:
             return f"results/read-alignments/{wildcards.benchmark}.dedup.bam{ext}"
+
     return inner
 
 
