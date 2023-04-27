@@ -291,9 +291,9 @@ def get_mosdepth_input(bai=False):
     ext = ".bai" if bai else ""
     def inner(wildcards):
         benchmark = get_benchmark(wildcards.benchmark)
-        bam = benchmark["bam"]
+        bam = benchmark.get("bam")
         if bam:
-            if benchmark["bai"] and bai:
+            if "bai" in benchmark and bai:
                 return benchmark["bai"]
             return bam + ext
         else:
