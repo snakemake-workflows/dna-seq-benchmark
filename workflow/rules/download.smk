@@ -223,8 +223,8 @@ rule samtools_index:
 
 rule mosdepth:
     input:
-        bam="results/read-alignments/{benchmark}.dedup.bam",
-        bai="results/read-alignments/{benchmark}.dedup.bam.bai",
+        bam=get_mosdepth_input(),
+        bai=get_mosdepth_input(bai=True),
     output:
         "results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
         "results/coverage/{benchmark}/coverage.quantized.bed.gz",

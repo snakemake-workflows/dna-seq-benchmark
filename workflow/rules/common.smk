@@ -287,6 +287,18 @@ def get_norm_params(wildcards):
     return f"--atomize --check-ref s --rm-dup exact {target}"
 
 
+def get_mosdepth_input(bai=False):
+    ext = ".bai" if bai else ""
+    def inner(wildcards):
+        benchmark = get_benchmark(wildcards.benchmark)
+        bam = benchmark["bam"]
+        if bam:
+            return bam + ext
+        else:
+            return f"results/read-alignments/{wildcards.benchmark}.dedup.bam{ext}"
+    return inner
+
+
 def _get_nonempty_coverages(callset):
     benchmark = config["variant-calls"][callset]["benchmark"]
 
