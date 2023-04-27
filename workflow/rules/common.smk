@@ -293,6 +293,8 @@ def get_mosdepth_input(bai=False):
         benchmark = get_benchmark(wildcards.benchmark)
         bam = benchmark["bam"]
         if bam:
+            if benchmark["bai"] and bai:
+                return benchmark["bai"]
             return bam + ext
         else:
             return f"results/read-alignments/{wildcards.benchmark}.dedup.bam{ext}"
