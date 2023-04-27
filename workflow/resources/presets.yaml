@@ -7,7 +7,7 @@ benchmarks:
 
   chm-eval:
     genome: chm-eval
-    bam-url: ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341793/CHM1_CHM13_3.bam
+    bam-url: ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341796/CHM1_CHM13_2.bam
     grch37: false
 
   seqc2-somatic-ea-n:
