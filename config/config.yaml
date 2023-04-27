@@ -22,9 +22,16 @@ custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
     # Truth genome to consider (for now only NA12878 allowed, TODO: CHM)
     genome: na12878
+    # Path to fastqs with the reads used for variant calling (alternatively, use bam below)
     fastqs:
       - path/to/1.fq
       - path/to/2.fq
+    # Path to bam with the reads used for variant calling (alternatively, use fastqs above)
+    # If both are given, bam is used.
+    # The bam is assumed to be already duplicate-marked, sorted, and indexed.
+    bam: path/to/sample.bam
+    # Optiona path to bai. If not given, inferred from bam path.
+    bai: path/to/sample.bam.bai
     target-regions: path/to/regions.bed
     # whether given target regions are on hg19
     grch37: false

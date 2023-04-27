@@ -13,19 +13,15 @@ rule rename_contigs:
         "-Ob -o {output} 2> {log}"
 
 
-rule normalize_calls:
+use rule normalize_truth as normalize_calls with:
     input:
         get_callset,
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/normalized-variants/{callset}.vcf.gz",
-    params:
-        extra=get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
-    wrapper:
-        "v1.9.0/bio/bcftools/norm"
 
 
 rule stratify_truth:

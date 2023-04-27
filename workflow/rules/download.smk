@@ -65,6 +65,21 @@ rule merge_truthsets:
         "bcftools concat -O b --allow-overlap {input} > {output} 2> {log}"
 
 
+rule normalize_truth:
+    input:
+        get_genome_truth,
+        ref="resources/reference/genome.fasta",
+        ref_index="resources/reference/genome.fasta.fai",
+    output:
+        "resources/variants/{genome}/all.truth.norm.bcf",
+    params:
+        extra=get_norm_params,
+    log:
+        "logs/normalize-truth/{genome}.log",
+    wrapper:
+        "v1.9.0/bio/bcftools/norm"
+
+
 rule get_confidence_bed:
     input:
         archive=get_archive_input,
@@ -208,8 +223,8 @@ rule samtools_index:
 
 rule mosdepth:
     input:
-        bam="results/read-alignments/{benchmark}.dedup.bam",
-        bai="results/read-alignments/{benchmark}.dedup.bam.bai",
+        bam=get_mosdepth_input(),
+        bai=get_mosdepth_input(bai=True),
     output:
         "results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
         "results/coverage/{benchmark}/coverage.quantized.bed.gz",
