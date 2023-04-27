@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.6.6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.5...v1.6.6) (2023-04-27)
+
+
+### Bug Fixes
+
+* fixes for custom benchmarks and cleanup of chi2 output ([#39](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/39)) ([c8cdfb8](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/c8cdfb826f60749b9b8ab8cd218d45b991158764))
+
 ### [1.6.5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.4...v1.6.5) (2023-03-20)
 
 
