@@ -137,6 +137,9 @@ rule collect_stratifications:
         "logs/collect-stratifications/{callset}/{vartype}.log",
     conda:
         "../envs/stats.yaml"
+    # We want this to be determined before FP/FN collection in order to avoid memory 
+    # issues with callsets that do not match the truth at all.
+    priority: 2 
     script:
         "../scripts/collect-stratifications.py"
 
@@ -221,6 +224,9 @@ rule collect_fp_fn:
         "logs/collect-fp-fn/{genome}/{cov}/{classification}.log",
     conda:
         "../envs/stats.yaml"
+    # This has to happen after precision/recall has been computed, otherwise we risk
+    # extremely high memory usage if a callset does not match the truth at all.
+    priority: 1
     script:
         "../scripts/collect-fp-fn.py"
 
