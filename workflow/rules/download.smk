@@ -12,6 +12,7 @@ rule get_reads:
     resources:
         sort_threads=lambda _, threads: max(threads - 2, 1),
     threads: 32
+    retries: 3
     shell:
         "(set +o pipefail; samtools view -f3 -h"
         " {params.bam_url}"
@@ -29,6 +30,7 @@ rule get_archive:
         "logs/get-archive/{genome}.log",
     conda:
         "../envs/tools.yaml"
+    retries: 3
     shell:
         "(mkdir -p {output}; curl -L {params.url} | tar -x -C {output} --strip-components 1) 2> {log}"
 
