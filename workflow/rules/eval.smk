@@ -137,9 +137,9 @@ rule collect_stratifications:
         "logs/collect-stratifications/{callset}/{vartype}.log",
     conda:
         "../envs/stats.yaml"
-    # We want this to be determined before FP/FN collection in order to avoid memory 
+    # We want this to be determined before FP/FN collection in order to avoid memory
     # issues with callsets that do not match the truth at all.
-    priority: 2 
+    priority: 2
     script:
         "../scripts/collect-stratifications.py"
 
