@@ -1,5 +1,18 @@
 # Changelog
 
+### [1.6.7](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.6...v1.6.7) (2023-05-04)
+
+
+### Bug Fixes
+
+* define retries for fallible rules ([#41](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/41)) ([2f7dddf](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/2f7dddfdb894e3582bd1fb129179f20b5ab078c4))
+* error out if a callset does not match the truth at all ([#43](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/43)) ([480b929](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/480b9296c84e5c71ffa2e560a9c50085836577fa))
+
+
+### Performance Improvements
+
+* update to latest datavzrd ([8022a46](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/8022a46ef81fa5365934f250cf4a5b1312388e33))
+
 ### [1.6.6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.5...v1.6.6) (2023-04-27)
 
 
