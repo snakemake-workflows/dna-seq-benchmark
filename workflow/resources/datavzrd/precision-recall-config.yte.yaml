@@ -5,20 +5,71 @@ __variables__:
 name: ?f"Precision/recall analysis of {wildcards.benchmark}"
 
 webview-controls: true
+default-view: results-table
 
 datasets:
   results:
     path: ?input.dataset
     separator: "\t"
+    links:
+      link to table:
+        column: callset
+        table-row: results/callset
 
 views:
-  results:
+  results-plot:
     dataset: results
     desc: |
-      Precision and recall is calculated by matching variants between each callset 
-      and truth using hap.py with the vcfeval option, in combination with refined logic for counting hits.
+      Precision and recall are calculated by matching variants between each callset 
+      and truth, stratified by coverage categories. The matching ignores genotype
+      differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate" 
+      column of the tabular result representation or in the tooltips shown when hovering
+      a point.
 
-      Genotype mismatches are displayed in the "genotype mismatch rate" column.
+      Data points with less than 50 observations for recall (TP + FN) or precision (TP + FP)
+      are not shown because estimates are unreliable in such cases.
+    render-plot:
+      spec: |
+        {
+          "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+          "description": "Precision/recall plot for all callsets.",
+          "width": "container",
+          "height": "container",
+          "params": [{
+            "name": "grid",
+            "select": "interval",
+            "bind": "scales"
+          }],
+          "transform": [
+            {
+              "filter": "((datum.tp_truth + datum.fn) >= 50) & ((datum.tp_query + datum.fp) >= 50)"
+            }
+          ],
+          "mark": {
+            "type": "line",
+            "point": true,
+            "tooltip": {"content": "data"}, "clip": true
+          },
+          "encoding": {
+            "x": {"field": "recall", "type": "quantitative"},
+            "y": {"field": "precision", "type": "quantitative"},
+            "color": {
+              "field": "callset",
+              "type": "nominal",
+              "scale": {"scheme": "category20"}
+            },
+            "order": {"field": "sort_index", "type": "quantitative"},
+            "href": {"field": "link to table"}
+          }
+        }
+
+  results-table:
+    dataset: results
+    desc: |
+      Precision and recall are calculated by matching variants between each callset 
+      and truth, stratified by coverage categories. The matching ignores genotype
+      differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate" 
+      column.
     page-size: 12
     render-table:
       columns:

@@ -1,3 +1,6 @@
+import sys
+sys.stderr = open(snakemake.log[0], "w")
+
 import pandas as pd
 
 
@@ -15,22 +18,22 @@ results = pd.concat(
     axis="rows",
 )
 
+def cov_key(cov_label):
+    # return lower bound as integer for sorting
+    if ".." in cov_label:
+        return int(cov_label.split("..")[0])
+    else:
+        return int(cov_label[1:])
+
 
 def sort_key(col):
     if col.name == "callset":
         return col
     else:
-
-        def cov_key(cov_label):
-            # return lower bound as integer for sorting
-            if ".." in cov_label:
-                return int(cov_label.split("..")[0])
-            else:
-                return int(cov_label[1:])
-
         return col.apply(cov_key)
 
 
 results.sort_values(["callset", "coverage"], inplace=True, key=sort_key)
+results["sort_index"] = results["coverage"].apply(cov_key)
 
 results.to_csv(snakemake.output[0], sep="\t", index=False)
