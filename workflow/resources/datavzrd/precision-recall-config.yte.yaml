@@ -14,7 +14,7 @@ datasets:
     links:
       link to table:
         column: callset
-        table-row: results/callset
+        table-row: results-table/callset
 
 views:
   results-plot:
@@ -28,13 +28,15 @@ views:
 
       Data points with less than 50 observations for recall (TP + FN) or precision (TP + FP)
       are not shown because estimates are unreliable in such cases.
+
+      Zoom in by scrolling inside of the plot area, pan by dragging, and reset by double-clicking.
     render-plot:
       spec: |
         {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "Precision/recall plot for all callsets.",
-          "width": "container",
-          "height": "container",
+          "width": 600,
+          "height": 600,
           "params": [{
             "name": "grid",
             "select": "interval",
