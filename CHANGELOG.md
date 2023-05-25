@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.7...v1.7.0) (2023-05-25)
+
+
+### Features
+
+* add plot view of precision and recall ([28e4249](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/28e424916f0cc1b201e245a818639e3193277546))
+
 ### [1.6.7](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.6...v1.6.7) (2023-05-04)
 
 
