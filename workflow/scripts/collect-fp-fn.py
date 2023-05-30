@@ -107,7 +107,7 @@ for label_idx, label in enumerate(snakemake.params.label_names):
         _, pvals = chi2(feature_matrix, not_na_target_vector)
         sorted_idx = np.argsort(pvals)
 
-        _, fdr = fdrcorrection(pvals, method="n") # use Benjamini/Yekutieli as variants might be both positively or negatively correlated
+        _, fdr = fdrcorrection(pvals, method="negcorr") # use Benjamini/Yekutieli as variants might be both positively or negatively correlated
 
         # clone data
         sorted_data = data.copy(deep=True)
@@ -123,7 +123,7 @@ for label_idx, label in enumerate(snakemake.params.label_names):
         outdata = sorted_data.iloc[sorted_idx]
 
         # only keep significant entries
-        outdata = outdata.loc[outdata["FDR dependency"] <= 0.05]
+        outdata = outdata.loc[outdata["FDR dependency"] <= 0.1]
         
     outpath = os.path.join(snakemake.output.dependency_sorting, f"{label}.tsv")
     store(outdata, outpath, label_idx=label_idx)
