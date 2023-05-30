@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.7.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.0...v1.7.1) (2023-05-30)
+
+
+### Bug Fixes
+
+* use 10% FDR threshold for correlation test ([b596fa3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/b596fa3c3b2a6c35718039c424f99c4e0455fb77))
+* use p-value <=0.05 for filtering chi-square results instead of FDR. While the FDR is still displayed, this better allows to check individual results without being influenced by the amount of multiple testing. ([096ffd0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/096ffd0cfc1fb471ee037f8415d979fac202019f))
+
 ## [1.7.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.6.7...v1.7.0) (2023-05-25)
 
 
