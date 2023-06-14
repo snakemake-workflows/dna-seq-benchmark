@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.1...v1.7.2) (2023-06-14)
+
+
+### Performance Improvements
+
+* update to latest datavzrd ([#46](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/46)) ([67171cf](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/67171cf6682d96487dcdb2088c5608b0d3721c26))
+
 ### [1.7.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.0...v1.7.1) (2023-05-30)
 
 
