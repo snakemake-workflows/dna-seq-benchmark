@@ -188,7 +188,7 @@ rule report_precision_recall:
     log:
         "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
     wrapper:
-        "v1.29.0/utils/datavzrd"
+        "v2.0.0/utils/datavzrd"
 
 
 rule extract_fp_fn:
@@ -262,4 +262,4 @@ rule report_fp_fn:
     log:
         "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
     wrapper:
-        "v1.29.0/utils/datavzrd"
+        "v2.0.0/utils/datavzrd"

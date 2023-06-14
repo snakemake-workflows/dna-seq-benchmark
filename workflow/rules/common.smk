@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 
 import yaml
+import json
 
 if "all" in config.get("variant-calls", dict()):
     raise ValueError(
