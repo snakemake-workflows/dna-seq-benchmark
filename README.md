@@ -4,7 +4,7 @@
 [![GitHub actions status](https://github.com/snakemake-workflows/dna-seq-benchmark/workflows/Tests/badge.svg?branch=main)](https://github.com/snakemake-workflows/dna-seq-benchmark/actions?query=branch%3Amain+workflow%3ATests)
 
 
-A Snakemake workflow for benchmarking variant calling approaches with Genome in a Bottle (GIAB) data (and other custom benchmark datasets). The workflow uses a combination of bedtools, mosdepth, hap.py, pandas and altair.
+A Snakemake workflow for benchmarking variant calling approaches with Genome in a Bottle (GIAB) data (and other custom benchmark datasets). The workflow uses a combination of bedtools, mosdepth, rtg-tools, pandas and datavzrd.
 
 
 ## Usage
