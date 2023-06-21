@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.2...v1.7.3) (2023-06-21)
+
+
+### Bug Fixes
+
+* use a precision of 3 for displaying floats in datavzrd, use an FDR threshold of 0.25 in order to see more borderline cases ([237b86c](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/237b86c8bb7c4c1f744740eae75ae8f4819587d7))
+
 ### [1.7.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.1...v1.7.2) (2023-06-14)
 
 
