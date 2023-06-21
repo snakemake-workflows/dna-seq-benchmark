@@ -122,8 +122,8 @@ for label_idx, label in enumerate(snakemake.params.label_names):
 
         outdata = sorted_data.iloc[sorted_idx]
 
-        # only keep significant entries
-        outdata = outdata.loc[outdata["p-value dependency"] <= 0.05]
+        # only keep the rather significant entries (but be a bit more permissive than 0.05)
+        outdata = outdata.loc[outdata["p-value dependency"] <= 0.25]
         
     outpath = os.path.join(snakemake.output.dependency_sorting, f"{label}.tsv")
     store(outdata, outpath, label_idx=label_idx)

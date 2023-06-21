@@ -81,17 +81,17 @@ views:
               scale: ordinal
               color-scheme: category20
         precision:
-          precision: 2
+          precision: 3
           plot:
             ticks:
               scale: linear
         recall:
-          precision: 2
+          precision: 3
           plot:
             ticks:
               scale: linear
         genotype_mismatch_rate:
-          precision: 2
+          precision: 3
           plot:
             ticks:
               scale: linear
