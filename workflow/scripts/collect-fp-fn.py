@@ -15,9 +15,9 @@ def collect_chromosomes(f):
     return pd.read_csv(f, sep="\t", dtype=str, usecols=["chromosome"]).drop_duplicates().tolist()
 
 
-def read_data(f, callset):
+def read_data(f, callset, chromosome):
     print("reading", f, "...", file=sys.stderr)
-    data = pd.read_csv(f, sep="\t", dtype=str,).set_index(
+    data = pd.read_csv(f, sep="\t", dtype=str,).set_index("chromosome").loc[chromosome].reset_index().set_index(
         [
             "chromosome",
             "position",
@@ -51,7 +51,7 @@ chromosomes = sorted({chrom for f in snakemake.input.tables for chrom in collect
 for i, chromosome in enumerate(chromosomes):
     data = pd.concat(
         [
-            read_data(f, callset)
+            read_data(f, callset, chromosome)
             for f, callset in zip(snakemake.input.tables, snakemake.params.callsets)
         ],
         axis="columns",
