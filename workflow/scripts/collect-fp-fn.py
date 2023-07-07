@@ -47,6 +47,9 @@ def get_idx_sorted_by_clustering(data):
 
 chromosomes = sorted({chrom for f in snakemake.input.tables for chrom in collect_chromosomes(f)})
 
+print(chromosomes)
+assert chromosomes
+
 # process data for each chromosome separately and append to the same files
 for i, chromosome in enumerate(chromosomes):
     data = pd.concat(
