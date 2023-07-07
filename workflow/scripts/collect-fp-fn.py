@@ -12,7 +12,9 @@ import numpy as np
 
 
 def collect_chromosomes(f):
-    return pd.read_csv(f, sep="\t", dtype=str, usecols=["chromosome"]).drop_duplicates()["chromosome"].tolist()
+    d = pd.read_csv(f, sep="\t", dtype=str, usecols=["chromosome"]).drop_duplicates()
+    print(d)
+    return d["chromosome"].tolist()
 
 
 def read_data(f, callset, chromosome):
