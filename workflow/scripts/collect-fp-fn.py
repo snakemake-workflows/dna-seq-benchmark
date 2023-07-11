@@ -13,13 +13,21 @@ import numpy as np
 
 def collect_chromosomes(f):
     d = pd.read_csv(f, sep="\t", dtype=str, usecols=["chromosome"]).drop_duplicates()
-    print(d)
     return d["chromosome"].tolist()
 
 
-def read_data(f, callset, chromosome):
+def read_data(f, callset, chromosome=None):
     print("reading", f, "...", file=sys.stderr)
-    data = pd.read_csv(f, sep="\t", dtype=str,).set_index("chromosome").loc[chromosome].reset_index().set_index(
+    data = pd.read_csv(
+        f,
+        sep="\t",
+        dtype=str,
+    )
+
+    if chromosome is not None:
+        data = data.set_index("chromosome").loc[chromosome].reset_index()
+
+    data = data.set_index(
         [
             "chromosome",
             "position",
@@ -47,10 +55,12 @@ def get_idx_sorted_by_clustering(data):
     return idx
 
 
-chromosomes = sorted({chrom for f in snakemake.input.tables for chrom in collect_chromosomes(f)})
+chromosomes = sorted(
+    {chrom for f in snakemake.input.tables for chrom in collect_chromosomes(f)}
+)
 
-print(chromosomes)
-assert chromosomes
+if not chromosomes:
+    chromosomes = [None]
 
 # process data for each chromosome separately and append to the same files
 for i, chromosome in enumerate(chromosomes):
@@ -62,9 +72,7 @@ for i, chromosome in enumerate(chromosomes):
         axis="columns",
     )
 
-    data = data.loc[
-        data.isna().sum(axis="columns").sort_values().index,
-    ]
+    data = data.loc[data.isna().sum(axis="columns").sort_values().index,]
 
     data = data.dropna(how="all")
 
@@ -74,7 +82,6 @@ for i, chromosome in enumerate(chromosomes):
         data = data.iloc[idx_rows, idx_cols]
 
     label_df = pd.DataFrame(snakemake.params.labels)
-
 
     def store(data, output, label_idx=None):
         _label_df = label_df
@@ -95,7 +102,6 @@ for i, chromosome in enumerate(chromosomes):
             mode = "a"
             header = False
         data.to_csv(output, sep="\t", mode=mode, header=header)
-
 
     store(data, snakemake.output.main)
 
@@ -126,7 +132,9 @@ for i, chromosome in enumerate(chromosomes):
             _, pvals = chi2(feature_matrix, not_na_target_vector)
             sorted_idx = np.argsort(pvals)
 
-            _, fdr = fdrcorrection(pvals, method="negcorr") # use Benjamini/Yekutieli as variants might be both positively or negatively correlated
+            _, fdr = fdrcorrection(
+                pvals, method="negcorr"
+            )  # use Benjamini/Yekutieli as variants might be both positively or negatively correlated
 
             # clone data
             sorted_data = data.copy(deep=True)
@@ -143,6 +151,6 @@ for i, chromosome in enumerate(chromosomes):
 
             # only keep the rather significant entries (but be a bit more permissive than 0.05)
             outdata = outdata.loc[outdata["p-value dependency"] <= 0.25]
-            
+
         outpath = os.path.join(snakemake.output.dependency_sorting, f"{label}.tsv")
         store(outdata, outpath, label_idx=label_idx)
