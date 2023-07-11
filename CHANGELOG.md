@@ -7,6 +7,13 @@
 
 * omit index creation in FP/FN collection ([aa090b1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/aa090b10faf37eb52119b576574c2ad4bae16b9e))
 
+### [1.8.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.0...v1.8.1) (2023-07-11)
+
+
+### Bug Fixes
+
+* omit index creation in FP/FN collection ([aa090b1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/aa090b10faf37eb52119b576574c2ad4bae16b9e))
+
 ## [1.8.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.4...v1.8.0) (2023-07-11)
 
 
