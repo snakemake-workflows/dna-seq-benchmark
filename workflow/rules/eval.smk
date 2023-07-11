@@ -220,6 +220,7 @@ rule collect_fp_fn:
         callsets=get_collect_fp_fn_callsets,
         labels=get_collect_fp_fn_labels,
         label_names=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
+        max_entries=config.get("max-fp-fn-entries", 300),
     log:
         "logs/collect-fp-fn/{genome}/{cov}/{classification}.log",
     conda:

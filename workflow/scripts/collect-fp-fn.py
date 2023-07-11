@@ -63,8 +63,13 @@ chromosomes = sorted(
 if not chromosomes:
     chromosomes = [None]
 
+n_written = 0
+
 # process data for each chromosome separately and append to the same files
 for i, chromosome in enumerate(chromosomes):
+    if n_written > snakemake.params.max_entries:
+        break
+
     data = pd.concat(
         [
             read_data(f, callset, chromosome)
@@ -105,6 +110,7 @@ for i, chromosome in enumerate(chromosomes):
         data.to_csv(output, sep="\t", mode=mode, header=header)
 
     store(data, snakemake.output.main)
+    n_written += len(data)
 
     label_df.index = snakemake.params.label_names
 

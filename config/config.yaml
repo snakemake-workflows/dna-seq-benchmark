@@ -2,7 +2,7 @@ variant-calls:
   # Listing of callsets and corresponding paths, representing variant call results
   # from different pipelines or different configurations of the same pipeline.
   # Multiple entries are possible.
-  <callset>: 
+  <callset>:
     # Optional labels to describe callset in report. Comment out if not needed.
     # Both labels and values thereof can be freely chosen.
     labels:
@@ -41,3 +41,7 @@ limit-reads: false
 
 # whether evaluation shall happen on grch37
 grch37: false
+
+# maximum number of entries in the FP and FN tables
+# (this might be exceeded because each chromosome is always fully included)
+max-fp-fn-entries: 300
