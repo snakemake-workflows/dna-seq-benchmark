@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.4...v1.8.0) (2023-07-11)
+
+
+### Features
+
+* chunked processing of fp/fn collection in order to save memory ([#51](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/51)) ([a36a13b](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/a36a13b96082d5caf4a42149de36f4dc980c0e49))
+
 ### [1.7.4](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.7.3...v1.7.4) (2023-07-03)
 
 
