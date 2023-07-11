@@ -1,5 +1,17 @@
 # Changelog
 
+### [1.8.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.1...v1.8.2) (2023-07-11)
+
+
+### Features
+
+* limit the number of entries to be shown in the FP/FN tables ([7b2cc19](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/7b2cc193f69d90fe2ac8ed55c7cc4f80bc4148b0))
+
+
+### Miscellaneous Chores
+
+* release 1.8.2 ([faa44a6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/faa44a6a9b5fdb06256277107341dc17bd24b760))
+
 ### [1.8.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.0...v1.8.1) (2023-07-11)
 
 
