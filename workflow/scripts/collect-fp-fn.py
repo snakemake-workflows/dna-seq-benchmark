@@ -24,8 +24,9 @@ def read_data(f, callset, chromosome=None):
         dtype=str,
     )
 
+    print(data.head(), file=sys.stderr)
     if chromosome is not None:
-        data = data.set_index("chromosome").loc[chromosome].reset_index()
+        data = data.loc[data["chromosome"] == chromosome]
     print(data.head(), file=sys.stderr)
 
     data = data.set_index(
