@@ -23,3 +23,11 @@ if "variant-calls" in config:
                 vartype=["snvs", "indels"],
             ),
             get_fp_fn_reports,
+            # collect the checkpoint inputs to avoid issues when
+            # --all-temp is used: --all-temp leads to premature deletion
+            # of the checkpoint output
+            expand(
+                "results/variants/{benchmark}.truth.cov-{cov}.stats.json",
+                benchmark=used_benchmarks,
+                cov=coverages,
+            ),
