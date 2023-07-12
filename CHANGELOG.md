@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.8.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.2...v1.8.3) (2023-07-12)
+
+
+### Bug Fixes
+
+* work around issues with --all-temp and the checkpoint output ([1c8a11f](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/1c8a11f0599c8f18f5f08b0977cd47f1628644e2))
+
 ### [1.8.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.1...v1.8.2) (2023-07-11)
 
 
