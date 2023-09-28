@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.8.4](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.3...v1.8.4) (2023-09-28)
+
+
+### Bug Fixes
+
+* avoid issue that occurs with single callset ([#57](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/57)) ([c41b1c3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/c41b1c3cc3ad1de03ec17a20ccc8030fdb46268a))
+
 ### [1.8.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.2...v1.8.3) (2023-07-12)
 
 
