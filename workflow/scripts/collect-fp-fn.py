@@ -82,7 +82,7 @@ for i, chromosome in enumerate(chromosomes):
 
     data = data.dropna(how="all")
 
-    if not data.empty:
+    if not data.empty and data.shape[1] > 1:
         idx_rows = get_idx_sorted_by_clustering(data)
         idx_cols = get_idx_sorted_by_clustering(data.T)
         data = data.iloc[idx_rows, idx_cols]
