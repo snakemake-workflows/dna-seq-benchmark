@@ -65,9 +65,11 @@ genomes:
         indels: ftp://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/release/v1.2/high-confidence_sINDEL_in_HC_regions_v1.2.vcf.gz
     confidence-regions:
       grch38: ftp://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/release/v1.2/High-Confidence_Regions_v1.2.bed
+    somatic: true
   
   na12878-somatic:
     truth:
       grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz
     confidence-regions:
       grch38: https://download.imgag.de/public/validation_dataset_somatic/benchmark_region.bed
+    somatic: true
