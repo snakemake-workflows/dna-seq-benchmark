@@ -321,6 +321,10 @@ def get_nonempty_coverages(wildcards):
     return _get_nonempty_coverages(wildcards.callset)
 
 
+def get_somatic_flag(wildcards):
+    return '--squash-ploidy' if genomes[benchmarks[wildcards.callset]['genome']]['somatic'] else ''
+
+
 def get_collect_stratifications_input(wildcards):
     import json
 

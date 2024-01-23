@@ -100,8 +100,8 @@ rule benchmark_variants:
     log:
         "logs/vcfeval/{callset}/{cov}.log",
     params:
-        output=lambda w, output: os.path.dirname(output[0]), # TODO insert param to apply somatic benchmark -> shell --squash-ploidy
-        somatic='--squash-ploidy' if genomes[benchmarks[{callset}]['genome']]['somatic'] else '', # if true: '--squash-ploidy' / if false: ''
+        output=lambda w, output: os.path.dirname(output[0]), 
+        somatic=get_somatic_flag,
     conda:
         "../envs/rtg-tools.yaml"
     threads: 32
