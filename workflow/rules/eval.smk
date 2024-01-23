@@ -100,14 +100,15 @@ rule benchmark_variants:
     log:
         "logs/vcfeval/{callset}/{cov}.log",
     params:
-        output=lambda w, output: os.path.dirname(output[0]),
+        output=lambda w, output: os.path.dirname(output[0]), # TODO insert param to apply somatic benchmark -> shell --squash-ploidy
+        somatic='--squash-ploidy' if genomes[benchmarks[{callset}]['genome']]['somatic'] else '', # if true: '--squash-ploidy' / if false: ''
     conda:
         "../envs/rtg-tools.yaml"
     threads: 32
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records "
         "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
-        "--output {params.output} --template {input.genome} &> {log}"
+        "--output {params.output} --template {input.genome} {params.somatic} &> {log}"
 
 
 rule calc_precision_recall:
