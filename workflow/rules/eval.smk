@@ -100,7 +100,7 @@ rule benchmark_variants:
     log:
         "logs/vcfeval/{callset}/{cov}.log",
     params:
-        output=lambda w, output: os.path.dirname(output[0]), 
+        output=lambda w, output: os.path.dirname(output[0]),
         somatic=get_somatic_flag,
     conda:
         "../envs/rtg-tools.yaml"

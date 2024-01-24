@@ -83,7 +83,7 @@ def get_plot_cov_labels():
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper-1}"
+            return f"{lower}-{upper - 1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in coverages}
@@ -134,7 +134,6 @@ def get_genome_build():
 
 def get_io_prefix(getter):
     def inner(wildcards, input, output):
-
         return getter(input, output).split(".")[0]
 
     return inner
@@ -258,7 +257,7 @@ def get_benchmark_truth(wildcards):
 def get_stratified_truth(suffix=""):
     def inner(wildcards):
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-        return (f"results/variants/{benchmark}.truth.cov-{{cov}}.vcf.gz{suffix}",)
+        return (f"results/variants/{benchmark}.truth.cov-{cov}.vcf.gz{suffix}",)
 
     return inner
 
@@ -270,7 +269,7 @@ def get_confidence_regions(wildcards):
 
 def get_test_regions(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-    return f"resources/regions/{benchmark}/test-regions.cov-{{cov}}.bed"
+    return f"resources/regions/{benchmark}/test-regions.cov-{cov}.bed"
 
 
 def get_rename_contig_file(wildcards):
@@ -323,7 +322,9 @@ def get_nonempty_coverages(wildcards):
 
 def get_somatic_flag(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-    return '--squash-ploidy' if genomes[benchmarks[benchmark]['genome']]['somatic'] else ''
+    return (
+        "--squash-ploidy" if genomes[benchmarks[benchmark]["genome"]]["somatic"] else ""
+    )
 
 
 def get_collect_stratifications_input(wildcards):
