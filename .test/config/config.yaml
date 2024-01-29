@@ -5,6 +5,9 @@ variant-calls:
   dummy-chm: 
     path: "resources/variants/chm-eval/all.truth.bcf"
     benchmark: "chm-eval"
+  dummy-imgag:
+    path: "resources/variants/na12878-somatic/all.truth.bcf"
+    benchmark: "imgag-somatic-5perc"
 
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
