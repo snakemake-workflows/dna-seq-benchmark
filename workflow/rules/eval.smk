@@ -88,6 +88,17 @@ rule generate_sdf:
         "rtg format --output {output} {input.genome} &> {log}"
 
 
+rule extract_truth_sample_name:
+    input:
+        truth=get_stratified_truth(),
+    output:
+        "results/somatic/{benchmark}.truth.cov-{cov}.sample_name.txt"
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools query -l {input.truth} > {output}"
+
+
 rule benchmark_variants:
     input:
         truth=get_stratified_truth(),
