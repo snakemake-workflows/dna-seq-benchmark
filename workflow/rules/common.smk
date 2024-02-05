@@ -320,7 +320,7 @@ def get_nonempty_coverages(wildcards):
     return _get_nonempty_coverages(wildcards.callset)
 
 
-def get_truth_sample_name(wildcards)
+def get_truth_sample_name(wildcards):
     with open("results/somatic/{benchmark}.truth.cov-{cov}.sample_name.txt") as file:
         truth_sample_name = file.read()
     return truth_sample_name
