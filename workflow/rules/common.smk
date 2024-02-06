@@ -257,7 +257,10 @@ def get_benchmark_truth(wildcards):
 def get_stratified_truth(suffix=""):
     def inner(wildcards):
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-        return (f"results/variants/{benchmark}.truth.cov-{cov}.vcf.gz{suffix}",)
+        # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
+        return "results/variants/{benchmark}.truth.cov-{{cov}}.vcf.gz{suffix}".format(
+            benchmark=benchmark, suffix=suffix
+        )
 
     return inner
 
@@ -269,7 +272,10 @@ def get_confidence_regions(wildcards):
 
 def get_test_regions(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-    return f"resources/regions/{benchmark}/test-regions.cov-{cov}.bed"
+    # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
+    return "resources/regions/{benchmark}/test-regions.cov-{{cov}}.bed".format(
+        benchmark=benchmark
+    )
 
 
 def get_rename_contig_file(wildcards):
