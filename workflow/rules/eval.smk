@@ -92,7 +92,7 @@ rule extract_truth_sample_name:
     input:
         truth=get_stratified_truth(),
     output:
-        "results/somatic/{benchmark}.truth.cov-{cov}.sample_name.txt"
+        "results/somatic/{callset}.truth.cov-{cov}.sample_name.txt",
     conda:
         "../envs/tools.yaml"
     shell:
@@ -106,6 +106,7 @@ rule benchmark_variants:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
         genome="resources/reference/genome-sdf",
+        file="results/somatic/{callset}.truth.cov-{cov}.sample_name.txt",
     output:
         "results/vcfeval/{callset}/{cov}/output.vcf.gz",
     log:

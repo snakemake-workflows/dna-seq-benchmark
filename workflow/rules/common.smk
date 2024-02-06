@@ -327,7 +327,12 @@ def get_nonempty_coverages(wildcards):
 
 
 def get_truth_sample_name(wildcards):
-    with open("results/somatic/{benchmark}.truth.cov-{cov}.sample_name.txt") as file:
+    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+    # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
+    filename = "results/somatic/{callset}.truth.cov-{cov}.sample_name.txt".format(
+            callset=wildcards.callset, cov=wildcards.cov
+        )
+    with open(filename) as file:
         truth_sample_name = file.read()
     return truth_sample_name
 
@@ -335,7 +340,7 @@ def get_truth_sample_name(wildcards):
 def get_somatic_flag(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
     if genomes[benchmarks[benchmark]["genome"]]["somatic"]:
-        sample_name_baseline = get_truth_sample_name()
+        sample_name_baseline = get_truth_sample_name(wildcards)
                 # via rule extract_truth_sample_name "results/somatic/{benchmark}.truth.cov-{cov}.sample_name.txt"
                 # get name baseline via bcftools query -l truth.vcf -> new rule / function
         sample_name_callset = config["variant-calls"][wildcards.callset]["tumor_sample_name"] # get name tumor via config -> from dict
