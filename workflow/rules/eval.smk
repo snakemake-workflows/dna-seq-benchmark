@@ -36,7 +36,7 @@ rule stratify_truth:
         "../envs/tools.yaml"
     shell:
         "(bedtools intersect -b {input.regions} -a "
-        "<(bcftools view {input.variants}) -wa -f 1.0 -header | "
+        "<(bcftools view {input.variants} | bcftools reheader -s <(echo 'truth')) -wa -f 1.0 -header | "
         "bcftools view -Oz > {output}) 2> {log}"
 
 
