@@ -88,17 +88,6 @@ rule generate_sdf:
         "rtg format --output {output} {input.genome} &> {log}"
 
 
-rule extract_truth_sample_name:
-    input:
-        truth=get_stratified_truth(),
-    output:
-        "results/somatic/{callset}.truth.cov-{cov}.sample_name.txt",
-    conda:
-        "../envs/tools.yaml"
-    shell:
-        "bcftools query -l {input.truth} > {output}"
-
-
 rule benchmark_variants:
     input:
         truth=get_stratified_truth(),
@@ -106,7 +95,6 @@ rule benchmark_variants:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
         genome="resources/reference/genome-sdf",
-        file="results/somatic/{callset}.truth.cov-{cov}.sample_name.txt",
     output:
         "results/vcfeval/{callset}/{cov}/output.vcf.gz",
     log:
@@ -121,6 +109,7 @@ rule benchmark_variants:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records "
         "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
         "--output {params.output} --template {input.genome} {params.somatic} &> {log}"
+        #  "--output {params.output} --template {input.genome} --squash-ploidy --sample HG001,40perc_tumor_40perc &> {log}"
 
 
 rule calc_precision_recall:

@@ -326,35 +326,15 @@ def get_nonempty_coverages(wildcards):
     return _get_nonempty_coverages(wildcards.callset)
 
 
-def get_truth_sample_name(wildcards):
-    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-    # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
-    filename = "results/somatic/{callset}.truth.cov-{cov}.sample_name.txt".format(
-            callset=wildcards.callset, cov=wildcards.cov
-        )
-    with open(filename) as file:
-        truth_sample_name = file.read()
-    return truth_sample_name
-
-
 def get_somatic_flag(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
     if genomes[benchmarks[benchmark]["genome"]]["somatic"]:
-        sample_name_baseline = get_truth_sample_name(wildcards)
-                # via rule extract_truth_sample_name "results/somatic/{benchmark}.truth.cov-{cov}.sample_name.txt"
-                # get name baseline via bcftools query -l truth.vcf -> new rule / function
+        sample_name_baseline = "truth"
         sample_name_callset = config["variant-calls"][wildcards.callset]["tumor_sample_name"] # get name tumor via config -> from dict
         somatic_flag = "--squash-ploidy --sample " + sample_name_baseline + ',' + sample_name_callset
     else:
         somatic_flag = ""
     return somatic_flag
-    # return (
-    #     "--squash-ploidy --sample <name baseline>,<name tumor>" #TODO replace <name baseline> and <name tumor>
-        
-    #     if genomes[benchmarks[benchmark]["genome"]]["somatic"] 
-        
-    #     else ""
-    # )
 
 
 def get_collect_stratifications_input(wildcards):
