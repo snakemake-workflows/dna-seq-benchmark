@@ -91,6 +91,10 @@ views:
             ticks:
               scale: linear
         genotype_mismatch_rate:
+          ?if genomes[benchmarks[wildcards.benchmark]["genome"]]["somatic"]: # if somatic: true
+            display-mode: hidden
+          ?else:
+            display-mode: normal
           precision: 3
           plot:
             ticks:
