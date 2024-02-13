@@ -109,7 +109,6 @@ rule benchmark_variants:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records "
         "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
         "--output {params.output} --template {input.genome} {params.somatic} &> {log}"
-        #  "--output {params.output} --template {input.genome} --squash-ploidy --sample HG001,40perc_tumor_40perc &> {log}"
 
 
 rule calc_precision_recall:
