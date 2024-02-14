@@ -167,6 +167,8 @@ rule render_precision_recall_report_config:
         template=workflow.source_path(
             "../resources/datavzrd/precision-recall-config.yte.yaml"
         ),
+    params:
+        somatic=get_somatic_status,
     output:
         "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
     log:
