@@ -40,7 +40,7 @@ rule stratify_truth:
         "bcftools view -Oz > {output}) 2> {log}"
 
 
-use rule stratify_truth as stratify_results with:
+rule stratify_results:
     input:
         variants="results/normalized-variants/{callset}.vcf.gz",
         regions=get_test_regions,
@@ -48,6 +48,12 @@ use rule stratify_truth as stratify_results with:
         "results/stratified-variants/{callset}/{cov}.vcf.gz",
     log:
         "logs/stratify-results/{callset}/{cov}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "(bedtools intersect -b {input.regions} -a "
+        "<(bcftools view {input.variants}) -wa -f 1.0 -header | "
+        "bcftools view -Oz > {output}) 2> {log}"
 
 
 rule index_stratified_truth:
