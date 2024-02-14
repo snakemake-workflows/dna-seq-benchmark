@@ -326,6 +326,10 @@ def get_nonempty_coverages(wildcards):
     return _get_nonempty_coverages(wildcards.callset)
 
 
+def get_somatic_status(wildcards):
+    return genomes[benchmarks[wildcards.benchmark]["genome"]]["somatic"]
+
+
 def get_somatic_flag(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
     if genomes[benchmarks[benchmark]["genome"]]["somatic"]:
