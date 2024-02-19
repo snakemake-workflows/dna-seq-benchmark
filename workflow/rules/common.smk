@@ -166,8 +166,18 @@ def get_cov_interval(name):
 
 def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
+    if get_somatic_status(wildcards):
+        return "results/normalized-variants/{callset}.gt-added.vcf.gz" 
+    elif "rename-contigs":
+        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
+    else:
+        return get_raw_callset(wildcards)
+
+
+def get_callset_correct_contigs(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
     if "rename-contigs" in callset:
-        return "results/normalized-variants/{callset}.replaced-contigs.bcf"
+        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
@@ -327,14 +337,19 @@ def get_nonempty_coverages(wildcards):
 
 
 def get_somatic_status(wildcards):
-    return genomes[benchmarks[wildcards.benchmark]["genome"]]["somatic"]
+    if hasattr(wildcards, "benchmark"):
+        return genomes[benchmarks[wildcards.benchmark]["genome"]]["somatic"]
+    else:
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        return genomes[benchmarks[benchmark]["genome"]]["somatic"]
+    
 
 def get_somatic_sample_name(wildcards):
     return config["variant-calls"][wildcards.callset]["tumor_sample_name"]
 
+
 def get_somatic_flag(wildcards):
-    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-    if genomes[benchmarks[benchmark]["genome"]]["somatic"]:
+    if get_somatic_status(wildcards):
         sample_name_baseline = "truth"
         sample_name_callset = config["variant-calls"][wildcards.callset]["tumor_sample_name"] # get name tumor via config -> from dict
         somatic_flag = "--squash-ploidy --sample " + sample_name_baseline + ',' + sample_name_callset
