@@ -1,23 +1,21 @@
-# TODO: diese rule wird nicht verwendet?!
 rule rename_contigs:
     input:
         calls=get_raw_callset,
         repl_file=get_rename_contig_file,
     output:
-        "results/normalized-variants/{callset}.replaced-contigs.bcf",
+        "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     log:
         "logs/rename-contigs/{callset}.log",
     conda:
         "../envs/tools.yaml"
     shell:
         "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
-        "-Ob -o {output} 2> {log}"
+        "-O z -o {output} 2> {log}"
 
 
-# TODO: is only needed when somatic is true?!
 rule add_genotype_field:
     input:
-        callset=get_raw_callset,#"results/normalized-variants/{callset}.replaced-contigs.bcf",
+        get_callset_correct_contigs,
     output:
         "results/normalized-variants/{callset}.gt-added.vcf.gz",
     log:
@@ -27,16 +25,12 @@ rule add_genotype_field:
     conda:
         "../envs/vatools.yaml"
     shell:
-        # TODO: test is GT field exists first
-        #"bcftools query -f '[%GT\t]%LINE\n' {input.callset} > {log} && echo 'Command succeeded' || echo 'Command failed'"
-        # "cp {input.callset} {output} && bcftools query -f '[%GT\t]%LINE\n' {input.callset} > {log} ||"
-        "vcf-genotype-annotator {input.callset} {params} 0/1 -o {output} &> {log} "
+        "vcf-genotype-annotator {input} {params} 0/1 -o {output} &> {log} || cp {input} {output}"
 
 
 use rule normalize_truth as normalize_calls with:
     input:
-        #get_callset,
-        "results/normalized-variants/{callset}.gt-added.vcf.gz",
+        get_callset,
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
     output:
