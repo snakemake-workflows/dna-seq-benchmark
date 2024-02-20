@@ -338,10 +338,10 @@ def get_nonempty_coverages(wildcards):
 
 def get_somatic_status(wildcards):
     if hasattr(wildcards, "benchmark"):
-        return genomes[benchmarks[wildcards.benchmark]["genome"]]["somatic"]
+        return genomes[benchmarks[wildcards.benchmark]["genome"]].get("somatic")
     else:
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-        return genomes[benchmarks[benchmark]["genome"]]["somatic"]
+        return genomes[benchmarks[benchmark]["genome"]].get("somatic")
 
 
 def get_somatic_sample_name(wildcards):
