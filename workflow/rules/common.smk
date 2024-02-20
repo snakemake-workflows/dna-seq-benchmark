@@ -167,7 +167,7 @@ def get_cov_interval(name):
 def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if get_somatic_status(wildcards):
-        return "results/normalized-variants/{callset}.gt-added.vcf.gz" 
+        return "results/normalized-variants/{callset}.gt-added.vcf.gz"
     elif "rename-contigs":
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     else:
@@ -342,7 +342,7 @@ def get_somatic_status(wildcards):
     else:
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
         return genomes[benchmarks[benchmark]["genome"]]["somatic"]
-    
+
 
 def get_somatic_sample_name(wildcards):
     return config["variant-calls"][wildcards.callset]["tumor_sample_name"]
