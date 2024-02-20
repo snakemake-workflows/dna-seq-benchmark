@@ -3,14 +3,31 @@ rule rename_contigs:
         calls=get_raw_callset,
         repl_file=get_rename_contig_file,
     output:
-        "results/normalized-variants/{callset}.replaced-contigs.bcf",
+        "results/normalized-variants/{callset}.replaced-contigs.vcf.gz",
     log:
         "logs/rename-contigs/{callset}.log",
     conda:
         "../envs/tools.yaml"
     shell:
         "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
-        "-Ob -o {output} 2> {log}"
+        "-Oz -o {output} 2> {log}"
+
+
+rule add_genotype_field:
+    input:
+        get_callset_correct_contigs,
+    output:
+        "results/normalized-variants/{callset}.gt-added.vcf.gz",
+    log:
+        "logs/add_genotype_field/{callset}.log",
+    params:
+        get_somatic_sample_name,
+    conda:
+        "../envs/vatools.yaml"
+    shell:
+        # part after || gets executed if vcf-genotype-annotater fails because GT field is already present
+        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
+        "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || cp {input} {output}"
 
 
 use rule normalize_truth as normalize_calls with:
