@@ -351,8 +351,12 @@ def get_somatic_sample_name(wildcards):
 def get_somatic_flag(wildcards):
     if get_somatic_status(wildcards):
         sample_name_baseline = "truth"
-        sample_name_callset = config["variant-calls"][wildcards.callset]["tumor_sample_name"] # get name tumor via config -> from dict
-        somatic_flag = "--squash-ploidy --sample " + sample_name_baseline + ',' + sample_name_callset
+        sample_name_callset = config["variant-calls"][wildcards.callset]["tumor_sample_name"]  # get name tumor via config -> from dict
+        # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
+        somatic_flag = "--squash-ploidy --sample {sample_name_baseline},{sample_name_callset}".format(
+            sample_name_baseline=sample_name_baseline,
+            sample_name_callset=sample_name_callset,
+        )
     else:
         somatic_flag = ""
     return somatic_flag
