@@ -10,7 +10,7 @@ rule rename_contigs:
         "../envs/tools.yaml"
     shell:
         "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
-        "-O z -o {output} 2> {log}"
+        "-Oz -o {output} 2> {log}"
 
 
 rule add_genotype_field:
@@ -25,7 +25,9 @@ rule add_genotype_field:
     conda:
         "../envs/vatools.yaml"
     shell:
-        "vcf-genotype-annotator {input} {params} 0/1 -o {output} &> {log} || cp {input} {output}"
+        # part after || gets executed if vcf-genotype-annotater fails because GT field is already present
+        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
+        "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || cp {input} {output}"
 
 
 use rule normalize_truth as normalize_calls with:
