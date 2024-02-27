@@ -18,6 +18,8 @@ rule remove_non_pass:
         get_callset,
     output:
         "results/filtered-variants/{callset}.bcf"
+    log:
+        "logs/filter/{callset}.log"
     params:
         extra="-f 'PASS,.'"
     wrapper:
