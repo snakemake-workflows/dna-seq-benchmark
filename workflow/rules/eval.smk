@@ -3,7 +3,7 @@ rule rename_contigs:
         calls=get_raw_callset,
         repl_file=get_rename_contig_file,
     output:
-        "results/normalized-variants/{callset}.replaced-contigs.vcf.gz",
+        "results/normalized-variants/{callset}.replaced-contigs.bcf",
     log:
         "logs/rename-contigs/{callset}.log",
     conda:
