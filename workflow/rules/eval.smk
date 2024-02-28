@@ -30,9 +30,22 @@ rule add_genotype_field:
         "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || cp {input} {output}"
 
 
-use rule normalize_truth as normalize_calls with:
+rule remove_non_pass:
     input:
         get_callset,
+    output:
+        "results/filtered-variants/{callset}.bcf",
+    log:
+        "logs/filter/{callset}.log",
+    params:
+        extra="-f 'PASS,.'",
+    wrapper:
+        "v3.3.6/bio/bcftools/view"
+
+
+use rule normalize_truth as normalize_calls with:
+    input:
+        "results/filtered-variants/{callset}.bcf",
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
     output:
