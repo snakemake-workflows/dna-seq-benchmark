@@ -13,9 +13,22 @@ rule rename_contigs:
         "-Ob -o {output} 2> {log}"
 
 
-use rule normalize_truth as normalize_calls with:
+rule remove_non_pass:
     input:
         get_callset,
+    output:
+        "results/filtered-variants/{callset}.bcf",
+    log:
+        "logs/filter/{callset}.log",
+    params:
+        extra="-f 'PASS,.'",
+    wrapper:
+        "v3.3.6/bio/bcftools/view"
+
+
+use rule normalize_truth as normalize_calls with:
+    input:
+        "results/filtered-variants/{callset}.bcf",
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
     output:
