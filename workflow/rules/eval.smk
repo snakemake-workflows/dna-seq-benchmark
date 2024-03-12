@@ -61,7 +61,7 @@ rule stratify_truth:
     output:
         "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz",
     log:
-        "logs/stratify-truth.{benchmark}.{cov}.log",
+        "logs/stratify-truth/{benchmark}.{cov}.log",
     conda:
         "../envs/tools.yaml"
     shell:
