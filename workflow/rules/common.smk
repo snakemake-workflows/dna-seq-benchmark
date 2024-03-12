@@ -121,6 +121,8 @@ def get_confidence_bed_cmd(wildcards, input):
 
     if input.archive:
         return f"cat {input.archive}/{bed} {unpack_cmd}"
+    if is_local_file(bed):
+        return f"cat {bed} {unpack_cmd}"
     else:
         return f"curl --insecure -L {bed} {unpack_cmd}"
 
@@ -202,10 +204,12 @@ def get_target_bed_input(wildcards):
 def get_target_bed_statement(wildcards):
     target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
 
+    unpack_cmd = "| zcat " if target_bed.endswith(".gz") else ""
+
     if is_local_file(target_bed):
-        return f"cat {target_bed}"
+        return f"cat {target_bed} {unpack_cmd}"
     else:
-        return f"curl --insecure -L {target_bed}"
+        return f"curl --insecure -L {target_bed} {unpack_cmd}"
 
 
 def get_target_regions(wildcards):
