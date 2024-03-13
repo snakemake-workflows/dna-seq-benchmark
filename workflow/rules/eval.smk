@@ -27,8 +27,22 @@ rule add_genotype_field:
     shell:
         # part after || gets executed if vcf-genotype-annotater fails because GT field is already present
         # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
-        "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || cp {input} {output}"
+        "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || bcftools view {input} -Oz > {output}"
 
+rule add_format_field:
+    input: 
+        "resources/variants/{genome}/all.truth.norm.bcf"
+    output:
+        "resources/variants/{genome}/all.truth.format-added.vcf.gz"
+    log:
+        "logs/add_format_field/{genome}.log"
+    conda:
+         "../envs/vatools.yaml"
+    shell:
+        # TODO: abfragen ob field da ist bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf 
+        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
+        # adds FORMAT field with GT field and sample name 'truth'
+        "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log}"
 
 rule remove_non_pass:
     input:
