@@ -39,7 +39,8 @@ rule add_format_field:
     conda:
          "../envs/vatools.yaml"
     shell:
-        # TODO: abfragen ob field da ist bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf 
+        # TODO: Optional - Check first if FORMAT field is present for example with
+        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf 
         # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
         # adds FORMAT field with GT field and sample name 'truth'
         "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log}"
