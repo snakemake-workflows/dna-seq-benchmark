@@ -265,7 +265,10 @@ def get_genome_truth(wildcards):
 
 def get_benchmark_truth(wildcards):
     genome = get_benchmark(wildcards.benchmark)["genome"]
-    return f"resources/variants/{genome}/all.truth.norm.bcf"
+    if get_somatic_status(wildcards):
+        return f"resources/variants/{genome}/all.truth.format-added.vcf.gz"
+    else:
+        return f"resources/variants/{genome}/all.truth.norm.bcf"
 
 
 def get_stratified_truth(suffix=""):
