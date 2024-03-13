@@ -113,6 +113,21 @@ def get_truthsets(csi=False):
     return inner
 
 
+def index_truthsets(wildcards):
+    def inner(wildcards):
+        genome = genomes[wildcards.genome]
+        truthsets = genome["truth"][get_genome_build()]
+        return expand(
+            "bcftools index -f resources/variants/{genome}/{truthset}.truth.bcf",
+            genome=wildcards.genome,
+            truthset=truthsets,
+        )
+    bcf_cmd_list = inner(wildcards)
+    bcf_cmd_list.append('')
+    bcf_cmd = '\n'.join(bcf_cmd_list)
+    return bcf_cmd
+
+
 def get_confidence_bed_cmd(wildcards, input):
     genome = genomes[wildcards.genome]
     bed = genome["confidence-regions"][get_genome_build()]
