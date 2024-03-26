@@ -22,6 +22,10 @@ class Classifications:
 
     def register(self, record):
         for c in self.comparator.classify(record):
+            # TODO: depending on case, fetch VAF from truth or query record (FP: from query record, field configurable by callset (e.g. FORMAT/AF, INFO/AF, ...)
+            # for truth record, field configurable by benchmark preset (same syntax as above)
+            # increment counters for bins, bins given to constructor as list of tuples or some numpy equivalent.
+            # Default: None. If no VAF field given for either truth or callset, don't bin at all.
             if c.cls is Class.TP_truth:
                 self.tp_truth += 1
             elif c.cls is Class.TP_query:
