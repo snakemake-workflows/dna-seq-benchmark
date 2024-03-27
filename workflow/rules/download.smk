@@ -56,15 +56,17 @@ rule get_truth:
 rule merge_truthsets:
     input:
         bcf=get_truthsets(),
-        csi=get_truthsets(csi=True),
     output:
         "resources/variants/{genome}.merged.truth.bcf",
     log:
         "logs/merge-truthsets/{genome}.log",
     conda:
         "../envs/tools.yaml"
+    params:
+        bcf_index_cmd=index_truthsets,
     shell:
-        "bcftools concat -O b --allow-overlap {input} > {output} 2> {log}"
+        "{params.bcf_index_cmd}"
+        "bcftools concat -O b --allow-overlap {input.bcf} > {output} 2> {log}"
 
 
 rule normalize_truth:

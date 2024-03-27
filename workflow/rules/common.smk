@@ -113,6 +113,21 @@ def get_truthsets(csi=False):
     return inner
 
 
+def index_truthsets(wildcards):
+    def inner(wildcards):
+        genome = genomes[wildcards.genome]
+        truthsets = genome["truth"][get_genome_build()]
+        return expand(
+            "bcftools index -f resources/variants/{genome}/{truthset}.truth.bcf",
+            genome=wildcards.genome,
+            truthset=truthsets,
+        )
+    bcf_cmd_list = inner(wildcards)
+    bcf_cmd_list.append('')
+    bcf_cmd = '\n'.join(bcf_cmd_list)
+    return bcf_cmd
+
+
 def get_confidence_bed_cmd(wildcards, input):
     genome = genomes[wildcards.genome]
     bed = genome["confidence-regions"][get_genome_build()]
@@ -121,6 +136,8 @@ def get_confidence_bed_cmd(wildcards, input):
 
     if input.archive:
         return f"cat {input.archive}/{bed} {unpack_cmd}"
+    if is_local_file(bed):
+        return f"cat {bed} {unpack_cmd}"
     else:
         return f"curl --insecure -L {bed} {unpack_cmd}"
 
@@ -202,10 +219,12 @@ def get_target_bed_input(wildcards):
 def get_target_bed_statement(wildcards):
     target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
 
+    unpack_cmd = "| zcat " if target_bed.endswith(".gz") else ""
+
     if is_local_file(target_bed):
-        return f"cat {target_bed}"
+        return f"cat {target_bed} {unpack_cmd}"
     else:
-        return f"curl --insecure -L {target_bed}"
+        return f"curl --insecure -L {target_bed} {unpack_cmd}"
 
 
 def get_target_regions(wildcards):
@@ -261,7 +280,10 @@ def get_genome_truth(wildcards):
 
 def get_benchmark_truth(wildcards):
     genome = get_benchmark(wildcards.benchmark)["genome"]
-    return f"resources/variants/{genome}/all.truth.norm.bcf"
+    if get_somatic_status(wildcards):
+        return f"resources/variants/{genome}/all.truth.format-added.vcf.gz"
+    else:
+        return f"resources/variants/{genome}/all.truth.norm.bcf"
 
 
 def get_stratified_truth(suffix=""):
