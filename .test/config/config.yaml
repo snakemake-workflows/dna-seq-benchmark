@@ -1,10 +1,10 @@
 variant-calls:
-  dummy-giab: 
-    path: "resources/variants/na12878/all.truth.bcf"
-    benchmark: "giab-na12878-exome"
-  #dummy-chm: 
-  #  path: "resources/variants/chm-eval/all.truth.bcf"
-  #  benchmark: "chm-eval"
+  #dummy-giab: 
+  #  path: "resources/variants/na12878/all.truth.bcf"
+  #  benchmark: "giab-na12878-exome"
+  dummy-chm: 
+    path: "resources/variants/chm-eval/all.truth.bcf"
+    benchmark: "chm-eval"
   #dummy-imgag:
   #  path: "resources/variants/na12878-somatic/all.truth.bcf"
   #  benchmark: "imgag-somatic-5perc"
