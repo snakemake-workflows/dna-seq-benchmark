@@ -10,7 +10,41 @@ rule rename_contigs:
         "../envs/tools.yaml"
     shell:
         "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
-        "-Ob -o {output} 2> {log}"
+        "-Oz -o {output} 2> {log}"
+
+
+rule add_genotype_field:
+    input:
+        get_callset_correct_contigs,
+    output:
+        "results/normalized-variants/{callset}.gt-added.vcf.gz",
+    log:
+        "logs/add_genotype_field/{callset}.log",
+    params:
+        get_somatic_sample_name,
+    conda:
+        "../envs/vatools.yaml"
+    shell:
+        # part after || gets executed if vcf-genotype-annotater fails because GT field is already present
+        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
+        "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || bcftools view {input} -Oz > {output}"
+
+
+rule add_format_field:
+    input:
+        "resources/variants/{genome}/all.truth.norm.bcf",
+    output:
+        "resources/variants/{genome}/all.truth.format-added.vcf.gz",
+    log:
+        "logs/add_format_field/{genome}.log",
+    conda:
+        "../envs/vatools.yaml"
+    shell:
+        # TODO: Optional - Check first if FORMAT field is present for example with
+        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf 
+        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
+        # adds FORMAT field with GT field and sample name 'truth'
+        "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log}"
 
 
 rule remove_non_pass:
@@ -44,16 +78,16 @@ rule stratify_truth:
     output:
         "results/variants/{benchmark}.truth.cov-{cov}.vcf.gz",
     log:
-        "logs/stratify-truth.{benchmark}.{cov}.log",
+        "logs/stratify-truth/{benchmark}.{cov}.log",
     conda:
         "../envs/tools.yaml"
     shell:
         "(bedtools intersect -b {input.regions} -a "
-        "<(bcftools view {input.variants}) -wa -f 1.0 -header | "
+        "<(bcftools view {input.variants} | bcftools reheader -s <(echo 'truth')) -wa -f 1.0 -header | "
         "bcftools view -Oz > {output}) 2> {log}"
 
 
-use rule stratify_truth as stratify_results with:
+rule stratify_results:
     input:
         variants="results/normalized-variants/{callset}.vcf.gz",
         regions=get_test_regions,
@@ -61,6 +95,12 @@ use rule stratify_truth as stratify_results with:
         "results/stratified-variants/{callset}/{cov}.vcf.gz",
     log:
         "logs/stratify-results/{callset}/{cov}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "(bedtools intersect -b {input.regions} -a "
+        "<(bcftools view {input.variants}) -wa -f 1.0 -header | "
+        "bcftools view -Oz > {output}) 2> {log}"
 
 
 rule index_stratified_truth:
@@ -180,6 +220,8 @@ rule render_precision_recall_report_config:
         template=workflow.source_path(
             "../resources/datavzrd/precision-recall-config.yte.yaml"
         ),
+    params:
+        somatic=get_somatic_status,
     output:
         "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
     log:
