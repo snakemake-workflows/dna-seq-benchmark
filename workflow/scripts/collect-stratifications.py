@@ -30,11 +30,13 @@ if snakemake.input:
         load_data(f, cov) for cov, f in zip(snakemake.params.coverages, snakemake.input)
     )
 
-    if (report["tp_truth"] == 0).all():
-        raise ValueError(
-            f"The callset {snakemake.wildcards.callset} does not predict any variant from the truth. "
-            "This is likely a technical issue in the callset and should be checked before further evaluation."
-        )
+    # TODO With separate files for SNVs and indels with e.g. STRELKA no predicted variants for the other type are expected
+    # If later relevant, add annotation to the report
+    # if (report["tp_truth"] == 0).all():
+    #     raise ValueError(
+    #         f"The callset {snakemake.wildcards.callset} does not predict any variant from the truth. "
+    #         "This is likely a technical issue in the callset and should be checked before further evaluation."
+    #     )
 
     report.to_csv(snakemake.output[0], sep="\t", index=False)
 else:

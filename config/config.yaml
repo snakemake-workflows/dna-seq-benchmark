@@ -11,6 +11,7 @@ variant-calls:
     # Optional subcategory for separating callsets in the report. Comment out if not needed.
     subcategory: agilent
     path: <path>
+    tumor_sample_name: <tumor-sample-name> # via bcftools query -l <your-vcf>
     # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
     benchmark: giab-na12878-exome
     # Uncomment and point to file containing contig name replacements
