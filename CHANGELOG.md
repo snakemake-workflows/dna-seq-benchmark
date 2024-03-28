@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.9.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.5...v1.9.0) (2024-03-28)
+
+
+### Features
+
+* expand benchmarking datasets with IMGAG somatic validation data ([#61](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/61)) ([307e034](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/307e034ecad19d3d35a1bdc08aeb8a0aa1de815e))
+* only consider PASS and no-filter variants in given callsets ([#66](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/66)) ([7c48a8c](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/7c48a8c623824a7c948376961b92ae232b95d239))
+
+
+### Bug Fixes
+
+* imgag-somatic and integrate seqc2 ([#63](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/63)) ([274d800](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/274d80085e2e6de07234c0954908c9e9a1ebe146))
+
 ### [1.8.5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.4...v1.8.5) (2023-11-13)
 
 
