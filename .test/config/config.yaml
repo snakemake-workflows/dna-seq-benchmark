@@ -11,7 +11,7 @@ variant-calls:
     tumor_sample_name: "HG001"
   dummy-seqc2:
     path: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
-    benchmark: "seqc2-somatic"
+    benchmark: "seqc2-somatic-ea"
     tumor_sample_name: "truth"
 
 custom-benchmarks:
