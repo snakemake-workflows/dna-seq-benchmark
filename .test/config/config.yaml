@@ -8,6 +8,7 @@ variant-calls:
   dummy-imgag:
     path: "resources/variants/na12878-somatic/all.truth.bcf"
     benchmark: "imgag-somatic-5perc"
+    tumor_sample_name: "HG001"
 
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
