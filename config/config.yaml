@@ -17,6 +17,7 @@ variant-calls:
     # Uncomment and point to file containing contig name replacements
     # as needed for 'bcftools annotate --rename-chrs'
     # rename-contigs: path/to/rename-contigs.txt
+    vaf-field: FORMAT/AF # needs to be checked with bcftools view -h
 
 # Optional custom benchmarks
 custom-benchmarks:
