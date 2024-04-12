@@ -386,14 +386,16 @@ def get_somatic_flag(wildcards):
         somatic_flag = ""
     return somatic_flag
 
-def get_vaf_fields(wildcards): 
+
+def get_vaf_fields(wildcards):
     vaf_callset = config["variant-calls"][wildcards.callset].get("vaf_field")
 
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
     vaf_benchmark = benchmarks[benchmark].get("vaf_field")
-    
+
     # can return (None, None) if param not set
     return (vaf_callset, vaf_benchmark)
+
 
 def get_collect_stratifications_input(wildcards):
     import json
