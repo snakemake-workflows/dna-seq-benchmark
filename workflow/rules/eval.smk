@@ -173,6 +173,8 @@ rule calc_precision_recall:
         snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.log",
+    params:
+        vaf_fields=get_vaf_fields,
     conda:
         "../envs/pysam.yaml"
     script:
