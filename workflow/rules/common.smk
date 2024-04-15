@@ -106,9 +106,9 @@ def get_truthsets(csi=False):
         truthsets = genome["truth"][get_genome_build()]
         if csi:
             return expand(
-            "resources/variants/{genome}/{truthset}.truth.bcf.csi",
-            genome=wildcards.genome,
-            truthset=truthsets,
+                "resources/variants/{genome}/{truthset}.truth.bcf.csi",
+                genome=wildcards.genome,
+                truthset=truthsets,
             )
         else:
             return expand(
