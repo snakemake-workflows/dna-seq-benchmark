@@ -52,18 +52,13 @@ rule get_truth:
         " | sed {params.repl_chr} | bcftools view -Ob - > {output}"
         ") 2> {log}"
 
-rule index_truthsets:
+use rule index_variants as index_truthsets with:
     input:
         bcf=get_truthsets(),
     output:
-        get_truthsets(csi=True),
+        "resources/variants/{genome}/{truthset}.truth.bcf.csi", #get_truthsets(csi=True),
     log:
-        "logs/index-truthsets/{genome}.log",
-    conda:
-        "../envs/tools.yaml"
-    shell:
-        "bcftools index -f {input.bcf} 2> {log}"
-
+        "logs/index-truthsets/{genome}/{truthset}.log",
 
 rule merge_truthsets:
     input:
