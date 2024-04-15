@@ -53,13 +53,16 @@ rule get_truth:
         ") 2> {log}"
 
 
-use rule index_variants as index_truthsets with:
+rule index_truthsets:
     input:
-        bcf=get_truthsets(),
+        bcf="resources/variants/{genome}/{truthset}.truth.bcf",
     output:
         "resources/variants/{genome}/{truthset}.truth.bcf.csi",
     log:
         "logs/index-truthsets/{genome}/{truthset}.log",
+    wrapper:
+        "v1.9.0/bio/bcftools/index"
+
 
 
 rule merge_truthsets:
