@@ -57,7 +57,7 @@ use rule index_variants as index_truthsets with:
     input:
         bcf=get_truthsets(),
     output:
-        "resources/variants/{genome}/{truthset}.truth.bcf.csi",  #get_truthsets(csi=True),
+        "resources/variants/{genome}/{truthset}.truth.bcf.csi",
     log:
         "logs/index-truthsets/{genome}/{truthset}.log",
 
