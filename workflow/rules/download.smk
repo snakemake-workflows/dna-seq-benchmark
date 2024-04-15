@@ -52,20 +52,30 @@ rule get_truth:
         " | sed {params.repl_chr} | bcftools view -Ob - > {output}"
         ") 2> {log}"
 
+rule index_truthsets:
+    input:
+        bcf=get_truthsets(),
+    output:
+        get_truthsets(csi=True),
+    log:
+        "logs/index-truthsets/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools index -f {input.bcf} 2> {log}"
+
 
 rule merge_truthsets:
     input:
         bcf=get_truthsets(),
+        csi=get_truthsets(csi=True),
     output:
         "resources/variants/{genome}.merged.truth.bcf",
     log:
         "logs/merge-truthsets/{genome}.log",
     conda:
         "../envs/tools.yaml"
-    params:
-        bcf_index_cmd=index_truthsets,
     shell:
-        "{params.bcf_index_cmd}"
         "bcftools concat -O b --allow-overlap {input.bcf} > {output} 2> {log}"
 
 
