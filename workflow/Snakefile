@@ -7,7 +7,6 @@ configfile: "config/config.yaml"
 
 
 include: "rules/common.smk"
-include: "rules/utils.smk"
 include: "rules/download.smk"
 
 
