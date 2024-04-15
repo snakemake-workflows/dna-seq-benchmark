@@ -64,7 +64,6 @@ rule index_truthsets:
         "v1.9.0/bio/bcftools/index"
 
 
-
 rule merge_truthsets:
     input:
         bcf=get_truthsets(),
