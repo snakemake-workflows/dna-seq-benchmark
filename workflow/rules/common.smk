@@ -229,11 +229,19 @@ def get_target_bed_statement(wildcards):
 
 
 def get_target_regions(wildcards):
-    benchmark = get_benchmark(wildcards.benchmark)
-    if "target-regions" in benchmark:
-        return "resources/regions/{benchmark}/target-regions.bed"
+    if hasattr(wildcards, "benchmark"):
+        benchmark = get_benchmark(wildcards.benchmark)
+        if "target-regions" in benchmark:
+            return "resources/regions/{benchmark}/target-regions.bed"
+        else:
+            return []
     else:
-        return []
+        benchmark_name = config["variant-calls"][wildcards.callset]["benchmark"]
+        benchmark = get_benchmark(benchmark_name)
+        if "target-regions" in benchmark:
+            return "resources/regions/" + benchmark_name + "/target-regions.bed"
+        else:
+            return []
 
 
 def get_target_regions_intersect_statement(wildcards, input):
