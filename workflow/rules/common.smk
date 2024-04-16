@@ -299,8 +299,13 @@ def get_stratified_truth(suffix=""):
 
 
 def get_confidence_regions(wildcards):
-    benchmark = get_benchmark(wildcards.benchmark)
-    return f"resources/regions/{benchmark['genome']}.confidence-regions.bed"
+    if hasattr(wildcards, "benchmark"):
+        benchmark = get_benchmark(wildcards.benchmark)
+        return f"resources/regions/{benchmark['genome']}.confidence-regions.bed"
+    else:
+        benchmark_name = config["variant-calls"][wildcards.callset]["benchmark"]
+        benchmark = get_benchmark(benchmark_name)
+        return f"resources/regions/{benchmark['genome']}.confidence-regions.bed"
 
 
 def get_test_regions(wildcards):

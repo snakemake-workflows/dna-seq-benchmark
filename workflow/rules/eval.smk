@@ -65,18 +65,19 @@ rule normalize_calls:
         bcf="results/filtered-variants/{callset}.bcf",
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
-        regions=get_test_regions,
+        regions=get_confidence_regions,
     output:
         "results/normalized-variants/{callset}.vcf.gz",
-    params:
-        get_norm_params,
+    #params:
+    #    get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
     conda:
         "../envs/tools.yaml"
     shell:
         "(bedtools intersect -b {input.regions} -a "
-        "<(bcftools norm {params} {input.bcf} ) | "
+        #"<(bcftools norm {params} {input.bcf} ) | "
+        "<(bcftools norm --atomize --check-ref s --fasta-ref {input.ref} --rm-dup exact {input.bcf} ) | "
         "bcftools view -Oz > {output}) 2> {log}"
 
 
