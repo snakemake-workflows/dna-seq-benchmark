@@ -1,7 +1,7 @@
 variant-calls:
-  #dummy-giab: 
-  #  path: "resources/variants/na12878/all.truth.bcf"
-  #  benchmark: "giab-na12878-exome"
+  dummy-giab: 
+    path: "resources/variants/na12878/all.truth.bcf"
+    benchmark: "giab-na12878-exome"
   dummy-chm: 
     path: "resources/variants/chm-eval/all.truth.bcf"
     benchmark: "chm-eval"
