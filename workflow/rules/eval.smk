@@ -76,7 +76,8 @@ rule normalize_calls:
         "../envs/tools.yaml"
     shell:
         "(bedtools intersect -b {input.regions} -a "
-        "<(bcftools norm {params} 2> {log}"
+        "<(bcftools norm {params} {input.bcf} ) | "
+        "bcftools view -Oz > {output}) 2> {log}"
 
 
 rule stratify_truth:
