@@ -186,7 +186,7 @@ def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif "rename-contigs":
+    elif "rename-contigs" in callset:
         return "results/normalized-variants/{callset}.replaced-contigs.bcf"
     else:
         return get_raw_callset(wildcards)
@@ -312,7 +312,7 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    return config["variant-calls"][wildcards.callset].get("rename-contigs")
+    return config["variant-calls"][wildcards.callset]["rename-contigs"]
 
 
 def get_callset_subcategory(wildcards):
