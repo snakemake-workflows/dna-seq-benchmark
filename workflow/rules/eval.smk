@@ -68,7 +68,7 @@ rule normalize_calls:
         regions=get_confidence_regions,
     output:
         "results/normalized-variants/{callset}.vcf.gz",
-    #params:
+    # params:
     #    get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
@@ -76,8 +76,7 @@ rule normalize_calls:
         "../envs/tools.yaml"
     shell:
         "(bedtools intersect -b {input.regions} -a "
-        #"<(bcftools norm {params} {input.bcf} ) | "
-        "<(bcftools norm --atomize --check-ref s --fasta-ref {input.ref} --rm-dup exact {input.bcf} ) | "
+        "<(bcftools norm --atomize --check-ref s --fasta-ref {input.ref} --rm-dup exact {input.bcf}) -wa -f 1.0 -header | "
         "bcftools view -Oz > {output}) 2> {log}"
 
 
