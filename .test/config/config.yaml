@@ -2,17 +2,17 @@ variant-calls:
   dummy-giab: 
     path: "resources/variants/na12878/all.truth.bcf"
     benchmark: "giab-na12878-exome"
-  # dummy-chm: 
-  #   path: "resources/variants/chm-eval/all.truth.bcf"
-  #   benchmark: "chm-eval"
-  # dummy-imgag:
-  #   path: "resources/variants/na12878-somatic/all.truth.bcf"
-  #   benchmark: "imgag-somatic-5perc"
-  #   tumor_sample_name: "HG001"
-  # dummy-seqc2:
-  #   path: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
-  #   benchmark: "seqc2-somatic-ea"
-  #   tumor_sample_name: "truth"
+  dummy-chm: 
+    path: "resources/variants/chm-eval/all.truth.bcf"
+    benchmark: "chm-eval"
+  dummy-imgag:
+    path: "resources/variants/na12878-somatic/all.truth.bcf"
+    benchmark: "imgag-somatic-5perc"
+    tumor_sample_name: "HG001"
+  dummy-seqc2:
+    path: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
+    benchmark: "seqc2-somatic-ea"
+    tumor_sample_name: "truth"
 
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
