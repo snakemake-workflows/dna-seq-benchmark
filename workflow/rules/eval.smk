@@ -65,7 +65,7 @@ rule normalize_calls:
         bcf="results/filtered-variants/{callset}.bcf",
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
-        regions=get_confidence_regions,
+        regions=get_target_regions,
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     log:
