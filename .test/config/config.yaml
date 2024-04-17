@@ -1,5 +1,5 @@
 variant-calls:
-  dummy-giab: 
+  dummy-giab:
     path: "resources/variants/na12878/all.truth.bcf"
     benchmark: "giab-na12878-exome"
   dummy-chm: 
