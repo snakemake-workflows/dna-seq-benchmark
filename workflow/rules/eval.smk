@@ -41,7 +41,7 @@ rule add_format_field:
         "../envs/vatools.yaml"
     shell:
         # TODO: Optional - Check first if FORMAT field is present for example with
-        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf 
+        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf
         # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
         # adds FORMAT field with GT field and sample name 'truth'
         "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log}"
@@ -68,6 +68,8 @@ rule normalize_calls:
         regions=get_target_regions,
     output:
         "results/normalized-variants/{callset}.vcf.gz",
+    params:
+        extra=get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
     conda:
@@ -75,7 +77,7 @@ rule normalize_calls:
     shell:
         "(bedtools intersect -b {input.regions} -a "
         "<(bcftools view {input.bcf}) -wa -f 1.0 -header | "
-        "bcftools norm --atomize --check-ref s --fasta-ref {input.ref} --rm-dup exact | "
+        "bcftools norm {params.extra} --fasta-ref {input.ref} | "
         "bcftools view -Oz > {output}) 2> {log}"
 
 
