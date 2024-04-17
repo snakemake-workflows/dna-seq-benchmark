@@ -74,7 +74,7 @@ rule normalize_calls:
         "../envs/tools.yaml"
     shell:
         "(bedtools intersect -b {input.regions} -a "
-        "<(bcftools view -Oz {input.bcf}) -wa -f 1.0 -header | "
+        "<(bcftools view {input.bcf}) -wa -f 1.0 -header | "
         "bcftools norm --atomize --check-ref s --fasta-ref {input.ref} --rm-dup exact | "
         "bcftools view -Oz > {output}) 2> {log}"
 
