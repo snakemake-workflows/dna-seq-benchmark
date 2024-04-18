@@ -167,31 +167,15 @@ rule get_reference:
         "v1.7.2/bio/reference/ensembl-sequence"
 
 
-rule get_liftover_references:
+rule get_liftover_chain:
     output:
-        "resources/liftover/"
+        "resources/liftover/GRCh37_to_GRCh38.chain.gz"
     log:
-        "logs/get_liftover_references.log",
+        "logs/get_liftover_chain.log",
     conda:
         "../envs/tools.yaml"
     shell:
-        # GRCh37
-        "wget -O- ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/human_g1k_v37.fasta.gz | "
-        "gzip -d > $HOME/GRCh37/human_g1k_v37.fasta"
-        "samtools faidx $HOME/GRCh37/human_g1k_v37.fasta"
-        "bwa index $HOME/GRCh37/human_g1k_v37.fasta"
-        "wget -P $HOME/GRCh37 http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz"
-        "wget -P $HOME/GRCh37 http://hgdownload.cse.ucsc.edu/goldenpath/hg18/liftOver/hg18ToHg19.over.chain.gz"
-        "ref='$HOME/GRCh37/human_g1k_v37.fasta'"
-        # GRCh38
-        "wget -O- ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz | "
-        "gzip -d > $HOME/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
-        "samtools faidx $HOME/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
-        "bwa index $HOME/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
-        "wget -P $HOME/GRCh38 http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz"
-        "wget -P $HOME/GRCh38 http://hgdownload.cse.ucsc.edu/goldenpath/hg18/liftOver/hg18ToHg38.over.chain.gz"
-        "wget -P $HOME/GRCh38 http://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz"
-        "ref='$HOME/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna'"
+        "curl http://ftp.ensembl.org/pub/assembly_mapping/homo_sapiens/GRCh37_to_GRCh38.chain.gz -o {output}"
 
 
 rule samtools_faidx:

@@ -1,23 +1,18 @@
 rule liftover_callset:
     input:
-        get_callset,
+        callset=get_callset_correct_contigs,
+        liftover_chain = "resources/liftover/GRCh37_to_GRCh38.chain.gz",
+        reference="resources/reference/genome.fasta",
     output:
         "results/normalized-variants/{callset}.lifted.vcf.gz",
     log:
-        "logs/liftover-callset/{callset}.log",
-    container:
-        "docker:us.gcr.io/mccarroll-mocha/bcftools@sha256:b636b46e4db7122bc546041ad8dc9328d8b20a999fc8bdea82108eff07f6271a"
+        "logs/liftover_callset/{callset}.log",
+    conda:
+        "../envs/picard.yaml"
     shell:
-        "wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5c.20130502.sites.vcf.gz{,.tbi}
-        "bcftools +liftover --no-version -Ou ALL.wgs.phase3_shapeit2_mvncall_integrated_v5c.20130502.sites.vcf.gz -- "
-        "-s $HOME/GRCh37/human_g1k_v37.fasta"
-        "-f $HOME/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna" "
-        "-c $HOME/GRCh38/hg19ToHg38.over.chain.gz" "
-        "--reject ALL.wgs.phase3_shapeit2_mvncall_integrated_v5c.20130502.sites.reject.bcf "
-        "--reject-type b "
-        "--write-src | "
-        "bcftools sort -Ob | tee ALL.wgs.phase3_shapeit2_mvncall_integrated_v5c.20130502.sites.hg38.bcf | "
-        "bcftools index --force --output ALL.wgs.phase3_shapeit2_mvncall_integrated_v5c.20130502.sites.hg38.bcf.csi" "
+        "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict"
+        "picard LiftoverVcf  -I {input.callset}  -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
+
 
 
 rule rename_contigs:
@@ -37,7 +32,7 @@ rule rename_contigs:
 
 rule add_genotype_field:
     input:
-        get_callset_correct_contigs,
+        get_callset_correct_contigs_liftover,
     output:
         "results/normalized-variants/{callset}.gt-added.vcf.gz",
     log:
@@ -63,7 +58,7 @@ rule add_format_field:
         "../envs/vatools.yaml"
     shell:
         # TODO: Optional - Check first if FORMAT field is present for example with
-        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf 
+        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf
         # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
         # adds FORMAT field with GT field and sample name 'truth'
         "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log}"
@@ -195,8 +190,8 @@ rule calc_precision_recall:
         snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.log",
-    params:
-        vaf_fields=get_vaf_fields,
+    # params:
+    #     vaf_fields=get_vaf_fields,
     conda:
         "../envs/pysam.yaml"
     script:
