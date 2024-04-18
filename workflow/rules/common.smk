@@ -104,29 +104,20 @@ def get_truthsets(csi=False):
     def inner(wildcards):
         genome = genomes[wildcards.genome]
         truthsets = genome["truth"][get_genome_build()]
-        return expand(
-            "resources/variants/{genome}/{truthset}.truth.bcf",
-            genome=wildcards.genome,
-            truthset=truthsets,
-        )
+        if csi:
+            return expand(
+                "resources/variants/{genome}/{truthset}.truth.bcf.csi",
+                genome=wildcards.genome,
+                truthset=truthsets,
+            )
+        else:
+            return expand(
+                "resources/variants/{genome}/{truthset}.truth.bcf",
+                genome=wildcards.genome,
+                truthset=truthsets,
+            )
 
     return inner
-
-
-def index_truthsets(wildcards):
-    def inner(wildcards):
-        genome = genomes[wildcards.genome]
-        truthsets = genome["truth"][get_genome_build()]
-        return expand(
-            "bcftools index -f resources/variants/{genome}/{truthset}.truth.bcf",
-            genome=wildcards.genome,
-            truthset=truthsets,
-        )
-
-    bcf_cmd_list = inner(wildcards)
-    bcf_cmd_list.append("")
-    bcf_cmd = "\n".join(bcf_cmd_list)
-    return bcf_cmd
 
 
 def get_confidence_bed_cmd(wildcards, input):
@@ -186,7 +177,7 @@ def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif "rename-contigs":
+    elif "rename-contigs" in callset:
         return "results/normalized-variants/{callset}.replaced-contigs.bcf"
     else:
         return get_raw_callset(wildcards)
@@ -312,7 +303,7 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    return config["variant-calls"][wildcards.callset].get("rename-contigs")
+    return config["variant-calls"][wildcards.callset]["rename-contigs"]
 
 
 def get_callset_subcategory(wildcards):
