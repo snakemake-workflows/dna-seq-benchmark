@@ -2,7 +2,7 @@ from collections import defaultdict
 import sys, os
 
 # sys.path.insert(0, os.path.dirname(__file__))
-sys.stderr = open(snakemake.log[0], "w")
+# sys.stderr = open(snakemake.log[0], "w")
 
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -15,71 +15,99 @@ from common.classification import CompareExactGenotype, CompareExistence, Class
 
 class Classifications:
     def __init__(self, comparator, vaf_fields):
-        if vaf_fields[0] is None or vaf_fields[1] is None:  
+        self.comparator = comparator
+        if vaf_fields[0] is None or vaf_fields[1] is None:
+            self.stratify_by_vaf = False
             self.tp_query = 0
             self.tp_truth = 0
             self.fn = 0
             self.fp = 0
-            self.comparator = comparator
         else:
-            self.tp_query = np.array([]) # 0-100%
-            self.tp_truth = 0
-            self.fn = 0
-            self.fp = 0
+            self.stratify_by_vaf = True
+            self.vaf_field_query = vaf_fields[0][0]
+            self.vaf_field_name_query = vaf_fields[0][1]
+            self.vaf_field_truth = vaf_fields[1][0]
+            self.vaf_field_name_truth = vaf_fields[1][1]
+            # arrays with 10 fields (VAF from 0% to 100%)
+            self.tp_query = np.zeros(10)
+            self.tp_truth = np.zeros(10)
+            self.fn = np.zeros(10)
+            self.fp = np.zeros(10)
 
     def increment_counter(self, counter, vaf):
-        if vaf is None:
-            counter += 1
-        else:
+        if self.stratify_by_vaf:
             # 10 equally sized bins
             bin = int(vaf*10)
             counter[bin] += 1
+        else:
+            counter += 1
 
-    def register(self, record):
+    def register(self, record, truth):
         for c in self.comparator.classify(record):
             # TODO: depending on case, fetch VAF from truth or query record (FP: from query record, field configurable by callset (e.g. FORMAT/AF, INFO/AF, ...)
             # for truth record, field configurable by benchmark preset (same syntax as above)
             # increment counters for bins, bins given to constructor as list of tuples or some numpy equivalent.
             # Default: None. If no VAF field given for either truth or callset, don't bin at all. 
             if c.cls is Class.TP_truth:
-                vaf = truth.samples[record.name]["AF"] # still needs to be implemented
+                r = list(truth.fetch(record.contig, record.start, record.stop))[0]
+                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
                 self.increment_counter(self.tp_truth, vaf)
-                # self.tp_truth += 1
             elif c.cls is Class.TP_query:
-                vaf = truth.samples[record.name]["AF"] # still needs to be implemented
+                r = list(truth.fetch(record.contig, record.start, record.stop))[0]
+                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
                 self.increment_counter(self.tp_query, vaf)
-                # self.tp_query += 1
             elif c.cls is Class.FN:
-                vaf = truth.samples[record.name]["AF"] # still needs to be implemented
+                r = list(truth.fetch(record.contig, record.start, record.stop))[0]
+                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
                 self.increment_counter(self.fn, vaf)
-                # self.fn += 1
             elif c.cls is Class.FP:
-                vaf = record.samples[0]["AF"] # only works for FORMAT field
+                print(record.info.keys())
+                print(record.format.keys())
+                vaf = record.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else record.format[self.vaf_field_name_query]
                 self.increment_counter(self.fp, vaf)
-                # self.fp += 1
             else:
                 assert False, "unexpected case"
 
     def precision(self):
-        p = self.tp_query + self.fp
-        if p == 0:
-            return 1.0
-        return float(self.tp_query) / float(p)
+        if self.stratify_by_vaf:
+            p = self.tp_query + self.fp
+            for (x, i) in enumerate(p):
+                if x == 0:
+                    p[i] = 1.0
+                else:
+                    p[i] = self.tp_query[i] / p[i]
+            return p
+        else:
+            p = self.tp_query + self.fp
+            if p == 0:
+                return 1.0
+            return float(self.tp_query) / float(p)
 
     def recall(self):
-        t = self.tp_truth + self.fn
-        if t == 0:
-            return 1.0
-        return float(self.tp_truth) / float(t)
+        if self.stratify_by_vaf:
+            t = self.tp_truth + self.fn
+            for (x, i) in enumerate(t):
+                if x == 0:
+                    t[i] = 1.0
+                else:
+                    t[i] = self.tp_truth[i] / t[i]
+            return t
+        else:
+            t = self.tp_truth + self.fn
+            if t == 0:
+                return 1.0
+            return float(self.tp_truth) / float(t)
 
 
 def collect_results(vartype):
-    classifications_exact = Classifications(CompareExactGenotype(vartype))
-    classifications_existence = Classifications(CompareExistence(vartype))
+    vaf_fields = snakemake.params.vaf_fields
+    classifications_exact = Classifications(CompareExactGenotype(vartype), vaf_fields)
+    classifications_existence = Classifications(CompareExistence(vartype), vaf_fields)
+    truth = pysam.VariantFile(snakemake.input.truth)
 
     for record in pysam.VariantFile(snakemake.input.calls):
-        classifications_exact.register(record)
-        classifications_existence.register(record)
+        classifications_exact.register(record, truth)
+        classifications_existence.register(record, truth)
 
     vartype = "indels" if vartype == "INDEL" else "snvs"
 
@@ -92,6 +120,12 @@ def collect_results(vartype):
         )
     else:
         mismatched_genotype_rate = 0.0
+
+    precisions = classifications_existence.precision()
+    recalls = classifications_existence.recall()
+    print(precisions)
+    print(recalls)
+    print(classifications_existence.fp)
 
     d = pd.DataFrame(
         {
@@ -115,8 +149,6 @@ def collect_results(vartype):
             "genotype_mismatch_rate",
         ]
     ]
-
-snakemake.params.vaf_fields
 
 assert snakemake.wildcards.vartype in ["snvs", "indels"]
 vartype = "SNV" if snakemake.wildcards.vartype == "snvs" else "INDEL"
