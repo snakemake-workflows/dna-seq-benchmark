@@ -194,6 +194,7 @@ def get_callset_correct_contigs(wildcards):
     else:
         return get_raw_callset(wildcards)
 
+
 def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if "grch37" in callset:

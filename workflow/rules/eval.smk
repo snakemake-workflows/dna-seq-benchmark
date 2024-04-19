@@ -1,7 +1,7 @@
 rule liftover_callset:
     input:
         callset=get_callset_correct_contigs,
-        liftover_chain = "resources/liftover/GRCh37_to_GRCh38.chain.gz",
+        liftover_chain="resources/liftover/GRCh37_to_GRCh38.chain.gz",
         reference="resources/reference/genome.fasta",
     output:
         "results/normalized-variants/{callset}.lifted.vcf.gz",
@@ -12,7 +12,6 @@ rule liftover_callset:
     shell:
         "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict"
         "picard LiftoverVcf  -I {input.callset}  -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
-
 
 
 rule rename_contigs:

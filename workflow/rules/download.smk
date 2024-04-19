@@ -169,7 +169,7 @@ rule get_reference:
 
 rule get_liftover_chain:
     output:
-        "resources/liftover/GRCh37_to_GRCh38.chain.gz"
+        "resources/liftover/GRCh37_to_GRCh38.chain.gz",
     log:
         "logs/get_liftover_chain.log",
     conda:
