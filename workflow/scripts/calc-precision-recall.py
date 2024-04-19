@@ -37,12 +37,12 @@ class Classifications:
     def increment_counter(self, counter, vaf):
         if self.stratify_by_vaf:
             # 10 equally sized bins
-            bin = int(vaf*10)
+            bin = int(vaf*10) - 1
             counter[bin] += 1
         else:
             counter += 1
 
-    def register(self, record, truth):
+    def register(self, record, truth, query):
         for c in self.comparator.classify(record):
             # TODO: depending on case, fetch VAF from truth or query record (FP: from query record, field configurable by callset (e.g. FORMAT/AF, INFO/AF, ...)
             # for truth record, field configurable by benchmark preset (same syntax as above)
@@ -61,9 +61,8 @@ class Classifications:
                 vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
                 self.increment_counter(self.fn, vaf)
             elif c.cls is Class.FP:
-                print(record.info.keys())
-                print(record.format.keys())
-                vaf = record.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else record.format[self.vaf_field_name_query]
+                r = list(query.fetch(record.contig, record.start, record.stop))[0]
+                vaf = r.info[self.vaf_field_name_query][0] if self.vaf_field_query == "INFO" else r.format[self.vaf_field_name_query][0]
                 self.increment_counter(self.fp, vaf)
             else:
                 assert False, "unexpected case"
@@ -71,7 +70,7 @@ class Classifications:
     def precision(self):
         if self.stratify_by_vaf:
             p = self.tp_query + self.fp
-            for (x, i) in enumerate(p):
+            for (i,x) in enumerate(p):
                 if x == 0:
                     p[i] = 1.0
                 else:
@@ -86,7 +85,7 @@ class Classifications:
     def recall(self):
         if self.stratify_by_vaf:
             t = self.tp_truth + self.fn
-            for (x, i) in enumerate(t):
+            for (i,x) in enumerate(t):
                 if x == 0:
                     t[i] = 1.0
                 else:
@@ -104,49 +103,63 @@ def collect_results(vartype):
     classifications_exact = Classifications(CompareExactGenotype(vartype), vaf_fields)
     classifications_existence = Classifications(CompareExistence(vartype), vaf_fields)
     truth = pysam.VariantFile(snakemake.input.truth)
+    query = pysam.VariantFile(snakemake.input.query)
 
     for record in pysam.VariantFile(snakemake.input.calls):
-        classifications_exact.register(record, truth)
-        classifications_existence.register(record, truth)
+        classifications_exact.register(record, truth, query)
+        classifications_existence.register(record, truth, query)
 
     vartype = "indels" if vartype == "INDEL" else "snvs"
 
-    mismatched_genotype = (
-        classifications_existence.tp_query - classifications_exact.tp_query
-    )
-    if classifications_existence.tp_query > 0:
-        mismatched_genotype_rate = (
-            mismatched_genotype / classifications_existence.tp_query
-        )
-    else:
-        mismatched_genotype_rate = 0.0
+    # mismatched_genotype = (
+    #     classifications_existence.tp_query - classifications_exact.tp_query
+    # )
+    # if classifications_existence.tp_query > 0:
+    #     mismatched_genotype_rate = (
+    #         mismatched_genotype / classifications_existence.tp_query
+    #     )
+    # else:
+    #     mismatched_genotype_rate = 0.0
+    mismatched_genotype_rate = 0.0
 
     precisions = classifications_existence.precision()
     recalls = classifications_existence.recall()
-    print(precisions)
-    print(recalls)
-    print(classifications_existence.fp)
+    vafs = ["<0.1",
+            "<0.2",
+            "<0.3",
+            "<0.4",
+            "<0.5",
+            "<0.6",
+            "<0.7",
+            "<0.8",
+            "<0.9",
+            "<=1.0"
+            ]
 
+    print(len(vafs))
     d = pd.DataFrame(
         {
-            "precision": [classifications_existence.precision()],
-            "tp_query": [classifications_existence.tp_query],
-            "fp": [classifications_existence.fp],
-            "recall": [classifications_existence.recall()],
-            "tp_truth": [classifications_existence.tp_truth],
-            "fn": [classifications_existence.fn],
-            "genotype_mismatch_rate": [mismatched_genotype_rate],
+            "vafs": vafs,
+            "precision": classifications_existence.precision(),
+            "tp_query": classifications_existence.tp_query,
+            "fp": classifications_existence.fp,
+            "recall": classifications_existence.recall(),
+            "tp_truth": classifications_existence.tp_truth,
+            "fn": classifications_existence.fn,
+            #"genotype_mismatch_rate": [mismatched_genotype_rate],
         }
     )
+    print(d)
     return d[
         [
+            "vafs",
             "precision",
             "tp_query",
             "fp",
             "recall",
             "tp_truth",
             "fn",
-            "genotype_mismatch_rate",
+            #"genotype_mismatch_rate",
         ]
     ]
 
