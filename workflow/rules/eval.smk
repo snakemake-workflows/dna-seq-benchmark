@@ -169,6 +169,7 @@ rule calc_precision_recall:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
         idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
         common_src=common_src,
+        truth=get_stratified_truth(),
     output:
         snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
     log:
