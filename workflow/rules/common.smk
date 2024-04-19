@@ -379,10 +379,10 @@ def get_somatic_flag(wildcards):
 
 
 def get_vaf_fields(wildcards):
-    vaf_callset = config["variant-calls"][wildcards.callset].get("vaf_field")
+    vaf_callset = config["variant-calls"][wildcards.callset].get("vaf-field")
 
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-    vaf_benchmark = benchmarks[benchmark].get("vaf_field")
+    vaf_benchmark = benchmarks[benchmark].get("vaf-field")
 
     # can return (None, None) if param not set
     return (vaf_callset, vaf_benchmark)
