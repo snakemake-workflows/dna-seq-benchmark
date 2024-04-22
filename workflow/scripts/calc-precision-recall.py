@@ -2,7 +2,7 @@ from collections import defaultdict
 import sys, os
 
 # sys.path.insert(0, os.path.dirname(__file__))
-# sys.stderr = open(snakemake.log[0], "w")
+sys.stderr = open(snakemake.log[0], "w")
 
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -44,7 +44,7 @@ class Classifications:
 
     def register(self, record, truth, query):
         for c in self.comparator.classify(record):
-            # TODO: depending on case, fetch VAF from truth or query record (FP: from query record, field configurable by callset (e.g. FORMAT/AF, INFO/AF, ...)
+            # depending on case, fetch VAF from truth or query record (FP: from query record, field configurable by callset (e.g. FORMAT/AF, INFO/AF, ...)
             # for truth record, field configurable by benchmark preset (same syntax as above)
             # increment counters for bins, bins given to constructor as list of tuples or some numpy equivalent.
             # Default: None. If no VAF field given for either truth or callset, don't bin at all. 
@@ -111,57 +111,70 @@ def collect_results(vartype):
 
     vartype = "indels" if vartype == "INDEL" else "snvs"
 
-    # mismatched_genotype = (
-    #     classifications_existence.tp_query - classifications_exact.tp_query
-    # )
-    # if classifications_existence.tp_query > 0:
-    #     mismatched_genotype_rate = (
-    #         mismatched_genotype / classifications_existence.tp_query
-    #     )
-    # else:
-    #     mismatched_genotype_rate = 0.0
-    mismatched_genotype_rate = 0.0
+    # no stratification by VAF
+    if vaf_fields[0] is None or vaf_fields[1] is None:
+        mismatched_genotype = (
+            classifications_existence.tp_query - classifications_exact.tp_query
+        )
+        if classifications_existence.tp_query > 0:
+            mismatched_genotype_rate = (
+                mismatched_genotype / classifications_existence.tp_query
+            )
+        else:
+            mismatched_genotype_rate = 0.0
 
-    precisions = classifications_existence.precision()
-    recalls = classifications_existence.recall()
-    vafs = ["<0.1",
-            "<0.2",
-            "<0.3",
-            "<0.4",
-            "<0.5",
-            "<0.6",
-            "<0.7",
-            "<0.8",
-            "<0.9",
-            "<=1.0"
+        d = pd.DataFrame(
+            {
+                "precision": [classifications_existence.precision()],
+                "tp_query": [classifications_existence.tp_query],
+                "fp": [classifications_existence.fp],
+                "recall": [classifications_existence.recall()],
+                "tp_truth": [classifications_existence.tp_truth],
+                "fn": [classifications_existence.fn],
+                "genotype_mismatch_rate": [mismatched_genotype_rate],
+            }
+        )
+
+        return d[
+            [
+                "precision",
+                "tp_query",
+                "fp",
+                "recall",
+                "tp_truth",
+                "fn",
+                "genotype_mismatch_rate",
             ]
-
-    print(len(vafs))
-    d = pd.DataFrame(
-        {
-            "vafs": vafs,
-            "precision": classifications_existence.precision(),
-            "tp_query": classifications_existence.tp_query,
-            "fp": classifications_existence.fp,
-            "recall": classifications_existence.recall(),
-            "tp_truth": classifications_existence.tp_truth,
-            "fn": classifications_existence.fn,
-            #"genotype_mismatch_rate": [mismatched_genotype_rate],
-        }
-    )
-    print(d)
-    return d[
-        [
-            "vafs",
-            "precision",
-            "tp_query",
-            "fp",
-            "recall",
-            "tp_truth",
-            "fn",
-            #"genotype_mismatch_rate",
         ]
-    ]
+
+    # stratification by VAF
+    else:
+        vafs = [0.1*x for x in range(1,11)]
+
+        d = pd.DataFrame(
+            {
+                "vaf": vafs,
+                "precision": classifications_existence.precision(),
+                "tp_query": classifications_existence.tp_query,
+                "fp": classifications_existence.fp,
+                "recall": classifications_existence.recall(),
+                "tp_truth": classifications_existence.tp_truth,
+                "fn": classifications_existence.fn,
+            }
+        )
+
+        return d[
+            [
+                "vaf",
+                "precision",
+                "tp_query",
+                "fp",
+                "recall",
+                "tp_truth",
+                "fn",
+            ]
+        ]
+    
 
 assert snakemake.wildcards.vartype in ["snvs", "indels"]
 vartype = "SNV" if snakemake.wildcards.vartype == "snvs" else "INDEL"
