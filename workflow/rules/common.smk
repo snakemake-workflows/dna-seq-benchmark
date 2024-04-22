@@ -223,14 +223,14 @@ def get_target_regions(wildcards):
     if hasattr(wildcards, "benchmark"):
         benchmark = get_benchmark(wildcards.benchmark)
         if "target-regions" in benchmark:
-            return "resources/regions/{benchmark}/target-regions.bed"
+            return f"resources/regions/{benchmark}/target-regions.bed"
         else:
             return []
     else:
         benchmark_name = config["variant-calls"][wildcards.callset]["benchmark"]
         benchmark = get_benchmark(benchmark_name)
         if "target-regions" in benchmark:
-            return "resources/regions/{benchmark_name}/target-regions.bed"
+            return f"resources/regions/{benchmark_name}/target-regions.bed"
         else:
             return []
 
