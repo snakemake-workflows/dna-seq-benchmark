@@ -210,6 +210,7 @@ rule collect_precision_recall:
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark),
         labels=get_collect_precision_recall_labels,
+        vaf=get_vaf_status,
     log:
         "logs/collect-precision-recall/{benchmark}/{vartype}.log",
     conda:
@@ -226,6 +227,7 @@ rule render_precision_recall_report_config:
         ),
     params:
         somatic=get_somatic_status,
+        vaf=get_vaf_status,
     output:
         "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
     log:
