@@ -105,18 +105,28 @@ views:
             plot:
              heatmap:
                 scale: linear
-                # domain:
-                #   - <10%
-                #   - <20%
-                #   - <30%
-                #   - <40%
-                #   - <50%
-                #   - <60%
-                #   - <70%
-                #   - <80%
-                #   - <90%
-                #   - <=100%
-                color-scheme: greens
+                domain:
+                  - 0.1
+                  - 0.2
+                  - 0.3
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+                  - 1.0
+                range:
+                  - "#c0e6baff"
+                  - "#abdda5ff"
+                  - "#94d391ff"
+                  - "#7bc77dff"
+                  - "#60ba6cff"
+                  - "#46ab5eff"
+                  - "#329a51ff"
+                  - "#208943ff"
+                  - "#0e7735ff"
+                  - "#1a833fff"
     ?else:
       desc: |
         Precision and recall are calculated by matching variants between each callset 
