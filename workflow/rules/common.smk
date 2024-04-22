@@ -388,6 +388,14 @@ def get_vaf_fields(wildcards):
     return (vaf_callset, vaf_benchmark)
 
 
+def get_vaf_status(wildcards):
+    vaf_benchmark = benchmarks[wildcards.benchmark].get("vaf-field")
+    if vaf_benchmark is None:
+        return False
+    else:
+        return True
+
+
 def get_collect_stratifications_input(wildcards):
     import json
 
