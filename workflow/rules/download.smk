@@ -167,6 +167,17 @@ rule get_reference:
         "v1.7.2/bio/reference/ensembl-sequence"
 
 
+rule get_liftover_chain:
+    output:
+        "resources/liftover/GRCh37_to_GRCh38.chain.gz",
+    log:
+        "logs/get_liftover_chain.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "curl http://ftp.ensembl.org/pub/assembly_mapping/homo_sapiens/GRCh37_to_GRCh38.chain.gz -o {output}"
+
+
 rule samtools_faidx:
     input:
         "resources/reference/genome.fasta",
