@@ -52,21 +52,29 @@ class Classifications:
                 if self.stratify_by_vaf:
                     r = list(truth.fetch(record.contig, record.start, record.stop))[0]
                     vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                else:
+                    vaf = None
                 self.increment_counter(self.tp_truth, vaf)
             elif c.cls is Class.TP_query:
                 if self.stratify_by_vaf:
                     r = list(truth.fetch(record.contig, record.start, record.stop))[0]
                     vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                else:
+                    vaf = None
                 self.increment_counter(self.tp_query, vaf)
             elif c.cls is Class.FN:
                 if self.stratify_by_vaf:
                     r = list(truth.fetch(record.contig, record.start, record.stop))[0]
                     vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                else:
+                    vaf = None
                 self.increment_counter(self.fn, vaf)
             elif c.cls is Class.FP:
                 if self.stratify_by_vaf:
                     r = list(query.fetch(record.contig, record.start, record.stop))[0]
                     vaf = r.info[self.vaf_field_name_query][0] if self.vaf_field_query == "INFO" else r.format[self.vaf_field_name_query][0]
+                else:
+                    vaf = None
                 self.increment_counter(self.fp, vaf)
             else:
                 assert False, "unexpected case"
