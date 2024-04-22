@@ -221,8 +221,8 @@ def get_target_bed_statement(wildcards):
 
 def get_target_regions(wildcards):
     if hasattr(wildcards, "benchmark"):
-        benchmark = get_benchmark(wildcards.benchmark)
-        if "target-regions" in benchmark:
+        benchmark_dict = get_benchmark(wildcards.benchmark)
+        if "target-regions" in benchmark_dict:
             return f"resources/regions/{benchmark}/target-regions.bed"
         else:
             return []
