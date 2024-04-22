@@ -67,47 +67,98 @@ views:
 
   results-table:
     dataset: results
-    desc: |
-      Precision and recall are calculated by matching variants between each callset 
-      and truth, stratified by coverage categories. The matching ignores genotype
-      differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate" 
-      column.
-    page-size: 12
-    render-table:
-      columns:
-        callset:
-          plot:
-            heatmap:
-              scale: ordinal
-              color-scheme: category20
-        precision:
-          precision: 3
-          plot:
-            ticks:
-              scale: linear
-        recall:
-          precision: 3
-          plot:
-            ticks:
-              scale: linear
-        genotype_mismatch_rate:
-          ?if params.somatic:
-            display-mode: hidden
-          ?else:
-            display-mode: normal
-          precision: 3
-          plot:
-            ticks:
-              scale: linear
-        coverage:
-          plot:
-            heatmap:
-              scale: ordinal
-              domain:
-                - low
-                - medium
-                - high
-              range:
-                - "#c6dbef"
-                - "#9ecae1"
-                - "#6baed6"
+    ?if params.vaf:
+      desc: |
+        Precision and recall are calculated by matching variants between each callset 
+        and truth, stratified by coverage categories. Stratified by VAF.
+      page-size: 12
+      render-table:
+        columns:
+          callset:
+            plot:
+              heatmap:
+                scale: ordinal
+                color-scheme: category20
+          precision:
+            precision: 3
+            plot:
+              ticks:
+                scale: linear
+          recall:
+            precision: 3
+            plot:
+              ticks:
+                scale: linear
+          coverage:
+            plot:
+              heatmap:
+                scale: ordinal
+                domain:
+                  - low
+                  - medium
+                  - high
+                range:
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#6baed6"
+          vaf:
+            plot:
+             heatmap:
+                scale: linear
+                # domain:
+                #   - <10%
+                #   - <20%
+                #   - <30%
+                #   - <40%
+                #   - <50%
+                #   - <60%
+                #   - <70%
+                #   - <80%
+                #   - <90%
+                #   - <=100%
+                color-scheme: greens
+    ?else:
+      desc: |
+        Precision and recall are calculated by matching variants between each callset 
+        and truth, stratified by coverage categories. The matching ignores genotype
+        differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate" 
+        column.
+      page-size: 12
+      render-table:
+        columns:
+          callset:
+            plot:
+              heatmap:
+                scale: ordinal
+                color-scheme: category20
+          precision:
+            precision: 3
+            plot:
+              ticks:
+                scale: linear
+          recall:
+            precision: 3
+            plot:
+              ticks:
+                scale: linear
+          genotype_mismatch_rate:
+            ?if params.somatic:
+              display-mode: hidden
+            ?else:
+              display-mode: normal
+            precision: 3
+            plot:
+              ticks:
+                scale: linear
+          coverage:
+            plot:
+              heatmap:
+                scale: ordinal
+                domain:
+                  - low
+                  - medium
+                  - high
+                range:
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#6baed6"
