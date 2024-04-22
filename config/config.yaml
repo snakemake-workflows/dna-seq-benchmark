@@ -17,6 +17,8 @@ variant-calls:
     # Uncomment and point to file containing contig name replacements
     # as needed for 'bcftools annotate --rename-chrs'
     # rename-contigs: path/to/rename-contigs.txt
+    # Uncomment if callset was produced using grch37 as reference, then a liftover to grch38 will be performed
+    # grch37: true
 
 # Optional custom benchmarks
 custom-benchmarks:
