@@ -49,20 +49,24 @@ class Classifications:
             # increment counters for bins, bins given to constructor as list of tuples or some numpy equivalent.
             # Default: None. If no VAF field given for either truth or callset, don't bin at all. 
             if c.cls is Class.TP_truth:
-                r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                if self.stratify_by_vaf:
+                    r = list(truth.fetch(record.contig, record.start, record.stop))[0]
+                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
                 self.increment_counter(self.tp_truth, vaf)
             elif c.cls is Class.TP_query:
-                r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                if self.stratify_by_vaf:
+                    r = list(truth.fetch(record.contig, record.start, record.stop))[0]
+                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
                 self.increment_counter(self.tp_query, vaf)
             elif c.cls is Class.FN:
-                r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                if self.stratify_by_vaf:
+                    r = list(truth.fetch(record.contig, record.start, record.stop))[0]
+                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
                 self.increment_counter(self.fn, vaf)
             elif c.cls is Class.FP:
-                r = list(query.fetch(record.contig, record.start, record.stop))[0]
-                vaf = r.info[self.vaf_field_name_query][0] if self.vaf_field_query == "INFO" else r.format[self.vaf_field_name_query][0]
+                if self.stratify_by_vaf:
+                    r = list(query.fetch(record.contig, record.start, record.stop))[0]
+                    vaf = r.info[self.vaf_field_name_query][0] if self.vaf_field_query == "INFO" else r.format[self.vaf_field_name_query][0]
                 self.increment_counter(self.fp, vaf)
             else:
                 assert False, "unexpected case"
