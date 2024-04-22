@@ -232,11 +232,19 @@ def get_target_bed_statement(wildcards):
 
 
 def get_target_regions(wildcards):
-    benchmark = get_benchmark(wildcards.benchmark)
-    if "target-regions" in benchmark:
-        return "resources/regions/{benchmark}/target-regions.bed"
+    if hasattr(wildcards, "benchmark"):
+        benchmark_dict = get_benchmark(wildcards.benchmark)
+        if "target-regions" in benchmark_dict:
+            return f"resources/regions/{wildcards.benchmark}/target-regions.bed"
+        else:
+            return []
     else:
-        return []
+        benchmark_name = config["variant-calls"][wildcards.callset]["benchmark"]
+        benchmark = get_benchmark(benchmark_name)
+        if "target-regions" in benchmark:
+            return f"resources/regions/{benchmark_name}/target-regions.bed"
+        else:
+            return []
 
 
 def get_target_regions_intersect_statement(wildcards, input):
@@ -293,10 +301,7 @@ def get_benchmark_truth(wildcards):
 def get_stratified_truth(suffix=""):
     def inner(wildcards):
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-        # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
-        return "results/variants/{benchmark}.truth.cov-{{cov}}.vcf.gz{suffix}".format(
-            benchmark=benchmark, suffix=suffix
-        )
+        return f"results/variants/{benchmark}.truth.cov-{{cov}}.vcf.gz{suffix}"
 
     return inner
 
@@ -308,10 +313,7 @@ def get_confidence_regions(wildcards):
 
 def get_test_regions(wildcards):
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-    # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
-    return "resources/regions/{benchmark}/test-regions.cov-{{cov}}.bed".format(
-        benchmark=benchmark
-    )
+    return f"resources/regions/{benchmark}/test-regions.cov-{{cov}}.bed"
 
 
 def get_rename_contig_file(wildcards):
@@ -380,10 +382,8 @@ def get_somatic_flag(wildcards):
         sample_name_callset = config["variant-calls"][wildcards.callset][
             "tumor_sample_name"
         ]  # get name tumor via config -> from dict
-        # TODO use f-string when this is fixed: https://github.com/snakemake/snakefmt/issues/215
-        somatic_flag = "--squash-ploidy --sample {sample_name_baseline},{sample_name_callset}".format(
-            sample_name_baseline=sample_name_baseline,
-            sample_name_callset=sample_name_callset,
+        somatic_flag = (
+            f"--squash-ploidy --sample {sample_name_baseline},{sample_name_callset}"
         )
     else:
         somatic_flag = ""

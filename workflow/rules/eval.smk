@@ -76,15 +76,25 @@ rule remove_non_pass:
         "v3.3.6/bio/bcftools/view"
 
 
-use rule normalize_truth as normalize_calls with:
+rule normalize_calls:
     input:
-        "results/filtered-variants/{callset}.bcf",
+        bcf="results/filtered-variants/{callset}.bcf",
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
+        regions=get_target_regions,
     output:
         "results/normalized-variants/{callset}.vcf.gz",
+    params:
+        extra=get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "(bedtools intersect -b {input.regions} -a "
+        "<(bcftools view {input.bcf}) -wa -f 1.0 -header | "
+        "bcftools norm {params.extra} --fasta-ref {input.ref} | "
+        "bcftools view -Oz > {output}) 2> {log}"
 
 
 rule stratify_truth:
