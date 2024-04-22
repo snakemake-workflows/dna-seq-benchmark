@@ -223,7 +223,7 @@ def get_target_regions(wildcards):
     if hasattr(wildcards, "benchmark"):
         benchmark_dict = get_benchmark(wildcards.benchmark)
         if "target-regions" in benchmark_dict:
-            return f"resources/regions/{benchmark}/target-regions.bed"
+            return f"resources/regions/{wildcards.benchmark}/target-regions.bed"
         else:
             return []
     else:
