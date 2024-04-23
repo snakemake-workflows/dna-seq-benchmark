@@ -47,32 +47,32 @@ class Classifications:
             # depending on case, fetch VAF from truth or query record (FP: from query record, field configurable by callset (e.g. FORMAT/AF, INFO/AF, ...)
             # for truth record, field configurable by benchmark preset (same syntax as above)
             # increment counters for bins, bins given to constructor as list of tuples or some numpy equivalent.
-            # Default: None. If no VAF field given for either truth or callset, don't bin at all. 
+            # Default: None. If no VAF field given for either truth or callset, don't bin at all.
             if c.cls is Class.TP_truth:
                 if self.stratify_by_vaf:
                     r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
                 else:
                     vaf = None
                 self.increment_counter(self.tp_truth, vaf)
             elif c.cls is Class.TP_query:
                 if self.stratify_by_vaf:
                     r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
                 else:
                     vaf = None
                 self.increment_counter(self.tp_query, vaf)
             elif c.cls is Class.FN:
                 if self.stratify_by_vaf:
                     r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.format[self.vaf_field_name_truth]
+                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
                 else:
                     vaf = None
                 self.increment_counter(self.fn, vaf)
             elif c.cls is Class.FP:
                 if self.stratify_by_vaf:
                     r = list(query.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_query][0] if self.vaf_field_query == "INFO" else r.format[self.vaf_field_name_query][0]
+                    vaf = r.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else r.samples[0][self.vaf_field_name_query][0]
                 else:
                     vaf = None
                 self.increment_counter(self.fp, vaf)
@@ -186,7 +186,7 @@ def collect_results(vartype):
                 "fn",
             ]
         ]
-    
+
 
 assert snakemake.wildcards.vartype in ["snvs", "indels"]
 vartype = "SNV" if snakemake.wildcards.vartype == "snvs" else "INDEL"
