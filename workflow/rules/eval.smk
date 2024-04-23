@@ -196,7 +196,9 @@ rule calc_precision_recall:
         idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
         common_src=common_src,
         truth=get_stratified_truth(),
+        truth_idx=get_stratified_truth(".tbi"),
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
+        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
         snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
     log:
