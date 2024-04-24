@@ -34,8 +34,13 @@ class Classifications:
             self.fn = np.zeros(10)
             self.fp = np.zeros(10)
 
-    def increment_counter(self, counter, vaf):
+    def increment_counter(self, current_record, other_record, counter, fp=False):
         if self.stratify_by_vaf:
+            r = list(other_record.fetch(current_record.contig, current_record.start, current_record.stop))[0]
+            if fp:
+                vaf = r.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else r.samples[0][self.vaf_field_name_query][0]
+            else:
+                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
             # 10 equally sized bins
             bin = int(vaf*10) - 1
             counter[bin] += 1
@@ -50,33 +55,13 @@ class Classifications:
             # increment counters for bins, bins given to constructor as list of tuples or some numpy equivalent.
             # Default: None. If no VAF field given for either truth or callset, don't bin at all.
             if c.cls is Class.TP_truth:
-                if self.stratify_by_vaf:
-                    r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
-                else:
-                    vaf = None
-                self.tp_truth = self.increment_counter(self.tp_truth, vaf)
+                self.tp_truth = self.increment_counter(record, truth, self.tp_truth)
             elif c.cls is Class.TP_query:
-                if self.stratify_by_vaf:
-                    r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
-                else:
-                    vaf = None
-                self.tp_query = self.increment_counter(self.tp_query, vaf)
+                self.tp_query = self.increment_counter(record, truth, self.tp_query)
             elif c.cls is Class.FN:
-                if self.stratify_by_vaf:
-                    r = list(truth.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
-                else:
-                    vaf = None
-                self.fn = self.increment_counter(self.fn, vaf)
+                self.fn = self.increment_counter(record, truth, self.fn)
             elif c.cls is Class.FP:
-                if self.stratify_by_vaf:
-                    r = list(query.fetch(record.contig, record.start, record.stop))[0]
-                    vaf = r.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else r.samples[0][self.vaf_field_name_query][0]
-                else:
-                    vaf = None
-                self.fp = self.increment_counter(self.fp, vaf)
+                self.fp = self.increment_counter(record, query, self.fp, True)
             else:
                 assert False, "unexpected case"
 
