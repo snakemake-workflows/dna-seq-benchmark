@@ -70,7 +70,7 @@ views:
     ?if params.vaf:
       desc: |
         Precision and recall are calculated by matching variants between each callset 
-        and truth, stratified by coverage categories. Stratified by VAF.
+        and truth, stratified by coverage categories and VAF.
       page-size: 12
       render-table:
         columns:
