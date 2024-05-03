@@ -9,7 +9,7 @@ default-view: results-table
 
 datasets:
   results:
-    path: ?input.dataset
+    path: ?input.table
     separator: "\t"
     links:
       link to table:
