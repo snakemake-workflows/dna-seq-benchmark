@@ -20,9 +20,9 @@ views:
   results-plot:
     dataset: results
     desc: |
-      Precision and recall are calculated by matching variants between each callset 
+      Precision and recall are calculated by matching variants between each callset
       and truth, stratified by coverage categories. The matching ignores genotype
-      differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate" 
+      differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate"
       column of the tabular result representation or in the tooltips shown when hovering
       a point.
 
@@ -69,7 +69,7 @@ views:
     dataset: results
     ?if params.vaf:
       desc: |
-        Precision and recall are calculated by matching variants between each callset 
+        Precision and recall are calculated by matching variants between each callset
         and truth, stratified by coverage categories. Stratified by VAF.
       page-size: 12
       render-table:
@@ -105,6 +105,11 @@ views:
             plot:
              heatmap:
                 scale: linear
+                custom-content:
+                  function(value, row) {
+                    let lower = value - 0.1;
+                    return `${lower.toFixed(1)}..${parseFloat(value).toFixed(1)}`
+                  }
                 domain:
                   - 0.1
                   - 0.2
@@ -129,9 +134,9 @@ views:
                   - "#1a833fff"
     ?else:
       desc: |
-        Precision and recall are calculated by matching variants between each callset 
+        Precision and recall are calculated by matching variants between each callset
         and truth, stratified by coverage categories. The matching ignores genotype
-        differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate" 
+        differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate"
         column.
       page-size: 12
       render-table:
