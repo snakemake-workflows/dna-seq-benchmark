@@ -247,38 +247,21 @@ rule collect_precision_recall:
         "../scripts/collect-precision-recall.py"
 
 
-rule render_precision_recall_report_config:
+rule report_precision_recall:
     input:
-        dataset="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
-        template=workflow.source_path(
+        config=workflow.source_path(
             "../resources/datavzrd/precision-recall-config.yte.yaml"
         ),
+        table="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
+    output:
+        "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
     params:
         somatic=get_somatic_status,
         vaf=get_vaf_status,
-    output:
-        "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
     log:
         "logs/yte/datavzrd-config/precision-recall/{benchmark}/{vartype}.log",
     template_engine:
         "yte"
-
-
-rule report_precision_recall:
-    input:
-        config="results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
-        table="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
-    output:
-        report(
-            directory("results/report/precision-recall/{benchmark}/{vartype}"),
-            htmlindex="index.html",
-            category="precision/recall",
-            labels={"benchmark": "{benchmark}", "vartype": "{vartype}"},
-        ),
-    log:
-        "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
-    wrapper:
-        "v3.10.1/utils/datavzrd"
 
 
 rule extract_fp_fn:
@@ -322,26 +305,11 @@ rule collect_fp_fn:
         "../scripts/collect-fp-fn.py"
 
 
-rule render_fp_fn_report_config:
-    input:
-        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
-        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
-        template=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
-    output:
-        "results/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.config.yaml",
-    params:
-        labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
-    log:
-        "logs/yte/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.log",
-    template_engine:
-        "yte"
-
-
 rule report_fp_fn:
     input:
         main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
         dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
-        config="results/datavzrd-config/fp-fn/{genome}/{cov}/{classification}.config.yaml",
+        config=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
     output:
         report(
             directory("results/report/fp-fn/{genome}/{cov}/{classification}"),
@@ -352,5 +320,7 @@ rule report_fp_fn:
         ),
     log:
         "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
+    params:
+        labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
     wrapper:
         "v3.10.1/utils/datavzrd"
