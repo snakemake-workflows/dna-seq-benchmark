@@ -407,7 +407,14 @@ def get_vaf_status(wildcards):
     if vaf_benchmark is None:
         return False
     else:
-        return True
+        callsets = get_benchmark_callsets(wildcards.benchmark)
+        vaf_callsets = [
+            config["variant-calls"][callset].get("vaf-field") for callset in callsets
+        ]
+        if any(vaf_callset is not None for vaf_callset in vaf_callsets):
+            return True
+        else:
+            return False
 
 
 def get_collect_stratifications_input(wildcards):
