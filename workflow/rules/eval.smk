@@ -254,14 +254,19 @@ rule report_precision_recall:
         ),
         table="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
     output:
-        "results/datavzrd-config/precision-recall/{benchmark}/{vartype}.config.yaml",
+        report(
+            directory("results/report/precision-recall/{benchmark}/{vartype}"),
+            htmlindex="index.html",
+            category="precision/recall",
+            labels={"benchmark": "{benchmark}", "vartype": "{vartype}"},
+        ),
+    log:
+        "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
     params:
         somatic=get_somatic_status,
         vaf=get_vaf_status,
-    log:
-        "logs/yte/datavzrd-config/precision-recall/{benchmark}/{vartype}.log",
-    template_engine:
-        "yte"
+    wrapper:
+        "v3.10.1/utils/datavzrd"
 
 
 rule extract_fp_fn:
