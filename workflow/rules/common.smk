@@ -199,6 +199,8 @@ def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if "grch37" in callset:
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
+    elif "rename-contigs" in callset:
+        return "results/normalized-variants/{callset}.replaced-contigs.bcf"
     else:
         return get_raw_callset(wildcards)
 
