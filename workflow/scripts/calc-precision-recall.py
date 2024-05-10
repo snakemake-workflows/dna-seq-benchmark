@@ -42,7 +42,7 @@ class Classifications:
             else:
                 vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
             # 10 equally sized bins
-            bin = int(vaf*10) - 1
+            bin = max(0, int(vaf*10) - 1)
             counter[bin] += 1
         else:
             counter += 1
