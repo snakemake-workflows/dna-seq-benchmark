@@ -38,9 +38,11 @@ class Classifications:
         if self.stratify_by_vaf:
             r = list(other_record.fetch(current_record.contig, current_record.start, current_record.stop))[0]
             if fp:
-                vaf = r.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else r.samples[0][self.vaf_field_name_query][0]
+                vaf = r.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else r.samples[0][self.vaf_field_name_query]
             else:
-                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth][0]
+                vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth]
+            if type(vaf) == tuple:
+                vaf = vaf[0]
             # 10 equally sized bins
             bin = max(0, int(vaf*10) - 1)
             counter[bin] += 1
