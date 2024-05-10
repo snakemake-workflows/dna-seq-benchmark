@@ -29,10 +29,10 @@ class Classifications:
             self.vaf_field_truth = vaf_fields[1][0]
             self.vaf_field_name_truth = vaf_fields[1][1]
             # arrays with 10 fields (VAF from 0% to 100%)
-            self.tp_query = np.zeros(10)
-            self.tp_truth = np.zeros(10)
-            self.fn = np.zeros(10)
-            self.fp = np.zeros(10)
+            self.tp_query = np.zeros(10, dtype=np.uint)
+            self.tp_truth = np.zeros(10, dtype=np.uint)
+            self.fn = np.zeros(10, dtype=np.uint)
+            self.fp = np.zeros(10, dtype=np.uint)
 
     def increment_counter(self, current_record, other_record, counter, fp=False):
         if self.stratify_by_vaf:
@@ -67,7 +67,7 @@ class Classifications:
 
     def precision(self):
         if self.stratify_by_vaf:
-            p = self.tp_query + self.fp
+            p = self.tp_query.astype(np.float32) + self.fp
             for (i,x) in enumerate(p):
                 if x == 0:
                     p[i] = 1.0
@@ -82,7 +82,7 @@ class Classifications:
 
     def recall(self):
         if self.stratify_by_vaf:
-            t = self.tp_truth + self.fn
+            t = self.tp_truth.astype(np.float32) + self.fn
             for (i,x) in enumerate(t):
                 if x == 0:
                     t[i] = 1.0
