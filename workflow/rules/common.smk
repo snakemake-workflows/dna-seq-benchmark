@@ -83,7 +83,7 @@ def get_plot_cov_labels():
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper - 1}"
+            return f"{lower}-{upper-1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in coverages}

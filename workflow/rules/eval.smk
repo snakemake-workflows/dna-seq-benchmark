@@ -24,9 +24,9 @@ rule liftover_callset:
     conda:
         "../envs/picard.yaml"
     resources:
-         mem_mb=100000
+        mem_mb=64000,
     shell:
-        "picard LiftoverVcf -Xmx100g --MAX_RECORDS_IN_RAM 100000 -I {input.callset} -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
+        "picard LiftoverVcf -Xmx64g --MAX_RECORDS_IN_RAM 100000 -I {input.callset} -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
 
 
 rule rename_contigs:
