@@ -1,17 +1,32 @@
+rule get_reference_dict:
+    input:
+        reference="resources/reference/genome.fasta",
+    output:
+        "resources/reference/genome.fasta.dict",
+    log:
+        "logs/get-reference-dict.log",
+    conda:
+        "../envs/picard.yaml"
+    shell:
+        "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict &> {log}"
+
+
 rule liftover_callset:
     input:
         callset=get_callset_correct_contigs,
         liftover_chain="resources/liftover/GRCh37_to_GRCh38.chain.gz",
         reference="resources/reference/genome.fasta",
+        reference_dict="resources/reference/genome.fasta.dict",
     output:
         "results/normalized-variants/{callset}.lifted.vcf.gz",
     log:
         "logs/liftover_callset/{callset}.log",
     conda:
         "../envs/picard.yaml"
+    resources:
+         mem_mb=100000
     shell:
-        "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict"
-        "picard LiftoverVcf  -I {input.callset}  -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
+        "picard LiftoverVcf -Xmx100g --MAX_RECORDS_IN_RAM 100000 -I {input.callset} -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
 
 
 rule rename_contigs:
