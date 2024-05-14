@@ -5,3 +5,5 @@ resources/**
 .test/**
 logs
 logs/**
+data/**
+report/**
