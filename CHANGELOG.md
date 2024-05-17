@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.9.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.5...v1.9.0) (2024-05-17)
+
+
+### Features
+
+* expand benchmarking datasets with IMGAG somatic validation data ([#61](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/61)) ([307e034](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/307e034ecad19d3d35a1bdc08aeb8a0aa1de815e))
+* Liftover callsets from hg19/GRCh37 to hg38/GRCh38 ([#70](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/70)) ([28f96a8](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/28f96a8f53c1f03b62b00f153c6efa6ee520ff73))
+* only consider PASS and no-filter variants in given callsets ([#66](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/66)) ([7c48a8c](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/7c48a8c623824a7c948376961b92ae232b95d239))
+* stratification of VAFs ([#68](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/68)) ([8d2c121](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/8d2c121aa9a5ea30b1a39fe2dda0d74263aaf6fb))
+
+
+### Bug Fixes
+
+* fix failing giab testcase ([#72](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/72)) ([5f24c56](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/5f24c56646d533e621c1b6b3bda4d561016fc808))
+* imgag-somatic and integrate seqc2 ([#63](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/63)) ([274d800](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/274d80085e2e6de07234c0954908c9e9a1ebe146))
+* merge truthsets ([#71](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/71)) ([aa8ca0a](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/aa8ca0a79ac98cf274857e193a92d65394988b31))
+* rename-contigs to include target bed intersection and add mapping files to resources ([#73](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/73)) ([65930c5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/65930c56d6ad1abbba2036e1647f297b27c9b897))
+* use latest datavzrd wrapper, integrating templating of config, thereby avoiding leaks of local storage paths into datavzrd config ([#74](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/74)) ([40a64ed](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/40a64ed1f0a54e56a580b921c69f7ecf510d56a5))
+
 ### [1.8.5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.4...v1.8.5) (2023-11-13)
 
 
