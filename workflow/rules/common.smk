@@ -83,7 +83,7 @@ def get_plot_cov_labels():
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper - 1}"
+            return f"{lower}-{upper-1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in coverages}
@@ -178,7 +178,7 @@ def get_callset(wildcards):
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
     elif "rename-contigs" in callset:
-        return "results/normalized-variants/{callset}.replaced-contigs.bcf"
+        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif "grch37" in callset:
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     else:
@@ -188,7 +188,7 @@ def get_callset(wildcards):
 def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if "rename-contigs" in callset:
-        return "results/normalized-variants/{callset}.replaced-contigs.bcf"
+        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif "grch37" in callset:
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     else:
@@ -199,6 +199,8 @@ def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if "grch37" in callset:
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
+    elif "rename-contigs" in callset:
+        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
@@ -388,6 +390,31 @@ def get_somatic_flag(wildcards):
     else:
         somatic_flag = ""
     return somatic_flag
+
+
+def get_vaf_fields(wildcards):
+    vaf_callset = config["variant-calls"][wildcards.callset].get("vaf-field")
+
+    benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+    vaf_benchmark = benchmarks[benchmark].get("vaf-field")
+
+    # can return (None, None) if param not set
+    return (vaf_callset, vaf_benchmark)
+
+
+def get_vaf_status(wildcards):
+    vaf_benchmark = benchmarks[wildcards.benchmark].get("vaf-field")
+    if vaf_benchmark is None:
+        return False
+    else:
+        callsets = get_benchmark_callsets(wildcards.benchmark)
+        vaf_callsets = [
+            config["variant-calls"][callset].get("vaf-field") for callset in callsets
+        ]
+        if any(vaf_callset is not None for vaf_callset in vaf_callsets):
+            return True
+        else:
+            return False
 
 
 def get_collect_stratifications_input(wildcards):

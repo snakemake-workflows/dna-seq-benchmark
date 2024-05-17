@@ -1,17 +1,32 @@
+rule get_reference_dict:
+    input:
+        reference="resources/reference/genome.fasta",
+    output:
+        "resources/reference/genome.fasta.dict",
+    log:
+        "logs/get-reference-dict.log",
+    conda:
+        "../envs/picard.yaml"
+    shell:
+        "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict &> {log}"
+
+
 rule liftover_callset:
     input:
         callset=get_callset_correct_contigs,
         liftover_chain="resources/liftover/GRCh37_to_GRCh38.chain.gz",
         reference="resources/reference/genome.fasta",
+        reference_dict="resources/reference/genome.fasta.dict",
     output:
         "results/normalized-variants/{callset}.lifted.vcf.gz",
     log:
         "logs/liftover_callset/{callset}.log",
     conda:
         "../envs/picard.yaml"
+    resources:
+        mem_mb=64000,
     shell:
-        "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict"
-        "picard LiftoverVcf  -I {input.callset}  -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
+        "picard LiftoverVcf -Xmx64g --MAX_RECORDS_IN_RAM 100000 -I {input.callset} -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
 
 
 rule rename_contigs:
@@ -19,7 +34,7 @@ rule rename_contigs:
         calls=get_raw_callset,
         repl_file=get_rename_contig_file,
     output:
-        "results/normalized-variants/{callset}.replaced-contigs.bcf",
+        "results/normalized-variants/{callset}.replaced-contigs.vcf.gz",
     log:
         "logs/rename-contigs/{callset}.log",
     conda:
@@ -195,12 +210,16 @@ rule calc_precision_recall:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
         idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
         common_src=common_src,
+        truth=get_stratified_truth(),
+        truth_idx=get_stratified_truth(".tbi"),
+        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
+        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
         snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.log",
-    # params:
-    #     vaf_fields=get_vaf_fields,
+    params:
+        vaf_fields=get_vaf_fields,
     conda:
         "../envs/pysam.yaml"
     script:
@@ -234,6 +253,7 @@ rule collect_precision_recall:
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark),
         labels=get_collect_precision_recall_labels,
+        vaf=get_vaf_status,
     log:
         "logs/collect-precision-recall/{benchmark}/{vartype}.log",
     conda:
@@ -259,6 +279,7 @@ rule report_precision_recall:
         "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
     params:
         somatic=get_somatic_status,
+        vaf=get_vaf_status,
     wrapper:
         "v3.10.1/utils/datavzrd"
 
