@@ -89,7 +89,7 @@ def get_mosdepth_quantize(wildcards):
     return ":".join(map(str, sorted(coverages.values()))) + ":"
 
 
-def get_plot_cov_labels(): # TODO check if ever used anywhere
+def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
