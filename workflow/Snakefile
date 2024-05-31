@@ -29,5 +29,5 @@ if "variant-calls" in config:
             expand(
                 "results/variants/{benchmark}.truth.cov-{cov}.stats.json",
                 benchmark=used_benchmarks,
-                cov=coverages,
+                cov=high_coverages,
             ),
