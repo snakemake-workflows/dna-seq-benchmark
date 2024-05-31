@@ -233,7 +233,7 @@ rule collect_stratifications:
         "results/precision-recall/callsets/{callset}.{vartype}.tsv",
     params:
         coverages=get_nonempty_coverages,
-        coverage_lower_bounds=coverages,
+        coverage_lower_bounds=get_coverages,
     log:
         "logs/collect-stratifications/{callset}/{vartype}.log",
     conda:
@@ -280,6 +280,7 @@ rule report_precision_recall:
     params:
         somatic=get_somatic_status,
         vaf=get_vaf_status,
+        high_coverage=get_high_coverage_status,
     wrapper:
         "v3.10.1/utils/datavzrd"
 
