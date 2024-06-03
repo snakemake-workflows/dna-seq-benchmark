@@ -28,6 +28,11 @@ if "variant-calls" in config:
             # of the checkpoint output
             expand(
                 "results/variants/{benchmark}.truth.cov-{cov}.stats.json",
-                benchmark=used_benchmarks,
+                benchmark=[benchmark for benchmark in used_benchmarks if benchmarks[benchmark].get("high-coverage")],
                 cov=high_coverages,
+            ),
+            expand(
+                "results/variants/{benchmark}.truth.cov-{cov}.stats.json",
+                benchmark=[benchmark for benchmark in used_benchmarks if not benchmarks[benchmark].get("high-coverage")],
+                cov=low_coverages,
             ),
