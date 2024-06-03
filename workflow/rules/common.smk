@@ -34,18 +34,18 @@ repl_chr = "s/chr//"
 
 
 low_coverages = {
-    "low": 1,
-    "medium": 10,
-    "high": 30,
+    "lc_low": 1,
+    "lc_medium": 10,
+    "lc_high": 30,
 }
 
 high_coverages = {
-    "wes_very_low": 1,
-    "wes_low": 10,
-    "wes_medium": 30,
-    "wes_upper_medium": 50,
-    "wes_high": 100,
-    "wes_very_high": 300,
+    "hc_very_low": 1,
+    "hc_low": 10,
+    "hc_medium": 30,
+    "hc_upper_medium": 50,
+    "hc_high": 100,
+    "hc_very_high": 300,
 }
 
 
