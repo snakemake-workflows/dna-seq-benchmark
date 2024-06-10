@@ -10,7 +10,7 @@ benchmarks:
     bam-url: ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341796/CHM1_CHM13_2.bam
     grch37: false
 
-  seqc2-somatic-ea:
+  seqc2-wes:
     genome: seqc2-somatic
     bam-url: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/WES/WES_EA_T_1.bwa.dedup.bam
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
@@ -19,25 +19,25 @@ benchmarks:
       - INFO # either FORMAT or INFO
       - TVAF # name of tumor variant allele frequency
 
-  imgag-somatic-5perc:
+  imgag-5:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_5.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
     grch37: false
 
-  imgag-somatic-10perc:
+  imgag-10:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_10.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
     grch37: false
 
-  imgag-somatic-20perc:
+  imgag-20:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_20.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
     grch37: false
 
-  imgag-somatic-40perc:
+  imgag-40:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_40.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
