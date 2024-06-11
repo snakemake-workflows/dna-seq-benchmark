@@ -7,7 +7,7 @@ variant-calls:
     benchmark: "chm-eval"
   dummy-imgag:
     path: "resources/variants/na12878-somatic/all.truth.bcf"
-    benchmark: "imgag-somatic-5perc"
+    benchmark: "imgag-5"
     tumor_sample_name: "HG001"
   dummy-seqc2:
     path: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
