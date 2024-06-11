@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.9.0...v1.10.0) (2024-06-11)
+
+
+### Features
+
+* improve coverage stratification for datasets with high coverage ([#75](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/75)) ([225113c](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/225113c4c5154cf1884dc211f73928159c370456))
+
+
+### Bug Fixes
+
+* change bm names to adhere to naming scheme in pm4onco ([#78](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/78)) ([20ad65e](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/20ad65e59d9b91013a4d07845885eab26cea4399))
+
 ## [1.9.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.8.5...v1.9.0) (2024-05-17)
 
 
