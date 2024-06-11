@@ -33,10 +33,19 @@ if any(
 repl_chr = "s/chr//"
 
 
-coverages = {
-    "low": 1,
-    "medium": 10,
-    "high": 30,
+low_coverages = {
+    "lc_low": 1,
+    "lc_medium": 10,
+    "lc_high": 30,
+}
+
+high_coverages = {
+    "hc_very_low": 1,
+    "hc_low": 10,
+    "hc_medium": 30,
+    "hc_upper_medium": 50,
+    "hc_high": 100,
+    "hc_very_high": 300,
 }
 
 
@@ -75,18 +84,19 @@ def get_bwa_input(wildcards):
         return benchmark["fastqs"]
 
 
-def get_mosdepth_quantize():
+def get_mosdepth_quantize(wildcards):
+    coverages = get_coverages(wildcards)
     return ":".join(map(str, sorted(coverages.values()))) + ":"
 
 
-def get_plot_cov_labels():
+def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
             return f"{lower}-{upper-1}"
         return f"≥{lower}"
 
-    return {name: label(name) for name in coverages}
+    return {name: label(name) for name in low_coverages}
 
 
 def get_truth_url(wildcards, input):
@@ -156,13 +166,14 @@ def get_happy_prefix(wildcards, output):
 
 
 def get_cov_label(wildcards):
-    lower, upper = get_cov_interval(wildcards.cov)
+    coverages = get_coverages(wildcards)
+    lower, upper = get_cov_interval(wildcards.cov, coverages)
     if upper:
         return f"{lower}:{upper}"
     return f"{lower}:inf"
 
 
-def get_cov_interval(name):
+def get_cov_interval(name, coverages):
     threshold = coverages[name]
     upper_bound = None
 
@@ -351,6 +362,11 @@ def get_mosdepth_input(bai=False):
 
 def _get_nonempty_coverages(callset):
     benchmark = config["variant-calls"][callset]["benchmark"]
+    benchmark_dict = get_benchmark(benchmark)
+    if benchmark_dict.get("high-coverage", False):
+        coverages = high_coverages
+    else:
+        coverages = low_coverages
 
     def isempty(cov):
         with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
@@ -364,6 +380,20 @@ def _get_nonempty_coverages(callset):
 
 def get_nonempty_coverages(wildcards):
     return _get_nonempty_coverages(wildcards.callset)
+
+
+def get_coverages(wildcards):
+    if hasattr(wildcards, "benchmark"):
+        # benchmark = get_benchmark(wildcards.benchmark)
+        high_cov_status = benchmarks[wildcards.benchmark].get("high-coverage", False)
+    else:
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        high_cov_status = benchmarks[benchmark].get("high-coverage", False)
+    if high_cov_status:
+        coverages = high_coverages
+    else:
+        coverages = low_coverages
+    return coverages
 
 
 def get_somatic_status(wildcards):
@@ -415,6 +445,11 @@ def get_vaf_status(wildcards):
             return True
         else:
             return False
+
+
+def get_high_coverage_status(wildcards):
+    benchmark = get_benchmark(wildcards.benchmark)
+    return benchmark.get("high-coverage", False)
 
 
 def get_collect_stratifications_input(wildcards):

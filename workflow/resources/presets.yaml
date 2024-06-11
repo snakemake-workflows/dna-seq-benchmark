@@ -15,33 +15,38 @@ benchmarks:
     bam-url: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/WES/WES_EA_T_1.bwa.dedup.bam
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
     grch37: false
-    vaf-field: 
+    vaf-field:
       - INFO # either FORMAT or INFO
       - TVAF # name of tumor variant allele frequency
+    high-coverage: true
 
   imgag-somatic-5perc:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_5.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
     grch37: false
+    high-coverage: true
 
   imgag-somatic-10perc:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_10.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
     grch37: false
+    high-coverage: true
 
   imgag-somatic-20perc:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_20.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
     grch37: false
+    high-coverage: true
 
   imgag-somatic-40perc:
     genome: na12878-somatic
     bam-url: https://download.imgag.de/public/validation_dataset_somatic/NA12878x3_23_NA12877_21_40.bam
     target-regions: https://download.imgag.de/public/validation_dataset_somatic/Twist_Custom_Exome_IMGAG_v2.bed
     grch37: false
+    high-coverage: true
 
 genomes:
   na12878:
@@ -51,7 +56,7 @@ genomes:
     confidence-regions:
       grch37: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.bed
       grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed
-  
+
   chm-eval:
     archive: https://github.com/lh3/CHM-eval/releases/download/v0.5/CHM-evalkit-20180222.tar
     truth:
@@ -60,7 +65,7 @@ genomes:
     confidence-regions:
       grch38: full.38.bed.gz
       grch37: full.37m.bed.gz
-  
+
   seqc2-somatic:
     truth:
       grch38:
@@ -69,7 +74,7 @@ genomes:
     confidence-regions:
       grch38: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/release/latest/High-Confidence_Regions_v1.2.bed
     somatic: true
-  
+
   na12878-somatic:
     truth:
       grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz
