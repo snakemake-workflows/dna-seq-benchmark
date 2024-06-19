@@ -91,6 +91,11 @@ views:
             plot:
               ticks:
                 scale: linear
+          "f*":
+            precision: 3
+            plot:
+              ticks:
+                scale: linear
           coverage:
             plot:
               heatmap:
@@ -179,6 +184,11 @@ views:
               display-mode: hidden
             ?else:
               display-mode: normal
+            precision: 3
+            plot:
+              ticks:
+                scale: linear
+          "f*":
             precision: 3
             plot:
               ticks:

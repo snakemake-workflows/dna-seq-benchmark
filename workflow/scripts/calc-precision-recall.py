@@ -70,7 +70,7 @@ class Classifications:
     def precision(self):
         if self.stratify_by_vaf:
             p = self.tp_query.astype(np.float32) + self.fp
-            for (i,x) in enumerate(p):
+            for (i, x) in enumerate(p):
                 if x == 0:
                     p[i] = 1.0
                 else:
@@ -85,7 +85,7 @@ class Classifications:
     def recall(self):
         if self.stratify_by_vaf:
             t = self.tp_truth.astype(np.float32) + self.fn
-            for (i,x) in enumerate(t):
+            for (i, x) in enumerate(t):
                 if x == 0:
                     t[i] = 1.0
                 else:
@@ -96,6 +96,26 @@ class Classifications:
             if t == 0:
                 return 1.0
             return float(self.tp_truth) / float(t)
+        
+    def fstar(self):
+        """Calculate F* score,
+        see https://link.springer.com/article/10.1007/s10994-021-05964-1.
+
+        This is an interpretable alternative to the F-measure.
+        Proportion of correct predictions among all predictions and missed variants.
+        Or in other words, the probability that a variant taken from the union of 
+        prediction and truth is correctly predicted.
+        It is a monotonic transformation of the F-measure.
+        """
+        if self.stratify_by_vaf:
+            a = self.tp_query.astype(np.float32) + self.fn + self.fp
+            for (i, x) in enumerate(a):
+                a[i] = self.tp_query[i] / a[i]
+            return a
+        else:
+            a = self.tp_query + self.fn + self.fp
+            return float(self.tp_truth) / float(a)
+
 
 
 def collect_results(vartype):
@@ -132,6 +152,7 @@ def collect_results(vartype):
                 "tp_truth": [classifications_existence.tp_truth],
                 "fn": [classifications_existence.fn],
                 "genotype_mismatch_rate": [mismatched_genotype_rate],
+                "F*": [classifications_existence.fstar()],
             }
         )
 
@@ -144,6 +165,7 @@ def collect_results(vartype):
                 "tp_truth",
                 "fn",
                 "genotype_mismatch_rate",
+                "F*",
             ]
         ]
 
