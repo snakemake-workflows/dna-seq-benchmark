@@ -4,7 +4,7 @@ __variables__:
   green: "#74c476"
   orange: "#fd8d3c"
 
-name: ?f"Precision/recall analysis of {wildcards.benchmark}"
+name: ?f"Precision/recall analysis of {wildcards.benchmark} v{wildcards.version}"
 
 webview-controls: true
 default-view: results-table
@@ -121,7 +121,7 @@ views:
                     - "#6baed6"
           vaf:
             plot:
-             heatmap:
+              heatmap:
                 scale: linear
                 custom-content:
                   function(value, row) {
