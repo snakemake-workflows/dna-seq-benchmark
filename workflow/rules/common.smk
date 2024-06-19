@@ -93,7 +93,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper-1}"
+            return f"{lower}-{upper - 1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in low_coverages}
@@ -492,7 +492,6 @@ def get_collect_precision_recall_input(wildcards):
 
 def get_genome_version(wildcards):
     genome_benchmark = get_benchmark(wildcards.benchmark).get("genome")
-    #genome_benchmark = benchmarks[benchmark].get("genome")
     return genomes[genome_benchmark].get("version")
 
 
