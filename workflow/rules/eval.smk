@@ -273,7 +273,7 @@ rule report_precision_recall:
             directory("results/report/precision-recall/{benchmark}/{vartype}"),
             htmlindex="index.html",
             category="precision/recall",
-            labels={"benchmark": "{benchmark}", "vartype": "{vartype}"},
+            labels={"benchmark": "{benchmark}", "version": "{version}", "vartype": "{vartype}"},
         ),
     log:
         "logs/datavzrd/precision-recall/{benchmark}/{vartype}.log",
