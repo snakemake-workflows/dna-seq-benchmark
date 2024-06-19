@@ -275,7 +275,6 @@ rule report_precision_recall:
             category="precision/recall",
             labels={
                 "benchmark": "{benchmark}",
-                "version": "{version}",
                 "vartype": "{vartype}",
             },
         ),
@@ -285,6 +284,7 @@ rule report_precision_recall:
         somatic=get_somatic_status,
         vaf=get_vaf_status,
         high_coverage=get_high_coverage_status,
+        version=get_genome_version,
     wrapper:
         "v3.10.1/utils/datavzrd"
 
