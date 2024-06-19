@@ -490,6 +490,12 @@ def get_collect_precision_recall_input(wildcards):
     )
 
 
+def get_genome_version(wildcards):
+    genome_benchmark = get_benchmark(wildcards.benchmark).get("genome")
+    #genome_benchmark = benchmarks[benchmark].get("genome")
+    return genomes[genome_benchmark].get("version")
+
+
 def get_genome_callsets(genome):
     return sorted(
         callset
