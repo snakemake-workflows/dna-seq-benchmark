@@ -4,7 +4,7 @@ __variables__:
   green: "#74c476"
   orange: "#fd8d3c"
 
-name: ?f"Precision/recall analysis of {wildcards.benchmark} v{wildcards.version}"
+name: ?f"Precision/recall analysis of {wildcards.benchmark}"
 
 webview-controls: true
 default-view: results-table
