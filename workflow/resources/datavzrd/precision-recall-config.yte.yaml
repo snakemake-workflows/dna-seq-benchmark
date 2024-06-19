@@ -13,6 +13,7 @@ datasets:
   results:
     path: ?input.table
     separator: "\t"
+    offer-excel: true
     links:
       link to table:
         column: callset
