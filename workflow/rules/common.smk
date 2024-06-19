@@ -490,9 +490,18 @@ def get_collect_precision_recall_input(wildcards):
     )
 
 
+def get_genome_name(wildcards):
+    if hasattr(wildcards, "benchmark"):
+        return get_benchmark(wildcards.benchmark).get("genome")
+    if hasattr(wildcards, "callset"):
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        return get_benchmark(benchmark).get("genome")
+    else:
+        return wildcards.genome
+    
+
 def get_genome_version(wildcards):
-    genome_benchmark = get_benchmark(wildcards.benchmark).get("genome")
-    return genomes[genome_benchmark].get("version")
+    return genomes[get_genome_name(wildcards)].get("version")
 
 
 def get_genome_callsets(genome):
