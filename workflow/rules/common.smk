@@ -93,7 +93,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper-1}"
+            return f"{lower}-{upper - 1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in low_coverages}
@@ -488,6 +488,20 @@ def get_collect_precision_recall_input(wildcards):
     return expand(
         "results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets
     )
+
+
+def get_genome_name(wildcards):
+    if hasattr(wildcards, "benchmark"):
+        return get_benchmark(wildcards.benchmark).get("genome")
+    if hasattr(wildcards, "callset"):
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        return get_benchmark(benchmark).get("genome")
+    else:
+        return wildcards.genome
+
+
+def get_genome_version(wildcards):
+    return genomes[get_genome_name(wildcards)].get("version")
 
 
 def get_genome_callsets(genome):

@@ -50,6 +50,7 @@ benchmarks:
 
 genomes:
   na12878:
+    version: 4.2.1
     truth:
       grch37: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh37/HG001_GRCh37_1_22_v4.2.1_benchmark.vcf.gz
       grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz
@@ -58,6 +59,7 @@ genomes:
       grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.bed
 
   chm-eval:
+    version: 0.5
     archive: https://github.com/lh3/CHM-eval/releases/download/v0.5/CHM-evalkit-20180222.tar
     truth:
       grch38: full.38.vcf.gz
@@ -67,6 +69,7 @@ genomes:
       grch37: full.37m.bed.gz
 
   seqc2-somatic:
+    version: 1.2
     truth:
       grch38:
         snvs: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/release/latest/high-confidence_sSNV_in_HC_regions_v1.2.vcf.gz
@@ -76,6 +79,7 @@ genomes:
     somatic: true
 
   na12878-somatic:
+    version: 4.2.1
     truth:
       grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz
     confidence-regions:
