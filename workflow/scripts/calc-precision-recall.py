@@ -182,6 +182,7 @@ def collect_results(vartype):
                 "recall": classifications_existence.recall(),
                 "tp_truth": classifications_existence.tp_truth,
                 "fn": classifications_existence.fn,
+                "F*": classifications_existence.fstar(),
             }
         )
 
@@ -194,6 +195,7 @@ def collect_results(vartype):
                 "recall",
                 "tp_truth",
                 "fn",
+                "F*",
             ]
         ]
 
