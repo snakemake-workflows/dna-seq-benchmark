@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.11.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.10.0...v1.11.0) (2024-06-20)
+
+
+### Features
+
+* add F*-measure ([#84](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/84)) ([92f4903](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/92f4903bd9af9e875ec4a15ddb485e2313c2b513))
+* add seqc2 wgs and ffpe to presets ([#82](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/82)) ([c475b0f](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/c475b0f5d263a7195946a1ec467050394696af08))
+* add version of benchmark as key in presets and include in report ([#80](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/80)) ([111b4ec](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/111b4ece8413342f18c608c304e691ca8144aa93))
+* offer download of datavzrd reports as excel ([#81](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/81)) ([6f5055e](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/6f5055ecdd4190782567965f77eb6bb112923a4c))
+
 ## [1.10.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.9.0...v1.10.0) (2024-06-11)
 
 
