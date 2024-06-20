@@ -31,10 +31,14 @@ views:
     ?view if view == "main" else f"by {view}":
       ?if view == "main":
         desc: |
+          ?f"""
           The values 0/0, 0/1, and 1/1 represent the genotype (not present, heterozygous, homozygous).
           If a callset does not have an entry, this means that the variant matches the truth.
 
           Rows and columns are sorted according to an unsupervised hiearchical clustering with hamming distance and ward linkage.
+
+          Benchmark version: {wildcards.genome} {params.version}
+          """
       ?else:
         desc: |
           ?f"""
@@ -46,6 +50,8 @@ views:
 
           The values 0/0, 0/1, and 1/1 represent the genotype (not present, heterozygous, homozygous).
           If a callset does not have an entry, this means that the variant matches the truth.
+
+          Benchmark version: {wildcards.genome} {params.version}
           """
       dataset: ?view
       page-size: 12
