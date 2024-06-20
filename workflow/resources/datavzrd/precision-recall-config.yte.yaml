@@ -103,7 +103,7 @@ views:
             plot:
               ticks:
                 scale: linear
-          "f*":
+          "F*":
             precision: 3
             plot:
               ticks:
@@ -208,7 +208,7 @@ views:
             plot:
               ticks:
                 scale: linear
-          "f*":
+          "F*":
             precision: 3
             plot:
               ticks:
