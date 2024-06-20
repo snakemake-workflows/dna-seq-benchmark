@@ -52,6 +52,7 @@ else:
                 "tp_truth",
                 "fn",
                 "genotype_mismatch_rate",
+                "F*",
             ]
         }
     ).to_csv(snakemake.output[0], sep="\t")
