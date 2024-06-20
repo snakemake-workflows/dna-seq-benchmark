@@ -16,6 +16,7 @@ datasets:
   main:
     path: ?input.main_dataset
     separator: "\t"
+    offer-excel: true
     headers: ?len(params.labels) + 1
   ?for label in params.labels:
     ?label:
