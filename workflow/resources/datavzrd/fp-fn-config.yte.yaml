@@ -37,7 +37,7 @@ views:
 
           Rows and columns are sorted according to an unsupervised hiearchical clustering with hamming distance and ward linkage.
 
-          For the benchmark {wildcards.genome} with version {params.version} was used.
+          Benchmark version: {wildcards.genome} {params.version}
           """
       ?else:
         desc: |
@@ -51,7 +51,7 @@ views:
           The values 0/0, 0/1, and 1/1 represent the genotype (not present, heterozygous, homozygous).
           If a callset does not have an entry, this means that the variant matches the truth.
 
-          For the benchmark {wildcards.genome} with version {params.version} was used.
+          Benchmark version: {wildcards.genome} {params.version}
           """
       dataset: ?view
       page-size: 12

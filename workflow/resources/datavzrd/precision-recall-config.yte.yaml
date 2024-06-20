@@ -34,7 +34,7 @@ views:
 
       Zoom in by scrolling inside of the plot area, pan by dragging, and reset by double-clicking.
 
-      For the benchmark {params.genome} with version {params.version} was used.
+      Benchmark version: {params.genome} {params.version}
       """
     render-plot:
       spec: |
@@ -79,7 +79,7 @@ views:
         Precision and recall are calculated by matching variants between each callset
         and truth, stratified by coverage categories. Stratified by VAF.
 
-        For the benchmark {params.genome} with version {params.version} was used.
+        Benchmark version: {params.genome} {params.version}
         """
       page-size: 12
       render-table:
@@ -166,7 +166,7 @@ views:
         differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate"
         column.
 
-        For the benchmark {params.genome} with version {params.version} was used.
+        Benchmark version: {params.genome} {params.version}
         """
       page-size: 12
       render-table:
