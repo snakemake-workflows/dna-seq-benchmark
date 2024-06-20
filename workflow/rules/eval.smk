@@ -284,7 +284,7 @@ rule report_precision_recall:
         somatic=get_somatic_status,
         vaf=get_vaf_status,
         high_coverage=get_high_coverage_status,
-        genome= get_genome_name,
+        genome=get_genome_name,
         version=get_genome_version,
     wrapper:
         "v3.10.1/utils/datavzrd"

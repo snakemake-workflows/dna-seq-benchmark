@@ -498,7 +498,7 @@ def get_genome_name(wildcards):
         return get_benchmark(benchmark).get("genome")
     else:
         return wildcards.genome
-    
+
 
 def get_genome_version(wildcards):
     return genomes[get_genome_name(wildcards)].get("version")
