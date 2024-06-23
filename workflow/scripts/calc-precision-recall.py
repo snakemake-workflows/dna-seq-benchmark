@@ -110,11 +110,13 @@ class Classifications:
         if self.stratify_by_vaf:
             a = self.tp_query.astype(np.float32) + self.fn + self.fp
             for (i, x) in enumerate(a):
+                if a[i] == 0:
+                    a[0] = 1.0
                 a[i] = self.tp_query[i] / a[i]
             return a
         else:
             a = self.tp_query + self.fn + self.fp
-            return float(self.tp_truth) / float(a)
+            return float(self.tp_query) / float(a)
 
 
 
