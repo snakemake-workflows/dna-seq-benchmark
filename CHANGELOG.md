@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.11.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.0...v1.11.1) (2024-06-23)
+
+
+### Bug Fixes
+
+* fix F* calculation ([#85](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/85)) ([e684a33](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/e684a3301161680106cffddecbf459a2bb32163b))
+
 ## [1.11.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.10.0...v1.11.0) (2024-06-20)
 
 
