@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.11.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.1...v1.11.2) (2024-06-24)
+
+
+### Performance Improvements
+
+* update to latest datavzrd (includes sorting and column hiding) ([#87](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/87)) ([182edbb](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/182edbb2cbe51e38e301e30c22feb9b09a013cc0))
+
 ### [1.11.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.0...v1.11.1) (2024-06-23)
 
 
