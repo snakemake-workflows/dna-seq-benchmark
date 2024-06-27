@@ -96,14 +96,14 @@ class Classifications:
             if t == 0:
                 return 1.0
             return float(self.tp_truth) / float(t)
-        
+
     def fstar(self):
         """Calculate F* score,
         see https://link.springer.com/article/10.1007/s10994-021-05964-1.
 
         This is an interpretable alternative to the F-measure.
         Proportion of correct predictions among all predictions and missed variants.
-        Or in other words, the probability that a variant taken from the union of 
+        Or in other words, the probability that a variant taken from the union of
         prediction and truth is correctly predicted.
         It is a monotonic transformation of the F-measure.
         """
@@ -111,11 +111,14 @@ class Classifications:
             a = self.tp_query.astype(np.float32) + self.fn + self.fp
             for (i, x) in enumerate(a):
                 if a[i] == 0:
-                    a[0] = 1.0
-                a[i] = self.tp_query[i] / a[i]
+                    a[i] = 1.0
+                else:
+                    a[i] = self.tp_query[i] / a[i]
             return a
         else:
             a = self.tp_query + self.fn + self.fp
+            if a == 0:
+               return 1.0
             return float(self.tp_query) / float(a)
 
 
