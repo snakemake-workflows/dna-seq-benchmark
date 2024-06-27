@@ -96,7 +96,7 @@ rule intersect_calls_with_target_regions:
         bcf="results/filtered-variants/{callset}.bcf",
         regions=get_target_regions,
     output:
-        "results/normalized-variants/{callset}_intersected.vcf.gz",
+        pipe("results/normalized-variants/{callset}_intersected.vcf"),
     log:
         "logs/intersect-calls/{callset}.log",
     conda:
@@ -110,7 +110,7 @@ rule normalize_calls:
     input:
         calls=branch(
             intersect_calls,
-            then="results/normalized-variants/{callset}_intersected.vcf.gz",
+            then="results/normalized-variants/{callset}_intersected.vcf",
             otherwise="results/filtered-variants/{callset}.bcf",
         ),
         ref="resources/reference/genome.fasta",
