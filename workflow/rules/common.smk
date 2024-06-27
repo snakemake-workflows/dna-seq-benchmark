@@ -93,7 +93,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper - 1}"
+            return f"{lower}-{upper-1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in low_coverages}
@@ -258,6 +258,13 @@ def get_target_regions(wildcards):
             return f"resources/regions/{benchmark_name}/target-regions.bed"
         else:
             return []
+
+
+def intersect_calls(wildcards):
+    if get_target_regions(wildcards) == []:
+        return False
+    else:
+        return True
 
 
 def get_target_regions_intersect_statement(wildcards, input):

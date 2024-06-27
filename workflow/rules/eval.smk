@@ -91,12 +91,30 @@ rule remove_non_pass:
         "v3.3.6/bio/bcftools/view"
 
 
-rule normalize_calls:
+rule intersect_calls_with_target_regions:
     input:
         bcf="results/filtered-variants/{callset}.bcf",
+        regions=get_target_regions,
+    output:
+        "results/normalized-variants/{callset}_intersected.vcf.gz",
+    log:
+        "logs/intersect-calls/{callset}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "(bedtools intersect -b {input.regions} -a "
+        "<(bcftools view {input.bcf}) -wa -f 1.0 -header > {output}) 2> {log}"
+
+
+rule normalize_calls:
+    input:
+        calls=branch(
+            intersect_calls,
+            then="results/normalized-variants/{callset}_intersected.vcf.gz",
+            otherwise="results/filtered-variants/{callset}.bcf",
+        ),
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
-        regions=get_target_regions,
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     params:
@@ -106,9 +124,7 @@ rule normalize_calls:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(bedtools intersect -b {input.regions} -a "
-        "<(bcftools view {input.bcf}) -wa -f 1.0 -header | "
-        "bcftools norm {params.extra} --fasta-ref {input.ref} | "
+        "(bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | "
         "bcftools view -Oz > {output}) 2> {log}"
 
 
