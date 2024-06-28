@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.11.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.2...v1.11.3) (2024-06-28)
+
+
+### Bug Fixes
+
+* fix f* calculation ([#89](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/89)) ([1afb621](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/1afb621e21a86210dfeb77c08b4984d70947d40e))
+* Split intersection with target region and normalize calls in separate rules. ([#90](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/90)) ([795a82b](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/795a82b1536e6269cd031f6cee0903a50b44c8b6))
+
 ### [1.11.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.1...v1.11.2) (2024-06-24)
 
 
