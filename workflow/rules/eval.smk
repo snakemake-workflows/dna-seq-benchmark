@@ -303,7 +303,7 @@ rule report_precision_recall:
         genome=get_genome_name,
         version=get_genome_version,
     wrapper:
-        "v3.12.2/utils/datavzrd"
+        "v3.13.6/utils/datavzrd"
 
 
 rule extract_fp_fn:
@@ -366,4 +366,4 @@ rule report_fp_fn:
         labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
         version=get_genome_version,
     wrapper:
-        "v3.12.2/utils/datavzrd"
+        "v3.13.6/utils/datavzrd"
