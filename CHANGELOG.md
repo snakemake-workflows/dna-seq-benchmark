@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.11.4](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.3...v1.11.4) (2024-07-08)
+
+
+### Bug Fixes
+
+* update to latest datavzrd wrappers ([ba6b039](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/ba6b039d8c8967421e4f6c836ec78f45f1e996e0))
+
 ### [1.11.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.2...v1.11.3) (2024-06-28)
 
 
