@@ -109,6 +109,8 @@ views:
             plot:
               ticks:
                 scale: linear
+          sort_index:
+            display-mode: hidden
           coverage:
             plot:
               heatmap:
@@ -214,6 +216,8 @@ views:
             plot:
               ticks:
                 scale: linear
+          sort_index:
+            display-mode: hidden
           coverage:
             plot:
               heatmap:
