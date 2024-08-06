@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.11.6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.5...v1.11.6) (2024-08-06)
+
+
+### Bug Fixes
+
+* hide sort_index in results table ([#94](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/94)) ([bb72674](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/bb72674f0530f55c5e7418c29c89955885eb2363))
+
 ### [1.11.5](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.4...v1.11.5) (2024-07-12)
 
 
