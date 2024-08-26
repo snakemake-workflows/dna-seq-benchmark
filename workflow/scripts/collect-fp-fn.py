@@ -94,16 +94,15 @@ for i, chromosome in enumerate(chromosomes):
         if label_idx is not None:
             _label_df = label_df.iloc[[label_idx]]
 
-        # add labels
-        index_cols = data.index.names
-        cols = data.columns
-        data = pd.concat([_label_df, data.reset_index()]).set_index(index_cols)
-        # restore column order
-        data = data[cols]
-
         if i == 0:
             mode = "w"
             header = True
+             # add labels
+            index_cols = data.index.names
+            cols = data.columns
+            data = pd.concat([_label_df, data.reset_index()]).set_index(index_cols)
+            # restore column order
+            data = data[cols]
         else:
             mode = "a"
             header = False
@@ -119,7 +118,7 @@ for i, chromosome in enumerate(chromosomes):
     # for each label, calculate mutual information and sort FP/FN entries in descending order
     for label_idx, label in enumerate(snakemake.params.label_names):
         outdata = data
-        if not data.empty:
+        if data.shape[1] > 1 and data.shape[0] > 1:
             # oe = OrdinalEncoder()
             # le = LabelEncoder()
             # feature matrix: genotypes, transposed into samples x features, replace NA with False (match)
@@ -133,28 +132,34 @@ for i, chromosome in enumerate(chromosomes):
 
             # ignore any NA in the target vector and correspondingly remove the rows in the feature matrix
             not_na_target_vector = target_vector[~pd.isna(target_vector)]
-            feature_matrix = feature_matrix.loc[not_na_target_vector.index]
-
-            # perfom chi² test against each feature
-            _, pvals = chi2(feature_matrix, not_na_target_vector)
-            sorted_idx = np.argsort(pvals)
-
-            _, fdr = fdrcorrection(
-                pvals, method="negcorr"
-            )  # use Benjamini/Yekutieli as variants might be both positively or negatively correlated
-
             # clone data
             sorted_data = data.copy(deep=True)
-
             # sort by label
             sorted_target_vector = target_vector.sort_values()
             sorted_data = sorted_data[sorted_target_vector.index]
+            if not not_na_target_vector.empty:
 
-            # add pvalue and FDR
-            sorted_data.insert(0, "FDR dependency", np.around(fdr, 3))
-            sorted_data.insert(0, "p-value dependency", np.around(pvals, 3))
+                feature_matrix = feature_matrix.loc[not_na_target_vector.index]
 
-            outdata = sorted_data.iloc[sorted_idx]
+                # perfom chi² test against each feature
+                _, pvals = chi2(feature_matrix, not_na_target_vector)
+                # TODO: this only sorts per chromosome, not globally
+                sorted_idx = np.argsort(pvals)
+
+                _, fdr = fdrcorrection(
+                    pvals, method="negcorr"
+                )  # use Benjamini/Yekutieli as variants might be both positively or negatively correlated
+
+                # add pvalue and FDR
+                sorted_data.insert(0, "FDR dependency", np.around(fdr, 3))
+                sorted_data.insert(0, "p-value dependency", np.around(pvals, 3))
+                sorted_data = sorted_data.iloc[sorted_idx]
+
+            else:
+                sorted_data.insert(0, "FDR dependency", pd.NA)
+                sorted_data.insert(0, "p-value dependency", pd.NA)
+
+            outdata = sorted_data
 
             # only keep the rather significant entries (but be a bit more permissive than 0.05)
             outdata = outdata.loc[outdata["p-value dependency"] <= 0.25]
