@@ -116,7 +116,7 @@ rule restrict_to_reference_contigs:
     log:
         "logs/restrict-to-reference-contigs/{callset}.log",
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/tools.yaml"
     shell:
         "bcftools view --regions $(cut -f1 {input.ref_index} | tr '\\n' ',') {input.calls} | "
         "bcftools reheader -f {input.ref_index} > {output} 2> {log}"
@@ -138,7 +138,7 @@ rule normalize_calls:
     log:
         "logs/normalize-calls/{callset}.log",
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/tools.yaml"
     shell:
         "(bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | "
         "bcftools view -Oz > {output}) 2> {log}"
