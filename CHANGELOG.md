@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.11.7](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.6...v1.11.7) (2024-09-12)
+
+
+### Bug Fixes
+
+* Only append labels in first iteration of storage loop; calculate chi2 only on non empty feature matrix. ([#96](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/96)) ([20a469a](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/20a469a6f661ac5c55ec561d8da5462710ec68d9))
+* restrict calls to reference contigs ([#101](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/101)) ([0413580](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/0413580a4ce030fcf38b35298d5cf1f20664c29c))
+
 ### [1.11.6](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.5...v1.11.6) (2024-08-06)
 
 
