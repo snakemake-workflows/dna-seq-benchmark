@@ -118,8 +118,8 @@ rule restrict_to_reference_contigs:
     conda:
         "../envs/bcftools.yaml"
     shell:
-        "bcftools view --regions $(cut -f1 {input.ref_index} | tr '\\n' ',') {input.calls} | "
-        "bcftools reheader -f {input.ref_index} > {output} 2> {log}"
+        "(bcftools view --regions $(cut -f1 {input.ref_index} | tr '\\n' ',') {input.calls} |"
+        " bcftools reheader -f {input.ref_index} > {output}) 2> {log}"
 
 
 rule normalize_calls:
