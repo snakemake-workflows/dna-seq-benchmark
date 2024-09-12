@@ -106,12 +106,28 @@ rule intersect_calls_with_target_regions:
         "<(bcftools view {input.bcf}) -wa -f 1.0 -header > {output}) 2> {log}"
 
 
+rule restrict_to_reference_contigs:
+    input:
+        calls="results/filtered-variants/{callset}.bcf",
+        calls_index="results/filtered-variants/{callset}.bcf.csi",
+        ref_index="resources/reference/genome.fasta.fai",
+    output:
+        "results/filtered-variants/{callset}_restricted.bcf",
+    log:
+        "logs/restrict-to-reference-contigs/{callset}.log",
+    conda:
+        "../envs/bcftools.yaml"
+    shell:
+        "bcftools view --regions $(cut -f1 {input.ref_index} | tr '\\n' ',') {input.calls} | "
+        "bcftools reheader -f {input.ref_index} > {output} 2> {log}"
+
+
 rule normalize_calls:
     input:
         calls=branch(
             intersect_calls,
             then="results/normalized-variants/{callset}_intersected.vcf",
-            otherwise="results/filtered-variants/{callset}.bcf",
+            otherwise="results/filtered-variants/{callset}_restricted.bcf",
         ),
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
@@ -122,7 +138,7 @@ rule normalize_calls:
     log:
         "logs/normalize-calls/{callset}.log",
     conda:
-        "../envs/tools.yaml"
+        "../envs/bcftools.yaml"
     shell:
         "(bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | "
         "bcftools view -Oz > {output}) 2> {log}"
