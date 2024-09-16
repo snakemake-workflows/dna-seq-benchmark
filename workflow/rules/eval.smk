@@ -106,6 +106,17 @@ rule intersect_calls_with_target_regions:
         "<(bcftools view {input.bcf}) -wa -f 1.0 -header > {output}) 2> {log}"
 
 
+rule index_callset:
+    input:
+        "results/filtered-variants/{callset}.bcf",
+    output:
+        "results/filtered-variants/{callset}.bcf.csi",
+    log:
+        "logs/bcftools-index/{callset}.log",
+    wrapper:
+        "v1.7.2/bio/bcftools/index"
+
+
 rule restrict_to_reference_contigs:
     input:
         calls="results/filtered-variants/{callset}.bcf",
