@@ -433,7 +433,9 @@ rule report_fp_fn:
 rule report_fp_fn_benchmark:
     input:
         main_dataset="results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
-        config=workflow.source_path("../resources/datavzrd/fp-fn-per-benchmark-config.yte.yaml"),
+        config=workflow.source_path(
+            "../resources/datavzrd/fp-fn-per-benchmark-config.yte.yaml"
+        ),
     output:
         report(
             directory("results/report/fp-fn/{benchmark}/{classification}"),
