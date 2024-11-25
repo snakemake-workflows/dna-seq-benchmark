@@ -36,9 +36,6 @@ def sort_key(col):
         return col
 
 
-# if snakemake.params.vaf:
-#     results.sort_values(["callset", "vaf", "coverage"], inplace=True, key=sort_key)
-# else:
 results.sort_values(["callset", "coverage"], inplace=True, key=sort_key)
 results["sort_index"] = results["coverage"].apply(cov_key)
 

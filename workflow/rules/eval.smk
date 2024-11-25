@@ -392,6 +392,7 @@ rule collect_stratifications_fp_fn:
     script:
         "../scripts/collect-stratifications-fp-fn.py"
 
+
 rule collect_fp_fn_benchmark:
     input:
         tables=get_collect_fp_fn_benchmark_input,
@@ -399,15 +400,12 @@ rule collect_fp_fn_benchmark:
         "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark),
-        # labels=get_collect_precision_recall_labels,
-        # vaf=get_vaf_status,
     log:
         "logs/fp-fn/benchmarks/{benchmark}.{classification}.log",
     conda:
         "../envs/stats.yaml"
     script:
         "../scripts/collect-fp-fn-benchmarks.py"
-
 
 
 rule report_fp_fn:

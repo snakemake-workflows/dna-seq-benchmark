@@ -467,6 +467,7 @@ def get_collect_stratifications_input(wildcards):
         cov=get_nonempty_coverages(wildcards),
     )
 
+
 def get_collect_stratifications_fp_fn_input(wildcards):
     return expand(
         "results/fp-fn/callsets/{{callset}}/{cov}.{{classification}}.tsv",
@@ -501,6 +502,7 @@ def get_collect_precision_recall_input(wildcards):
     return expand(
         "results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets
     )
+
 
 def get_collect_fp_fn_benchmark_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
@@ -565,7 +567,6 @@ def get_collect_fp_fn_input(wildcards):
     callsets = get_collect_fp_fn_callsets(wildcards)
     return expand(
         "results/fp-fn/callsets/{callset}/{{cov}}.{{classification}}.tsv",
-        # "results/fp-fn/callsets/{{cov}}/{callset}/{{classification}}.tsv",
         callset=callsets,
     )
 
