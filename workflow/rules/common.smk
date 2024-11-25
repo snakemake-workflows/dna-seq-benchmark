@@ -403,6 +403,16 @@ def get_coverages(wildcards):
     return coverages
 
 
+def get_coverages_of_callset(callset):
+    benchmark = config["variant-calls"][callset]["benchmark"]
+    high_cov_status = benchmarks[benchmark].get("high-coverage", False)
+    if high_cov_status:
+        coverages = high_coverages
+    else:
+        coverages = low_coverages
+    return coverages
+
+
 def get_somatic_status(wildcards):
     if hasattr(wildcards, "benchmark"):
         return genomes[benchmarks[wildcards.benchmark]["genome"]].get("somatic")
@@ -560,7 +570,13 @@ def get_callset_label_entries(callsets):
 
 
 def get_collect_fp_fn_callsets(wildcards):
-    return get_genome_callsets(wildcards.genome)
+    callsets = get_genome_callsets(wildcards.genome)
+    callsets = [
+        callset
+        for callset in callsets
+        if wildcards.cov in get_coverages_of_callset(callset)
+    ]
+    return callsets
 
 
 def get_collect_fp_fn_input(wildcards):
@@ -573,6 +589,11 @@ def get_collect_fp_fn_input(wildcards):
 
 def get_collect_fp_fn_labels(wildcards):
     callsets = get_genome_callsets(wildcards.genome)
+    callsets = [
+        callset
+        for callset in callsets
+        if wildcards.cov in get_coverages_of_callset(callset)
+    ]
     return get_callset_label_entries(callsets)
 
 
