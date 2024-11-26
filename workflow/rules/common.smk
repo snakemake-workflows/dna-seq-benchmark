@@ -93,7 +93,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper-1}"
+            return f"{lower}-{upper - 1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in low_coverages}
@@ -503,10 +503,7 @@ def get_fp_fn_reports_benchmarks(wildcards):
     for genome in used_genomes:
         yield from expand(
             "results/report/fp-fn/bench/{benchmark}/{classification}",
-            benchmark={
-                benchmark
-                for benchmark in used_benchmarks
-            },
+            benchmark={benchmark for benchmark in used_benchmarks},
             classification=["fp", "fn"],
         )
 
