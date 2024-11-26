@@ -438,7 +438,7 @@ rule report_fp_fn_benchmark:
         ),
     output:
         report(
-            directory("results/report/fp-fn/{benchmark}/{classification}"),
+            directory("results/report/fp-fn/bench/{benchmark}/{classification}"),
             htmlindex="index.html",
             category="{classification} variants",
             labels=lambda w: {"coverage": w.cov},
