@@ -499,6 +499,18 @@ def get_fp_fn_reports(wildcards):
         )
 
 
+def get_fp_fn_reports_benchmarks(wildcards):
+    for genome in used_genomes:
+        yield from expand(
+            "results/report/fp-fn/bench/{benchmark}/{classification}",
+            benchmark={
+                benchmark
+                for benchmark in used_benchmarks
+            },
+            classification=["fp", "fn"],
+        )
+
+
 def get_benchmark_callsets(benchmark):
     return [
         callset
