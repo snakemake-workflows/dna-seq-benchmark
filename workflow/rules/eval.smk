@@ -415,7 +415,7 @@ rule report_fp_fn:
         config=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
     output:
         report(
-            directory("results/report/fp-fn/{genome}/{cov}/{classification}"),
+            directory("results/report/fp-fn/genomes/{genome}/{cov}/{classification}"),
             htmlindex="index.html",
             category="{classification} variants",
             subcategory=lambda w: w.genome,
@@ -432,13 +432,13 @@ rule report_fp_fn:
 
 rule report_fp_fn_benchmark:
     input:
-        table="results/fp-fn/callsets/{benchmark}.{classification}.tsv",
+        table="results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
         config=workflow.source_path(
             "../resources/datavzrd/fp-fn-per-benchmark-config.yte.yaml"
         ),
     output:
         report(
-            directory("results/report/fp-fn/{benchmark}/{classification}"),
+            directory("results/report/fp-fn/benchmarks/{benchmark}/{classification}"),
             htmlindex="index.html",
             category="precision/recall",
             labels={
@@ -449,7 +449,7 @@ rule report_fp_fn_benchmark:
     log:
         "logs/datavzrd/fp-fn/{benchmark}/{classification}.log",
     params:
-        labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
+        labels=lambda w: get_callsets_labels(get_benchmark_callsets(w.benchmark)),
         version=get_genome_version,
     wrapper:
         "v5.0.1/utils/datavzrd"
