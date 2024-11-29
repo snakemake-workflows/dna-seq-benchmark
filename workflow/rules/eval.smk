@@ -440,7 +440,8 @@ rule report_fp_fn_benchmark:
         report(
             directory("results/report/fp-fn/benchmarks/{benchmark}/{classification}"),
             htmlindex="index.html",
-            category="precision/recall",
+            category="{classification} variants",
+            # subcategory=lambda w: w.benchmark,
             labels={
                 "benchmark": "{benchmark}",
                 "classification": "{classification}",
