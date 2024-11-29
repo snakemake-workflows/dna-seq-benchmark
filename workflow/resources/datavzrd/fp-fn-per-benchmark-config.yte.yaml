@@ -37,13 +37,8 @@ views:
                 scale: ordinal
           sort_index:
             display-mode: hidden
-          true_genotype:
-            ?if params.somatic:
+          ?if params.somatic:
+            true_genotype:
               display-mode: hidden
-            ?else:
-              display-mode: normal
-          predicted_genotype:
-            ?if params.somatic:
+            predicted_genotype:
               display-mode: hidden
-            ?else:
-              display-mode: normal
