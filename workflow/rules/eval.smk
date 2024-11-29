@@ -418,8 +418,11 @@ rule report_fp_fn:
             directory("results/report/fp-fn/genomes/{genome}/{cov}/{classification}"),
             htmlindex="index.html",
             category="{classification} variants",
-            subcategory=lambda w: w.genome,
-            labels=lambda w: {"coverage": w.cov},
+            subcategory="per genome",
+            labels=lambda w: {
+                "coverage": w.cov,
+                "genome": w.genome,
+            },
         ),
     log:
         "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
@@ -441,7 +444,7 @@ rule report_fp_fn_benchmark:
             directory("results/report/fp-fn/benchmarks/{benchmark}/{classification}"),
             htmlindex="index.html",
             category="{classification} variants",
-            # subcategory=lambda w: w.benchmark,
+            subcategory="per benchmark",
             labels={
                 "benchmark": "{benchmark}",
                 "classification": "{classification}",

@@ -21,28 +21,29 @@ datasets:
         table-row: results-table/callset
 
 views:
-  results-table:
-    dataset: results
-    # desc: |
-      # ?f"""
-      #  Benchmark version: {params.genome} {params.version}
-      # """
-    page-size: 12
-    render-table:
-      columns:
-        coverage:
-          plot:
-            heatmap:
-              scale: ordinal
-        sort_index:
-          display-mode: hidden
-        true_genotype:
-          ?if params.somatic:
+  ?for view in ["main", "coverage"]:
+    results-table:
+      dataset: results
+      # desc: |
+        # ?f"""
+        #  Benchmark version: {params.genome} {params.version}
+        # """
+      page-size: 12
+      render-table:
+        columns:
+          coverage:
+            plot:
+              heatmap:
+                scale: ordinal
+          sort_index:
             display-mode: hidden
-          ?else:
-            display-mode: normal
-        predicted_genotype:
-          ?if params.somatic:
-            display-mode: hidden
-          ?else:
-            display-mode: normal
+          true_genotype:
+            ?if params.somatic:
+              display-mode: hidden
+            ?else:
+              display-mode: normal
+          predicted_genotype:
+            ?if params.somatic:
+              display-mode: hidden
+            ?else:
+              display-mode: normal
