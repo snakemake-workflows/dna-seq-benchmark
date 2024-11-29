@@ -29,12 +29,20 @@ views:
       # """
     page-size: 12
     render-table:
-      headers:
-        ?for i, label in enumerate(labels):
-          ?i + 1:
-            label: ?label
-            ellipsis: 4
-            plot:
-              heatmap:
-                scale: ordinal
-                color-scheme: category20
+      columns:
+        coverage:
+          plot:
+            heatmap:
+              scale: ordinal
+        sort_index:
+          display-mode: hidden
+        true_genotype:
+          ?if params.somatic:
+            display-mode: hidden
+          ?else:
+            display-mode: normal
+        predicted_genotype:
+          ?if params.somatic:
+            display-mode: hidden
+          ?else:
+            display-mode: normal

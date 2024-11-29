@@ -451,5 +451,6 @@ rule report_fp_fn_benchmark:
     params:
         labels=lambda w: get_callsets_labels(get_benchmark_callsets(w.benchmark)),
         version=get_genome_version,
+        somatic=get_somatic_status,
     wrapper:
         "v5.0.1/utils/datavzrd"
