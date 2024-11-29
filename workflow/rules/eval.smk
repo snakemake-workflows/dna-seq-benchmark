@@ -417,8 +417,8 @@ rule report_fp_fn:
         report(
             directory("results/report/fp-fn/genomes/{genome}/{cov}/{classification}"),
             htmlindex="index.html",
-            category="{classification} variants",
-            subcategory="per genome",
+            category="{classification} variants per genome",
+            subcategory=lambda w: w.genome,
             labels=lambda w: {
                 "coverage": w.cov,
                 "genome": w.genome,
@@ -443,8 +443,8 @@ rule report_fp_fn_benchmark:
         report(
             directory("results/report/fp-fn/benchmarks/{benchmark}/{classification}"),
             htmlindex="index.html",
-            category="{classification} variants",
-            subcategory="per benchmark",
+            category="{classification} variants per benchmark",
+            #subcategory="per benchmark",
             labels={
                 "benchmark": "{benchmark}",
                 "classification": "{classification}",
@@ -456,5 +456,32 @@ rule report_fp_fn_benchmark:
         labels=lambda w: get_callsets_labels(get_benchmark_callsets(w.benchmark)),
         version=get_genome_version,
         somatic=get_somatic_status,
+    wrapper:
+        "v5.0.1/utils/datavzrd"
+
+
+rule report_fp_fn_callset:
+    input:
+        table="results/fp-fn/callsets/{callset}.{classification}.tsv",
+        config=workflow.source_path(
+            "../resources/datavzrd/fp-fn-per-callset-config.yte.yaml"
+        ),
+    output:
+        report(
+            directory("results/report/fp-fn/callsets/{callset}/{classification}"),
+            htmlindex="index.html",
+            category="{classification} variants per callset",
+            #subcategory="per callset",
+            labels={
+                "callset": "{callset}",
+                "classification": "{classification}",
+            },
+        ),
+    log:
+        "logs/datavzrd/fp-fn/{callset}/{classification}.log",
+    #params:
+        #labels=lambda w: get_callsets_labels(w.callset),
+        #version=get_genome_version,
+        #somatic=get_somatic_status,
     wrapper:
         "v5.0.1/utils/datavzrd"

@@ -19,6 +19,8 @@ callsets = config.get("variant-calls", dict())
 benchmarks.update(config.get("custom-benchmarks", dict()))
 used_benchmarks = {callset["benchmark"] for callset in callsets.values()}
 
+used_callsets = {callset for callset in callsets.keys()}
+
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 
