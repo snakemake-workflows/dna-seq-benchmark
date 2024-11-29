@@ -444,7 +444,6 @@ rule report_fp_fn_benchmark:
             directory("results/report/fp-fn/benchmarks/{benchmark}/{classification}"),
             htmlindex="index.html",
             category="{classification} variants per benchmark",
-            #subcategory="per benchmark",
             labels={
                 "benchmark": "{benchmark}",
                 "classification": "{classification}",
@@ -471,7 +470,6 @@ rule report_fp_fn_callset:
             directory("results/report/fp-fn/callsets/{callset}/{classification}"),
             htmlindex="index.html",
             category="{classification} variants per callset",
-            #subcategory="per callset",
             labels={
                 "callset": "{callset}",
                 "classification": "{classification}",
@@ -479,9 +477,5 @@ rule report_fp_fn_callset:
         ),
     log:
         "logs/datavzrd/fp-fn/{callset}/{classification}.log",
-    #params:
-        #labels=lambda w: get_callsets_labels(w.callset),
-        #version=get_genome_version,
-        #somatic=get_somatic_status,
     wrapper:
         "v5.0.1/utils/datavzrd"
