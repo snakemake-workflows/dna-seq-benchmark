@@ -435,32 +435,6 @@ rule report_fp_fn:
 
 rule report_fp_fn_benchmark:
     input:
-        table="results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
-        config=workflow.source_path(
-            "../resources/datavzrd/fp-fn-per-benchmark-config.yte.yaml"
-        ),
-    output:
-        report(
-            directory("results/report/fp-fn/benchmarks/{benchmark}/{classification}"),
-            htmlindex="index.html",
-            category="{classification} variants per benchmark",
-            labels={
-                "benchmark": "{benchmark}",
-                "classification": "{classification}",
-            },
-        ),
-    log:
-        "logs/datavzrd/fp-fn/{benchmark}/{classification}.log",
-    params:
-        labels=lambda w: get_callsets_labels(get_benchmark_callsets(w.benchmark)),
-        version=get_genome_version,
-        somatic=get_somatic_status,
-    wrapper:
-        "v5.0.1/utils/datavzrd"
-
-
-rule report_fp_fn_callset:
-    input:
         table="results/fp-fn/callsets/{callset}.{classification}.tsv",
         config=workflow.source_path(
             "../resources/datavzrd/fp-fn-per-callset-config.yte.yaml"
@@ -469,13 +443,21 @@ rule report_fp_fn_callset:
         report(
             directory("results/report/fp-fn/callsets/{callset}/{classification}"),
             htmlindex="index.html",
-            category="{classification} variants per callset",
-            labels={
-                "callset": "{callset}",
-                "classification": "{classification}",
+            category="{classification} variants per benchmark",
+            subcategory=lambda w: config["variant-calls"][w.callset]["benchmark"],
+            labels=lambda w: {
+                "callset": w.callset,
+                "benchmark": config["variant-calls"][w.callset]["benchmark"],
+                "classification": w.classification,
             },
         ),
     log:
         "logs/datavzrd/fp-fn/{callset}/{classification}.log",
+    params:
+        labels=lambda w: get_callsets_labels(
+            get_benchmark_callsets(config["variant-calls"][w.callset]["benchmark"])
+        ),
+        version=get_genome_version,
+        somatic=get_somatic_status,
     wrapper:
         "v5.0.1/utils/datavzrd"
