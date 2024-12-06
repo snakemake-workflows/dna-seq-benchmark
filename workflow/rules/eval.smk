@@ -433,7 +433,7 @@ rule report_fp_fn:
         "v5.0.1/utils/datavzrd"
 
 
-rule report_fp_fn_benchmark:
+rule report_fp_fn_callset:
     input:
         table="results/fp-fn/callsets/{callset}.{classification}.tsv",
         config=workflow.source_path(
@@ -447,8 +447,6 @@ rule report_fp_fn_benchmark:
             subcategory=lambda w: config["variant-calls"][w.callset]["benchmark"],
             labels=lambda w: {
                 "callset": w.callset,
-                "benchmark": config["variant-calls"][w.callset]["benchmark"],
-                "classification": w.classification,
             },
         ),
     log:
@@ -457,6 +455,7 @@ rule report_fp_fn_benchmark:
         labels=lambda w: get_callsets_labels(
             get_benchmark_callsets(config["variant-calls"][w.callset]["benchmark"])
         ),
+        genome=get_genome_name,
         version=get_genome_version,
         somatic=get_somatic_status,
     wrapper:
