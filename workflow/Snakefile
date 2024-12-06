@@ -23,11 +23,6 @@ if "variant-calls" in config:
                 vartype=["snvs", "indels"],
             ),
             expand(
-                "results/report/fp-fn/benchmarks/{benchmark}/{classification}",
-                benchmark=used_benchmarks,
-                classification=["fp", "fn"],
-            ),
-            expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
                 classification=["fp", "fn"],
