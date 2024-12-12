@@ -95,7 +95,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper - 1}"
+            return f"{lower}-{upper-1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in low_coverages}
@@ -599,12 +599,7 @@ def get_collect_fp_fn_input(wildcards):
 
 
 def get_collect_fp_fn_labels(wildcards):
-    callsets = get_genome_callsets(wildcards.genome)
-    callsets = [
-        callset
-        for callset in callsets
-        if wildcards.cov in get_coverages_of_callset(callset)
-    ]
+    callsets = get_collect_fp_fn_callsets(wildcards)
     return get_callset_label_entries(callsets)
 
 
