@@ -1,0 +1,37 @@
+__use_yte__: true
+
+__variables__:
+  green: "#74c476"
+  orange: "#fd8d3c"
+
+name: ?f"{wildcards.classification} of {wildcards.callset}"
+
+webview-controls: true
+default-view: results-table
+
+datasets:
+  results:
+    path: ?input.table
+    separator: "\t"
+    offer-excel: true
+
+views:
+  results-table:
+    dataset: results
+    desc: |
+      ?f"""
+       Rows are sorted by coverage.
+       Benchmark version: {params.genome} {params.version}
+      """
+    page-size: 12
+    render-table:
+      columns:
+        coverage:
+          plot:
+            heatmap:
+              scale: ordinal
+        ?if params.somatic:
+          true_genotype:
+            display-mode: hidden
+          predicted_genotype:
+            display-mode: hidden

@@ -19,6 +19,8 @@ callsets = config.get("variant-calls", dict())
 benchmarks.update(config.get("custom-benchmarks", dict()))
 used_benchmarks = {callset["benchmark"] for callset in callsets.values()}
 
+used_callsets = {callset for callset in callsets.keys()}
+
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 
@@ -403,6 +405,16 @@ def get_coverages(wildcards):
     return coverages
 
 
+def get_coverages_of_callset(callset):
+    benchmark = config["variant-calls"][callset]["benchmark"]
+    high_cov_status = benchmarks[benchmark].get("high-coverage", False)
+    if high_cov_status:
+        coverages = high_coverages
+    else:
+        coverages = low_coverages
+    return coverages
+
+
 def get_somatic_status(wildcards):
     if hasattr(wildcards, "benchmark"):
         return genomes[benchmarks[wildcards.benchmark]["genome"]].get("somatic")
@@ -468,16 +480,32 @@ def get_collect_stratifications_input(wildcards):
     )
 
 
+def get_collect_stratifications_fp_fn_input(wildcards):
+    return expand(
+        "results/fp-fn/callsets/{{callset}}/{cov}.{{classification}}.tsv",
+        cov=get_nonempty_coverages(wildcards),
+    )
+
+
 def get_fp_fn_reports(wildcards):
     for genome in used_genomes:
         yield from expand(
-            "results/report/fp-fn/{genome}/{cov}/{classification}",
+            "results/report/fp-fn/genomes/{genome}/{cov}/{classification}",
             genome=genome,
             cov={
                 cov
                 for callset in get_genome_callsets(genome)
                 for cov in _get_nonempty_coverages(callset)
             },
+            classification=["fp", "fn"],
+        )
+
+
+def get_fp_fn_reports_benchmarks(wildcards):
+    for genome in used_genomes:
+        yield from expand(
+            "results/report/fp-fn/benchmarks/{benchmark}/{classification}",
+            benchmark={benchmark for benchmark in used_benchmarks},
             classification=["fp", "fn"],
         )
 
@@ -494,6 +522,13 @@ def get_collect_precision_recall_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
     return expand(
         "results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets
+    )
+
+
+def get_collect_fp_fn_benchmark_input(wildcards):
+    callsets = get_benchmark_callsets(wildcards.benchmark)
+    return expand(
+        "results/fp-fn/callsets/{callset}.{{classification}}.tsv", callset=callsets
     )
 
 
@@ -546,19 +581,25 @@ def get_callset_label_entries(callsets):
 
 
 def get_collect_fp_fn_callsets(wildcards):
-    return get_genome_callsets(wildcards.genome)
+    callsets = get_genome_callsets(wildcards.genome)
+    callsets = [
+        callset
+        for callset in callsets
+        if wildcards.cov in get_coverages_of_callset(callset)
+    ]
+    return callsets
 
 
 def get_collect_fp_fn_input(wildcards):
     callsets = get_collect_fp_fn_callsets(wildcards)
     return expand(
-        "results/fp-fn/callsets/{{cov}}/{callset}/{{classification}}.tsv",
+        "results/fp-fn/callsets/{callset}/{{cov}}.{{classification}}.tsv",
         callset=callsets,
     )
 
 
 def get_collect_fp_fn_labels(wildcards):
-    callsets = get_genome_callsets(wildcards.genome)
+    callsets = get_collect_fp_fn_callsets(wildcards)
     return get_callset_label_entries(callsets)
 
 

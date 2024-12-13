@@ -338,9 +338,9 @@ rule extract_fp_fn:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
         common_src=common_src,
     output:
-        "results/fp-fn/callsets/{cov}/{callset}/{classification}.tsv",
+        "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     log:
-        "logs/extract-fp-fn/{cov}/{callset}/{classification}.log",
+        "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
     conda:
         "../envs/vembrane.yaml"
     script:
@@ -374,6 +374,40 @@ rule collect_fp_fn:
         "../scripts/collect-fp-fn.py"
 
 
+rule collect_stratifications_fp_fn:
+    input:
+        get_collect_stratifications_fp_fn_input,
+    output:
+        "results/fp-fn/callsets/{callset}.{classification}.tsv",
+    params:
+        coverages=get_nonempty_coverages,
+        coverage_lower_bounds=get_coverages,
+    log:
+        "logs/fp-fn/callsets/{callset}.{classification}.log",
+    conda:
+        "../envs/stats.yaml"
+    # This has to happen after precision/recall has been computed, otherwise we risk
+    # extremely high memory usage if a callset does not match the truth at all.
+    priority: 1
+    script:
+        "../scripts/collect-stratifications-fp-fn.py"
+
+
+rule collect_fp_fn_benchmark:
+    input:
+        tables=get_collect_fp_fn_benchmark_input,
+    output:
+        "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
+    params:
+        callsets=lambda w: get_benchmark_callsets(w.benchmark),
+    log:
+        "logs/fp-fn/benchmarks/{benchmark}.{classification}.log",
+    conda:
+        "../envs/stats.yaml"
+    script:
+        "../scripts/collect-fp-fn-benchmarks.py"
+
+
 rule report_fp_fn:
     input:
         main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
@@ -381,16 +415,48 @@ rule report_fp_fn:
         config=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
     output:
         report(
-            directory("results/report/fp-fn/{genome}/{cov}/{classification}"),
+            directory("results/report/fp-fn/genomes/{genome}/{cov}/{classification}"),
             htmlindex="index.html",
-            category="{classification} variants",
+            category="{classification} variants per genome",
             subcategory=lambda w: w.genome,
-            labels=lambda w: {"coverage": w.cov},
+            labels=lambda w: {
+                "coverage": w.cov,
+                "genome": w.genome,
+            },
         ),
     log:
         "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
     params:
         labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
         version=get_genome_version,
+    wrapper:
+        "v5.0.1/utils/datavzrd"
+
+
+rule report_fp_fn_callset:
+    input:
+        table="results/fp-fn/callsets/{callset}.{classification}.tsv",
+        config=workflow.source_path(
+            "../resources/datavzrd/fp-fn-per-callset-config.yte.yaml"
+        ),
+    output:
+        report(
+            directory("results/report/fp-fn/callsets/{callset}/{classification}"),
+            htmlindex="index.html",
+            category="{classification} variants per benchmark",
+            subcategory=lambda w: config["variant-calls"][w.callset]["benchmark"],
+            labels=lambda w: {
+                "callset": w.callset,
+            },
+        ),
+    log:
+        "logs/datavzrd/fp-fn/{callset}/{classification}.log",
+    params:
+        labels=lambda w: get_callsets_labels(
+            get_benchmark_callsets(config["variant-calls"][w.callset]["benchmark"])
+        ),
+        genome=get_genome_name,
+        version=get_genome_version,
+        somatic=get_somatic_status,
     wrapper:
         "v5.0.1/utils/datavzrd"
