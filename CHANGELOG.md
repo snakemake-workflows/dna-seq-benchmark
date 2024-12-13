@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.12.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.7...v1.12.0) (2024-12-13)
+
+
+### Features
+
+* Report FP / FN negative variants in single table ([#107](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/107)) ([0464700](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/04647001dd78648309aa71d9c44152ffba4c73b6))
+
+
+### Bug Fixes
+
+* fix missing index as input for restrict_to_reference_contigs ([#102](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/102)) ([c55c503](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/c55c50322ea9d836702cfed4c753b87358f32ae9))
+
+
+### Performance Improvements
+
+* update datavzrd wrapper ([#104](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/104)) ([db68793](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/db68793142b2fc98d444a18112f3da8802f777c0))
+
 ### [1.11.7](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.6...v1.11.7) (2024-09-12)
 
 
