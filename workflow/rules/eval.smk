@@ -93,11 +93,11 @@ rule remove_non_pass:
 
 rule calculate_vaf:
     input:
-        "results/filtered-variants/{callset}.bcf"
+        "results/filtered-variants/{callset}.bcf",
     output:
-        "results/calculate-vaf/{callset}.added-vaf.bcf"
+        "results/calculate-vaf/{callset}.added-vaf.bcf",
     log:
-        "logs/calculate-vaf/"
+        "logs/calculate-vaf/",
     conda:
         "../envs/cyvcf.yaml"
     script:
