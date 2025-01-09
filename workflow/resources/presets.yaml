@@ -16,8 +16,8 @@ benchmarks:
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
     grch37: false
     vaf-field:
-      - INFO # either FORMAT or INFO
-      - TVAF # name of tumor variant allele frequency
+      field: INFO # either FORMAT or INFO
+      name: TVAF # name of tumor variant allele frequency
     high-coverage: true
 
   seqc2-wgs:
@@ -25,8 +25,8 @@ benchmarks:
     bam-url: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/WGS/WGS_NS_T_1.bwa.dedup.bam
     grch37: false
     vaf-field:
-      - INFO # either FORMAT or INFO
-      - TVAF # name of tumor variant allele frequency
+      field: INFO # either FORMAT or INFO
+      name: TVAF # name of tumor variant allele frequency
     high-coverage: true
 
   seqc2-ffpe:
@@ -35,8 +35,8 @@ benchmarks:
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
     grch37: false
     vaf-field:
-      - INFO # either FORMAT or INFO
-      - TVAF # name of tumor variant allele frequency
+      field: INFO # either FORMAT or INFO
+      name: TVAF # name of tumor variant allele frequency
     high-coverage: true
 
   imgag-5:
