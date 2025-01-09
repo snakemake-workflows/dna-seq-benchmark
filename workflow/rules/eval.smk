@@ -91,6 +91,19 @@ rule remove_non_pass:
         "v3.3.6/bio/bcftools/view"
 
 
+rule calculate_vaf:
+    input:
+        "results/filtered-variants/{callset}.bcf"
+    output:
+        "results/calculate-vaf/{callset}.added-vaf.bcf"
+    log:
+        "logs/calculate-vaf/"
+    conda:
+        "../envs/cyvcf.yaml"
+    script:
+        "../scripts/calc-vaf.py"
+
+
 rule intersect_calls_with_target_regions:
     input:
         bcf="results/filtered-variants/{callset}.bcf",
