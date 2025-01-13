@@ -14,8 +14,8 @@ variant-calls:
     benchmark: "seqc2-wes"
     tumor_sample_name: "truth"
     vaf-field: 
-      - INFO
-      - TVAF
+      field: INFO
+      name: TVAF
 
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
