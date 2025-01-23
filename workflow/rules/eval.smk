@@ -458,5 +458,6 @@ rule report_fp_fn_callset:
         genome=get_genome_name,
         version=get_genome_version,
         somatic=get_somatic_status,
+        high_coverage=get_high_coverage_status,
     wrapper:
         "v5.0.1/utils/datavzrd"

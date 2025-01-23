@@ -467,8 +467,12 @@ def get_vaf_status(wildcards):
 
 
 def get_high_coverage_status(wildcards):
-    benchmark = get_benchmark(wildcards.benchmark)
-    return benchmark.get("high-coverage", False)
+    if hasattr(wildcards, "benchmark"):
+        benchmark = get_benchmark(wildcards.benchmark)
+        return benchmark.get("high-coverage", False)
+    else:
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        return benchmarks[benchmark].get("high-coverage", False)
 
 
 def get_collect_stratifications_input(wildcards):
