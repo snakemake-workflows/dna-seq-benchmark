@@ -24,6 +24,7 @@ used_callsets = {callset for callset in callsets.keys()}
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 
+#TODO: can this be removed?
 if any(
     callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values()
 ) and config.get("grch37"):
@@ -103,7 +104,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
 
 def get_truth_url(wildcards, input):
     genome = genomes[wildcards.genome]
-    truth = genome["truth"][get_genome_build()]
+    truth = genome["truth"][get_genome_build(wildcards)]
     if isinstance(truth, dict):
         truth = truth[wildcards.truthset]
     if input.archive:
@@ -115,7 +116,7 @@ def get_truth_url(wildcards, input):
 def get_truthsets(csi=False):
     def inner(wildcards):
         genome = genomes[wildcards.genome]
-        truthsets = genome["truth"][get_genome_build()]
+        truthsets = genome["truth"][get_genome_build(wildcards)]
         if csi:
             return expand(
                 "resources/variants/{genome}/{truthset}.truth.bcf.csi",
@@ -146,11 +147,8 @@ def get_confidence_bed_cmd(wildcards, input):
         return f"curl --insecure -L {bed} {unpack_cmd}"
 
 
-def get_genome_build():
-    if config.get("grch37"):
-        return "grch37"
-    else:
-        return "grch38"
+def get_genome_build(wildcards):
+    return config["variant-calls"][wildcards.callset]["genome-build"]
 
 
 def get_io_prefix(getter):
@@ -339,7 +337,12 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    return config["variant-calls"][wildcards.callset]["rename-contigs"]
+    if config["variant-calls"][wildcards.callset]["genome-build"] == "grch37" and config["variant-calls"][wildcards.callset]["rename-contigs"]:
+        return workflow.source_path("../resources/rename-contigs/grch37_ucsc2ensembl.txt")
+    if config["variant-calls"][wildcards.callset]["genome-build"] == "grch38" and config["variant-calls"][wildcards.callset]["rename-contigs"]:
+        return workflow.source_path("../resources/rename-contigs/grch38_ucsc2ensembl.txt")
+    else:
+        config["variant-calls"][wildcards.callset]["rename-contigs"]
 
 
 def get_callset_subcategory(wildcards):
@@ -394,10 +397,10 @@ def get_nonempty_coverages(wildcards):
 def get_coverages(wildcards):
     if hasattr(wildcards, "benchmark"):
         # benchmark = get_benchmark(wildcards.benchmark)
-        high_cov_status = benchmarks[wildcards.benchmark].get("high-coverage", False)
+        high_cov_status = benchmarks[wildcards.benchmark].get("high-coverage")
     else:
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-        high_cov_status = benchmarks[benchmark].get("high-coverage", False)
+        high_cov_status = benchmarks[benchmark].get("high-coverage")
     if high_cov_status:
         coverages = high_coverages
     else:
@@ -407,7 +410,7 @@ def get_coverages(wildcards):
 
 def get_coverages_of_callset(callset):
     benchmark = config["variant-calls"][callset]["benchmark"]
-    high_cov_status = benchmarks[benchmark].get("high-coverage", False)
+    high_cov_status = benchmarks[benchmark].get("high-coverage")
     if high_cov_status:
         coverages = high_coverages
     else:
