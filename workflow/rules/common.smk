@@ -24,7 +24,7 @@ used_callsets = {callset for callset in callsets.keys()}
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 
-#TODO: can this be removed?
+# TODO: can this be removed?
 if any(
     callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values()
 ) and config.get("grch37"):
@@ -337,12 +337,22 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    if config["variant-calls"][wildcards.callset]["genome-build"] == "grch37" and config["variant-calls"][wildcards.callset]["rename-contigs"]:
-        return workflow.source_path("../resources/rename-contigs/grch37_ucsc2ensembl.txt")
-    if config["variant-calls"][wildcards.callset]["genome-build"] == "grch38" and config["variant-calls"][wildcards.callset]["rename-contigs"]:
-        return workflow.source_path("../resources/rename-contigs/grch38_ucsc2ensembl.txt")
+    if (
+        config["variant-calls"][wildcards.callset]["genome-build"] == "grch37"
+        and config["variant-calls"][wildcards.callset]["rename-contigs"]
+    ):
+        return workflow.source_path(
+            "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
+        )
+    if (
+        config["variant-calls"][wildcards.callset]["genome-build"] == "grch38"
+        and config["variant-calls"][wildcards.callset]["rename-contigs"]
+    ):
+        return workflow.source_path(
+            "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
+        )
     else:
-        config["variant-calls"][wildcards.callset]["rename-contigs"]
+        return config["variant-calls"][wildcards.callset]["rename-contigs"]
 
 
 def get_callset_subcategory(wildcards):
