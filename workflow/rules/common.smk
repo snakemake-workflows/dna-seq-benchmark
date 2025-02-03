@@ -146,6 +146,7 @@ def get_confidence_bed_cmd(wildcards, input):
     else:
         return f"curl --insecure -L {bed} {unpack_cmd}"
 
+
 # TODO: update this to allow more than two reference genomes
 def get_genome_build():
     if config.get("grch37"):
