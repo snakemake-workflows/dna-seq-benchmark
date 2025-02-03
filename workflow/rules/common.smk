@@ -146,7 +146,7 @@ def get_confidence_bed_cmd(wildcards, input):
     else:
         return f"curl --insecure -L {bed} {unpack_cmd}"
 
-
+# TODO: update this to allow more than two reference genomes
 def get_genome_build():
     if config.get("grch37"):
         return "grch37"
@@ -191,9 +191,9 @@ def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif "rename-contigs" in callset:
+    elif callset["rename-contigs"] != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif "grch37" in callset:
+    elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -203,7 +203,7 @@ def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if "rename-contigs" in callset:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif "grch37" in callset:
+    elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -211,9 +211,9 @@ def get_callset_correct_contigs(wildcards):
 
 def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
-    if "grch37" in callset:
+    if callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
-    elif "rename-contigs" in callset:
+    elif callset["rename-contigs"] != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     else:
         return get_raw_callset(wildcards)

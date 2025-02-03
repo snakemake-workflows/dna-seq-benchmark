@@ -17,7 +17,8 @@ variant-calls:
     vaf-field: # needs to be checked with bcftools view -h
       field: FORMAT
       name: AF
-    # Set to grch37 if grch37 was used as reference, then a liftover to grch38 will be performed
+    # Set to grch37 if grch37 was used as reference for variant calling, 
+    # then a liftover to grch38 will be performed
     genome-build: grch38
     # Set to true if your file needs to be translated from UCSC to Ensembl
     # or point to a file containing contig name replacements
