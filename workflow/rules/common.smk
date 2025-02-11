@@ -24,13 +24,8 @@ used_callsets = {callset for callset in callsets.keys()}
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 
-# TODO: can this be removed?
 if (
-    any(
-        callset["benchmark"] == "giab-NA12878-exome"
-        for callset in callsets.values()
-        # ) and config.get("grch37"):
-    )
+    any(callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values())
     and config["reference-genome"] != "grch38"
 ):
     raise ValueError(
@@ -161,13 +156,8 @@ def get_confidence_bed_cmd(wildcards, input):
         return f"curl --insecure -L {bed} {unpack_cmd}"
 
 
-# TODO: update this to allow more than two reference genomes
 def get_genome_build():
     return config["reference-genome"]
-    # if config.get("grch37"):
-    #     return "grch37"
-    # else:
-    #     return "grch38"
 
 
 def get_io_prefix(getter):
@@ -295,7 +285,6 @@ def get_target_regions_intersect_statement(wildcards, input):
 
 def get_liftover_statement(wildcards, input, output):
     benchmark = get_benchmark(wildcards.benchmark)
-
     if benchmark["grch37"] and not config["reference-genome"] == "grch37":
         return f"| liftOver /dev/stdin {input.liftover} {output} /dev/null"
     else:
@@ -425,7 +414,6 @@ def get_nonempty_coverages(wildcards):
 
 def get_coverages(wildcards):
     if hasattr(wildcards, "benchmark"):
-        # benchmark = get_benchmark(wildcards.benchmark)
         high_cov_status = benchmarks[wildcards.benchmark].get("high-coverage")
     else:
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
