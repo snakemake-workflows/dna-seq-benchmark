@@ -62,6 +62,7 @@ common_src = [
     workflow.source_path("../scripts/common/classification.py"),
 ]
 
+
 def get_reference_genome_build():
     if config["reference-genome"] == "grch37":
         return "GRCh37"
