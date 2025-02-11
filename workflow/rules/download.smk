@@ -158,7 +158,7 @@ rule get_reference:
     params:
         species="homo_sapiens",
         datatype="dna",
-        build="GRCh37" if config["grch37"] else "GRCh38",
+        build=get_reference_genome_build(),
         release="104",
         chromosome="1" if config.get("limit-reads") else None,
     log:

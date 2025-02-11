@@ -62,6 +62,14 @@ common_src = [
     workflow.source_path("../scripts/common/classification.py"),
 ]
 
+def get_reference_genome_build():
+    if config["reference-genome"] == "grch37":
+        return "GRCh37"
+    elif config["reference-genome"] == "grch38":
+        return "GRCh38"
+    else:
+        return null
+
 
 def get_archive_input(wildcards):
     genome = genomes[wildcards.genome]
@@ -287,7 +295,7 @@ def get_target_regions_intersect_statement(wildcards, input):
 def get_liftover_statement(wildcards, input, output):
     benchmark = get_benchmark(wildcards.benchmark)
 
-    if benchmark["grch37"] and not config["referemce-genome"] == "grch37":
+    if benchmark["grch37"] and not config["reference-genome"] == "grch37":
         return f"| liftOver /dev/stdin {input.liftover} {output} /dev/null"
     else:
         return f"> {output}"
