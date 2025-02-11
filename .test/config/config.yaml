@@ -3,15 +3,18 @@ variant-calls:
     path: "resources/variants/na12878/all.truth.bcf"
     benchmark: "giab-na12878-exome"
     genome-build: grch38
+    rename-contigs: false
   dummy-chm: 
     path: "resources/variants/chm-eval/all.truth.bcf"
     benchmark: "chm-eval"
     genome-build: grch38
+    rename-contigs: false
   dummy-imgag:
     path: "resources/variants/na12878-somatic/all.truth.bcf"
     benchmark: "imgag-5"
     tumor_sample_name: "HG001"
     genome-build: grch38
+    rename-contigs: false
   dummy-seqc2:
     path: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
     benchmark: "seqc2-wes"
@@ -20,6 +23,7 @@ variant-calls:
       field: INFO
       name: TVAF
     genome-build: grch38
+    rename-contigs: false
 
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
@@ -29,7 +33,7 @@ custom-benchmarks:
       - path/to/1.fq
       - path/to/2.fq
     target-regions: path/to/regions.bed
-    # whether given target regions are on hg19
+    # given target regions are on grch38 or grch37
     genome-build: grch38
 
 limit-reads: true
