@@ -17,8 +17,9 @@ variant-calls:
     vaf-field: # needs to be checked with bcftools view -h
       field: FORMAT
       name: AF
-    # Set to grch37 if grch37 was used as reference for variant calling, 
-    # then a liftover to grch38 will be performed
+    # Set the reference genome used for variant calling
+    # Supported values: grch37, grch38
+    # A liftover to grch38 will be performed if needed
     genome-build: grch38
     # Set to true if your file needs to be translated from UCSC to Ensembl
     # or point to a file containing contig name replacements
@@ -46,8 +47,8 @@ custom-benchmarks:
 # Optional for testing: limit to first 10000 reads
 limit-reads: false
 
-# whether evaluation shall happen on grch37
-grch37: false
+# whether evaluation shall happen on grch37 or grch38
+reference-genome: grch38
 
 # maximum number of entries in the FP and FN tables
 # (this might be exceeded because each chromosome is always fully included)

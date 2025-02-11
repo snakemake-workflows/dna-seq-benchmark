@@ -38,4 +38,4 @@ custom-benchmarks:
 
 limit-reads: true
 
-grch37: false
+reference-genome: grch38

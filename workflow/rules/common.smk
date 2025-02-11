@@ -25,11 +25,16 @@ used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks
 
 
 # TODO: can this be removed?
-if any(
-    callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values()
-) and config.get("grch37"):
+if (
+    any(
+        callset["benchmark"] == "giab-NA12878-exome"
+        for callset in callsets.values()
+        # ) and config.get("grch37"):
+    )
+    and config["reference-genome"] != "grch38"
+):
     raise ValueError(
-        "grch37 must be set to false in the config if giab-NA12878-exome benchmark is used"
+        "grch38 must be set as reference-genome in the config if giab-NA12878-exome benchmark is used"
     )
 
 
@@ -149,10 +154,11 @@ def get_confidence_bed_cmd(wildcards, input):
 
 # TODO: update this to allow more than two reference genomes
 def get_genome_build():
-    if config.get("grch37"):
-        return "grch37"
-    else:
-        return "grch38"
+    return config["reference-genome"]
+    # if config.get("grch37"):
+    #     return "grch37"
+    # else:
+    #     return "grch38"
 
 
 def get_io_prefix(getter):
@@ -281,7 +287,7 @@ def get_target_regions_intersect_statement(wildcards, input):
 def get_liftover_statement(wildcards, input, output):
     benchmark = get_benchmark(wildcards.benchmark)
 
-    if benchmark["grch37"] and not config.get("grch37"):
+    if benchmark["grch37"] and not config["referemce-genome"] == "grch37":
         return f"| liftOver /dev/stdin {input.liftover} {output} /dev/null"
     else:
         return f"> {output}"
