@@ -29,7 +29,7 @@ benchmarks:
     vaf-field:
       field: INFO # either FORMAT or INFO
       name: TVAF # name of tumor variant allele frequency
-    high-coverage: true
+    high-coverage: false
 
   seqc2-ffpe:
     genome: seqc2-somatic
