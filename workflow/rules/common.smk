@@ -161,6 +161,8 @@ def get_confidence_bed_cmd(wildcards, input):
 
 
 def get_genome_build():
+    if "reference-genome" not in config:
+        raise ValueError("Missing required configuration: reference-genome")
     return config["reference-genome"]
 
 
