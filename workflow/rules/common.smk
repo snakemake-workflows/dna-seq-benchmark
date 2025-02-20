@@ -66,7 +66,10 @@ def get_reference_genome_build():
     elif config["reference-genome"] == "grch38":
         return "GRCh38"
     else:
-        raise ValueError(f"Invalid reference genome build: {config['reference-genome']}. Must be one of: grch37, grch38")
+        raise ValueError(
+            f"Invalid reference genome build: {config['reference-genome']}. Must be one of: grch37, grch38"
+        )
+
 
 def get_archive_input(wildcards):
     genome = genomes[wildcards.genome]
