@@ -59,13 +59,14 @@ common_src = [
 
 
 def get_reference_genome_build():
+    if "reference-genome" not in config:
+        raise ValueError("Missing required configuration: reference-genome")
     if config["reference-genome"] == "grch37":
         return "GRCh37"
     elif config["reference-genome"] == "grch38":
         return "GRCh38"
     else:
-        return null
-
+        raise ValueError(f"Invalid reference genome build: {config['reference-genome']}. Must be one of: grch37, grch38")
 
 def get_archive_input(wildcards):
     genome = genomes[wildcards.genome]
