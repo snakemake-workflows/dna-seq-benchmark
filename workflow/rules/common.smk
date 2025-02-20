@@ -24,11 +24,12 @@ used_callsets = {callset for callset in callsets.keys()}
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 
-if any(
-    callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values()
-) and config.get("grch37"):
+if (
+    any(callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values())
+    and config["reference-genome"] != "grch38"
+):
     raise ValueError(
-        "grch37 must be set to false in the config if giab-NA12878-exome benchmark is used"
+        "grch38 must be set as reference-genome in the config if giab-NA12878-exome benchmark is used"
     )
 
 
@@ -55,6 +56,19 @@ common_src = [
     workflow.source_path("../scripts/common/__init__.py"),
     workflow.source_path("../scripts/common/classification.py"),
 ]
+
+
+def get_reference_genome_build():
+    if "reference-genome" not in config:
+        raise ValueError("Missing required configuration: reference-genome")
+    if config["reference-genome"] == "grch37":
+        return "GRCh37"
+    elif config["reference-genome"] == "grch38":
+        return "GRCh38"
+    else:
+        raise ValueError(
+            f"Invalid reference genome build: {config['reference-genome']}. Must be one of: grch37, grch38"
+        )
 
 
 def get_archive_input(wildcards):
@@ -147,10 +161,9 @@ def get_confidence_bed_cmd(wildcards, input):
 
 
 def get_genome_build():
-    if config.get("grch37"):
-        return "grch37"
-    else:
-        return "grch38"
+    if "reference-genome" not in config:
+        raise ValueError("Missing required configuration: reference-genome")
+    return config["reference-genome"]
 
 
 def get_io_prefix(getter):
@@ -190,9 +203,9 @@ def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif "rename-contigs" in callset:
+    elif callset["rename-contigs"] != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif "grch37" in callset:
+    elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -202,7 +215,7 @@ def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if "rename-contigs" in callset:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif "grch37" in callset:
+    elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -210,9 +223,9 @@ def get_callset_correct_contigs(wildcards):
 
 def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
-    if "grch37" in callset:
+    if callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
-    elif "rename-contigs" in callset:
+    elif callset["rename-contigs"] != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -278,8 +291,7 @@ def get_target_regions_intersect_statement(wildcards, input):
 
 def get_liftover_statement(wildcards, input, output):
     benchmark = get_benchmark(wildcards.benchmark)
-
-    if benchmark["grch37"] and not config.get("grch37"):
+    if benchmark["grch37"] and not config["reference-genome"] == "grch37":
         return f"| liftOver /dev/stdin {input.liftover} {output} /dev/null"
     else:
         return f"> {output}"
@@ -339,7 +351,22 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    return config["variant-calls"][wildcards.callset]["rename-contigs"]
+    if (
+        config["variant-calls"][wildcards.callset]["genome-build"] == "grch37"
+        and config["variant-calls"][wildcards.callset]["rename-contigs"]
+    ):
+        return workflow.source_path(
+            "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
+        )
+    if (
+        config["variant-calls"][wildcards.callset]["genome-build"] == "grch38"
+        and config["variant-calls"][wildcards.callset]["rename-contigs"]
+    ):
+        return workflow.source_path(
+            "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
+        )
+    else:
+        return config["variant-calls"][wildcards.callset]["rename-contigs"]
 
 
 def get_callset_subcategory(wildcards):
@@ -393,11 +420,10 @@ def get_nonempty_coverages(wildcards):
 
 def get_coverages(wildcards):
     if hasattr(wildcards, "benchmark"):
-        # benchmark = get_benchmark(wildcards.benchmark)
-        high_cov_status = benchmarks[wildcards.benchmark].get("high-coverage", False)
+        high_cov_status = benchmarks[wildcards.benchmark].get("high-coverage")
     else:
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-        high_cov_status = benchmarks[benchmark].get("high-coverage", False)
+        high_cov_status = benchmarks[benchmark].get("high-coverage")
     if high_cov_status:
         coverages = high_coverages
     else:
@@ -407,7 +433,7 @@ def get_coverages(wildcards):
 
 def get_coverages_of_callset(callset):
     benchmark = config["variant-calls"][callset]["benchmark"]
-    high_cov_status = benchmarks[benchmark].get("high-coverage", False)
+    high_cov_status = benchmarks[benchmark].get("high-coverage")
     if high_cov_status:
         coverages = high_coverages
     else:
