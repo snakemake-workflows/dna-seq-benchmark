@@ -63,7 +63,8 @@ rule add_genotype_field:
 
 rule add_format_field:
     input:
-        "resources/variants/{genome}/all.truth.norm.bcf",
+        bcf="resources/variants/{genome}/all.truth.norm.bcf",
+        truth_name=workflow.source_path("../resources/truth.txt"),
     output:
         "resources/variants/{genome}/all.truth.format-added.vcf.gz",
     log:
@@ -71,11 +72,12 @@ rule add_format_field:
     conda:
         "../envs/vatools.yaml"
     shell:
-        # TODO: Optional - Check first if FORMAT field is present for example with
-        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf
         # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
         # adds FORMAT field with GT field and sample name 'truth'
-        "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log}"
+        # part after || gets executed if vcf-genotype-annotater fails because GT field is already present
+        # bcftools reheader changes sample name which is associated with GT field to truth
+        "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log} "
+        "|| bcftools reheader -s {truth_name} {input.bcf} | bcftools view -Oz > {output}"
 
 
 rule remove_non_pass:
