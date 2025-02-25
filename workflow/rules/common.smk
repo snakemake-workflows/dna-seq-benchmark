@@ -282,6 +282,26 @@ def intersect_calls(wildcards):
         return True
 
 
+def has_format_field(wildcards):
+    file_path = input.format_field_file
+    with open(file_path, "r") as infile:
+        content = infile.read().strip()
+        if content == "true":
+            return True
+        else:
+            return False
+
+
+def get_format_field_command(wildcards, has_format=params.has_format_field):
+    if has_format:
+        # bcftools reheader changes sample name which is associated with GT field to truth
+        return "bcftools reheader -s {input.truth_name} {input.bcf} | bcftools view -Oz > {output}"
+    else:
+        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
+        # adds FORMAT field with GT field and sample name 'truth'
+        return "vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}"
+
+
 def get_target_regions_intersect_statement(wildcards, input):
     if input.target:
         return f"bedtools intersect -a /dev/stdin -b {input.target} |"
