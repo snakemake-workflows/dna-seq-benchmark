@@ -76,7 +76,7 @@ rule add_format_field:
     conda:
         "../envs/vatools.yaml"
     shell:
-        "{format_field_cmd}"
+        "{params.format_field_cmd}"
 
 
 rule remove_non_pass:

@@ -282,7 +282,7 @@ def intersect_calls(wildcards):
         return True
 
 
-def has_format_field(wildcards):
+def has_format_field(wildcards, input):
     file_path = input.format_field_file
     with open(file_path, "r") as infile:
         content = infile.read().strip()
