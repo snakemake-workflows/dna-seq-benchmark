@@ -292,8 +292,8 @@ def has_format_field(wildcards):
             return False
 
 
-def get_format_field_command(wildcards, has_format=params.has_format_field):
-    if has_format:
+def get_format_field_command(wildcards, params):
+    if params.format_field:
         # bcftools reheader changes sample name which is associated with GT field to truth
         return "bcftools reheader -s {input.truth_name} {input.bcf} | bcftools view -Oz > {output}"
     else:
