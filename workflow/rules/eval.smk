@@ -71,7 +71,7 @@ rule add_format_field:
     log:
         "logs/add_format_field/{genome}.log",
     params:
-        format_field=has_format_field,
+        # format_field=has_format_field,
         format_field_cmd=get_format_field_command,
     conda:
         "../envs/vatools.yaml"

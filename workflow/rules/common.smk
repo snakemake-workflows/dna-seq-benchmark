@@ -203,7 +203,7 @@ def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif callset["rename-contigs"] != False:
+    elif callset.get("rename-contigs", False) != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
@@ -225,7 +225,7 @@ def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
-    elif callset["rename-contigs"] != False:
+    elif callset.get("rename-contigs", False) != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -282,24 +282,27 @@ def intersect_calls(wildcards):
         return True
 
 
-def has_format_field(wildcards, input):
+# def has_format_field(wildcards, input):
+#     file_path = input.format_field_file
+#     with open(file_path, "r") as infile:
+#         content = infile.read().strip()
+#         if content == "true":
+#             return True
+#         else:
+#             return False
+
+
+def get_format_field_command(wildcards, input, output):
     file_path = input.format_field_file
     with open(file_path, "r") as infile:
         content = infile.read().strip()
         if content == "true":
-            return True
+            # bcftools reheader changes sample name which is associated with GT field to truth
+            return f"bcftools reheader -s {input.truth_name} {input.bcf} | bcftools view -Oz > {output}"
         else:
-            return False
-
-
-def get_format_field_command(wildcards, params):
-    if params.format_field:
-        # bcftools reheader changes sample name which is associated with GT field to truth
-        return "bcftools reheader -s {input.truth_name} {input.bcf} | bcftools view -Oz > {output}"
-    else:
-        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
-        # adds FORMAT field with GT field and sample name 'truth'
-        return "vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}"
+            # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
+            # adds FORMAT field with GT field and sample name 'truth'
+            return f"vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}"
 
 
 def get_target_regions_intersect_statement(wildcards, input):
@@ -373,20 +376,20 @@ def get_test_regions(wildcards):
 def get_rename_contig_file(wildcards):
     if (
         config["variant-calls"][wildcards.callset]["genome-build"] == "grch37"
-        and config["variant-calls"][wildcards.callset]["rename-contigs"]
+        and config["variant-calls"][wildcards.callset].get("rename-contigs", False)
     ):
         return workflow.source_path(
             "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
         )
     if (
         config["variant-calls"][wildcards.callset]["genome-build"] == "grch38"
-        and config["variant-calls"][wildcards.callset]["rename-contigs"]
+        and config["variant-calls"][wildcards.callset].get("rename-contigs", False)
     ):
         return workflow.source_path(
             "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
         )
     else:
-        return config["variant-calls"][wildcards.callset]["rename-contigs"]
+        return config["variant-calls"][wildcards.callset].get("rename-contigs", False)
 
 
 def get_callset_subcategory(wildcards):
