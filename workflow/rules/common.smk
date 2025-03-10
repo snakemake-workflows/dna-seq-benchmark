@@ -374,16 +374,18 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    if (
-        config["variant-calls"][wildcards.callset]["genome-build"] == "grch37"
-        and config["variant-calls"][wildcards.callset].get("rename-contigs", False)
+    if config["variant-calls"][wildcards.callset][
+        "genome-build"
+    ] == "grch37" and config["variant-calls"][wildcards.callset].get(
+        "rename-contigs", False
     ):
         return workflow.source_path(
             "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
         )
-    if (
-        config["variant-calls"][wildcards.callset]["genome-build"] == "grch38"
-        and config["variant-calls"][wildcards.callset].get("rename-contigs", False)
+    if config["variant-calls"][wildcards.callset][
+        "genome-build"
+    ] == "grch38" and config["variant-calls"][wildcards.callset].get(
+        "rename-contigs", False
     ):
         return workflow.source_path(
             "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
