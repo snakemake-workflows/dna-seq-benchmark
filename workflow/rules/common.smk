@@ -344,7 +344,7 @@ def get_genome_truth(wildcards):
     if isinstance(truthset, str):
         return f"resources/variants/{genome_name}/all.truth.bcf"
     else:
-        return f"resources/variants/{genome_name}.merged.truth.bcf"
+        return f"resources/variants/{genome_name}/merged.truth.bcf"
 
 
 def get_benchmark_truth(wildcards):
