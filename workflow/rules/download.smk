@@ -69,7 +69,7 @@ rule merge_truthsets:
         bcf=get_truthsets(),
         csi=get_truthsets(csi=True),
     output:
-        "resources/variants/{genome}/merged.truth.bcf",
+        "resources/variants/{genome}.merged.truth.bcf",
     log:
         "logs/merge-truthsets/{genome}.log",
     conda:
