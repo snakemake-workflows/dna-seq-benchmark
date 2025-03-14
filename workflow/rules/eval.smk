@@ -64,18 +64,20 @@ rule add_genotype_field:
 rule add_format_field:
     input:
         bcf="resources/variants/{genome}/all.truth.norm.bcf",
-        format_field_file="resources/variants/{genome}/all.has-format-field.txt",
     output:
         "resources/variants/{genome}/all.truth.format-added.vcf.gz",
     log:
         "logs/add_format_field/{genome}.log",
-    params:
-        # format_field=has_format_field,
-        format_field_cmd=get_format_field_command,
     conda:
         "../envs/vatools.yaml"
     shell:
-        "{params.format_field_cmd}"
+        """
+        if bcftools view -h {input.bcf} | grep -q FORMAT; then
+            bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output}
+        else
+            vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}
+        fi
+        """
 
 
 rule remove_non_pass:
@@ -241,7 +243,7 @@ rule benchmark_variants:
         somatic=get_somatic_flag,
     conda:
         "../envs/rtg-tools.yaml"
-    threads: 1
+    threads: 32
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records "
         "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "

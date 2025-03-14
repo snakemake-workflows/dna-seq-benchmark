@@ -78,25 +78,6 @@ rule merge_truthsets:
         "bcftools concat -O b --allow-overlap {input.bcf} > {output} 2> {log}"
 
 
-rule has_format_field:
-    input:
-        "resources/variants/{genome}.{truthset}.truth.bcf",
-    output:
-        "resources/variants/{genome}/{truthset}.has-format-field.txt",
-    log:
-        "logs/has-format-field/{genome}.{truthset}.log",
-    conda:
-        "../envs/tools.yaml"
-    shell:
-        """
-        if bcftools view -h {input} | grep -q FORMAT; then
-            echo true > {output}
-        else
-            echo false > {output}
-        fi
-        """
-
-
 rule normalize_truth:
     input:
         get_genome_truth,
