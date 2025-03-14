@@ -64,7 +64,6 @@ rule add_genotype_field:
 rule add_format_field:
     input:
         bcf="resources/variants/{genome}/all.truth.norm.bcf",
-        # truth_name="/projects/koesterlab/pm4onco/dna-seq-benchmark_pm4onco/workflow/resources/truth.txt",
         format_field_file="resources/variants/{genome}/{truthset}.has-format-field.txt",
     output:
         "resources/variants/{genome}/all.truth.format-added.vcf.gz",
