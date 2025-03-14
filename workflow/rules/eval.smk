@@ -64,7 +64,7 @@ rule add_genotype_field:
 rule add_format_field:
     input:
         bcf="resources/variants/{genome}/all.truth.norm.bcf",
-        format_field_file="resources/variants/{genome}/{truthset}.has-format-field.txt",
+        format_field_file="resources/variants/{genome}/all.has-format-field.txt",
     output:
         "resources/variants/{genome}/all.truth.format-added.vcf.gz",
     log:
@@ -241,7 +241,7 @@ rule benchmark_variants:
         somatic=get_somatic_flag,
     conda:
         "../envs/rtg-tools.yaml"
-    threads: 32
+    threads: 1
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records "
         "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
