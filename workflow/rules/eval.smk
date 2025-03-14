@@ -11,6 +11,19 @@ rule get_reference_dict:
         "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict &> {log}"
 
 
+rule merge_callsets:
+    input:
+        get_raw_callset,
+    output:
+        "results/merge-callsets/{callset}.merged.vcf.gz",
+    log:
+        "logs/merge-callsets/{callset}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools concat -O z --allow-overlap {input} > {output} 2> {log}"
+
+
 rule liftover_callset:
     input:
         callset=get_callset_correct_contigs,

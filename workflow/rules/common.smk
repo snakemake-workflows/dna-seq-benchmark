@@ -199,6 +199,14 @@ def get_cov_interval(name, coverages):
     return threshold, upper_bound
 
 
+def get_callset_merge_status(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    vcf = callset["path"]
+    if isinstance(vcf, dict):
+        return True
+    return False
+
+
 def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     if get_somatic_status(wildcards):
@@ -207,6 +215,8 @@ def get_callset(wildcards):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
+    elif get_callset_merge_status(wildcards):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
