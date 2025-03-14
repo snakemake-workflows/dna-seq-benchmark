@@ -80,11 +80,11 @@ rule merge_truthsets:
 
 rule has_format_field:
     input:
-        "resources/variants/{genome}.merged.truth.bcf",
+        "resources/variants/{genome}.{truthset}.truth.bcf",
     output:
-        "resources/variants/{genome}/has-format-field.txt",
+        "resources/variants/{genome}/{truthset}.has-format-field.txt",
     log:
-        "logs/has-format-field/{genome}.log",
+        "logs/has-format-field/{genome}.{truthset}.log",
     conda:
         "../envs/tools.yaml"
     shell:
