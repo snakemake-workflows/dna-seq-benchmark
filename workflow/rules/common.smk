@@ -298,7 +298,7 @@ def get_format_field_command(wildcards, input, output):
         content = infile.read().strip()
         if content == "true":
             # bcftools reheader changes sample name which is associated with GT field to truth
-            return f"bcftools reheader -s {input.truth_name} {input.bcf} | bcftools view -Oz > {output}"
+            return f"bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output}"
         else:
             # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
             # adds FORMAT field with GT field and sample name 'truth'
