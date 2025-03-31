@@ -23,8 +23,10 @@ used_callsets = {callset for callset in callsets.keys()}
 
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
+
 wildcard_constraints:
-    benchmark="|".join(benchmarks)
+    benchmark="|".join(benchmarks),
+
 
 if (
     any(callset["benchmark"] == "giab-NA12878-exome" for callset in callsets.values())
