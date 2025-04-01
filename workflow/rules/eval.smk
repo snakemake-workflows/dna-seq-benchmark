@@ -16,8 +16,8 @@ rule merge_callsets:
     input:
         snv_vcf=lambda wildcards: get_raw_callset(wildcards)["snv"],
         indel_vcf=lambda wildcards: get_raw_callset(wildcards)["indel"],
-        snv_tbi=lambda wildcards: get_raw_callset(wildcards,".tbi")["snv"],
-        indel_tbi=lambda wildcards: get_raw_callset(wildcards,".tbi")["indel"],
+        snv_tbi=lambda wildcards: get_raw_callset(wildcards, ".tbi")["snv"],
+        indel_tbi=lambda wildcards: get_raw_callset(wildcards, ".tbi")["indel"],
     output:
         "results/merge-callsets/{callset}.merged.vcf.gz",
     log:

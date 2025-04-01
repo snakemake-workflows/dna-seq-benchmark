@@ -250,14 +250,11 @@ def get_callset_correct_contigs_liftover_merge(wildcards):
         return get_raw_callset(wildcards)
 
 
-def get_raw_callset(wildcards,suffix=""):
+def get_raw_callset(wildcards, suffix=""):
     callset = config["variant-calls"][wildcards.callset]
     path = callset["path"]
     if isinstance(path, dict):
-        return {
-            "snv":path["snv"]+suffix, 
-            "indel":path["indel"]+suffix
-            }
+        return {"snv": path["snv"] + suffix, "indel": path["indel"] + suffix}
     return path
 
 
