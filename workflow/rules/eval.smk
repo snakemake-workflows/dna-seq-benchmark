@@ -12,8 +12,12 @@ rule get_reference_dict:
 
 
 rule merge_callsets:
+    # TODO: this does only work if the callsets are handed as vcf.gz
     input:
-        get_raw_callset,
+        snv_vcf=lambda wildcards: get_raw_callset(wildcards)["snv"],
+        indel_vcf=lambda wildcards: get_raw_callset(wildcards)["indel"],
+        snv_tbi=lambda wildcards: get_raw_callset(wildcards,".tbi")["snv"],
+        indel_tbi=lambda wildcards: get_raw_callset(wildcards,".tbi")["indel"],
     output:
         "results/merge-callsets/{callset}.merged.vcf.gz",
     log:
@@ -21,8 +25,7 @@ rule merge_callsets:
     conda:
         "../envs/tools.yaml"
     shell:
-        # TODO: add indexing of input vcf
-        "bcftools concat -O z --allow-overlap {input} > {output} 2> {log}"
+        "bcftools concat -O z --allow-overlap {input.snv_vcf} {input.indel_vcf} > {output} 2> {log}"
 
 
 rule liftover_callset:
