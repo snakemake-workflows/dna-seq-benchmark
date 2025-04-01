@@ -21,6 +21,7 @@ rule merge_callsets:
     conda:
         "../envs/tools.yaml"
     shell:
+        # TODO: add indexing of input vcf
         "bcftools concat -O z --allow-overlap {input} > {output} 2> {log}"
 
 
@@ -44,7 +45,7 @@ rule liftover_callset:
 
 rule rename_contigs:
     input:
-        calls=get_raw_callset,
+        calls=get_callset_correct_contigs_liftover_merge,
         repl_file=get_rename_contig_file,
     output:
         "results/normalized-variants/{callset}.replaced-contigs.vcf.gz",

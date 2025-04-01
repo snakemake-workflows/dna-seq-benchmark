@@ -109,7 +109,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper-1}"
+            return f"{lower}-{upper - 1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in low_coverages}
@@ -241,9 +241,21 @@ def get_callset_correct_contigs_liftover(wildcards):
         return get_raw_callset(wildcards)
 
 
+def get_callset_correct_contigs_liftover_merge(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    path = callset["path"]
+    if isinstance(path, dict):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
+    else:
+        return get_raw_callset(wildcards)
+
+
 def get_raw_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
-    return callset["path"]
+    path = callset["path"]
+    if isinstance(path, dict):
+        return [path["snv"], path["indel"]]
+    return path
 
 
 def is_local_file(path):
