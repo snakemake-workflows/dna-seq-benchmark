@@ -257,7 +257,7 @@ def get_raw_callset(wildcards, suffix=""):
     callset = config["variant-calls"][wildcards.callset]
     path = callset["path"]
     if isinstance(path, dict):
-        return {"snv": path["snv"] + suffix, "indel": path["indel"] + suffix}
+        return {"snvs": path["snv"] + suffix, "indels": path["indel"] + suffix}
     return path
 
 
