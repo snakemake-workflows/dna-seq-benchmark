@@ -24,6 +24,17 @@ variant-calls:
       name: TVAF
     genome-build: grch38
     rename-contigs: false
+  dummy-seqc2-merge:
+    path: 
+      snv: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
+      indel: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
+    benchmark: "seqc2-wes"
+    tumor_sample_name: "truth"
+    vaf-field: 
+      field: INFO
+      name: TVAF
+    genome-build: grch38
+    rename-contigs: false
 
 custom-benchmarks:
   my-custom-benchmark: # custom benchmark name, choose freely (no whitespace allowed)
