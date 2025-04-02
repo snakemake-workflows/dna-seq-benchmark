@@ -26,8 +26,8 @@ variant-calls:
     rename-contigs: false
   dummy-seqc2-merge:
     path: 
-      snv: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
-      indel: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
+      snvs: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
+      indels: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
     benchmark: "seqc2-wes"
     tumor_sample_name: "truth"
     vaf-field: 
