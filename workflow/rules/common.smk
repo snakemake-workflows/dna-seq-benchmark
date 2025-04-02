@@ -227,6 +227,8 @@ def get_callset_correct_contigs(wildcards):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
+    elif get_callset_merge_status(wildcards):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
@@ -237,14 +239,15 @@ def get_callset_correct_contigs_liftover(wildcards):
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     elif callset["rename-contigs"] != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
+    elif get_callset_merge_status(wildcards):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
 
 def get_callset_correct_contigs_liftover_merge(wildcards):
     callset = config["variant-calls"][wildcards.callset]
-    path = callset["path"]
-    if isinstance(path, dict):
+    if get_callset_merge_status(wildcards):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
