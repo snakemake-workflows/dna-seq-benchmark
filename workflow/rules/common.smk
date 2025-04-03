@@ -205,39 +205,72 @@ def get_cov_interval(name, coverages):
 
 def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
+    vcf = callset["path"]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
     elif callset.get("rename-contigs", False) != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
+    elif isinstance(vcf, dict):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
 
 def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
+    vcf = callset["path"]
     if "rename-contigs" in callset:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
+    elif isinstance(vcf, dict):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
 
 def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
+    vcf = callset["path"]
     if callset["genome-build"] == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     elif callset.get("rename-contigs", False) != False:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
+    elif isinstance(vcf, dict):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
+    else:
+        return get_raw_callset(wildcards)
+
+
+def get_callset_correct_contigs_liftover_merge(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    vcf = callset["path"]
+    if isinstance(vcf, dict):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
 
 
 def get_raw_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
-    return callset["path"]
+    path = callset["path"]
+    if isinstance(path, dict):
+        return {"snvs": path["snvs"], "indels": path["indels"]}
+    return path
+
+
+def get_raw_callset_index(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    path = callset["path"]
+    if isinstance(path, dict):
+        if path["snvs"].split(".")[-1] == "bcf":
+            suffix = ".csi"
+        else:
+            suffix = ".tbi"
+        return {"snvs": path["snvs"] + suffix, "indels": path["indels"] + suffix}
+    return path
 
 
 def is_local_file(path):

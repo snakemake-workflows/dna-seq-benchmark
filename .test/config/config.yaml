@@ -15,8 +15,27 @@ variant-calls:
     tumor_sample_name: "HG001"
     genome-build: grch38
     rename-contigs: false
+  dummy-imgag-merge:
+    path: 
+      snvs: "resources/variants/na12878-somatic/all.truth.bcf"
+      indels: "resources/variants/na12878-somatic/all.truth.bcf"
+    benchmark: "imgag-5"
+    tumor_sample_name: "HG001"
+    genome-build: grch38
+    rename-contigs: false
   dummy-seqc2:
     path: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
+    benchmark: "seqc2-wes"
+    tumor_sample_name: "truth"
+    vaf-field: 
+      field: INFO
+      name: TVAF
+    genome-build: grch38
+    rename-contigs: false
+  dummy-seqc2-merge:
+    path: 
+      snvs: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
+      indels: "resources/variants/seqc2-somatic/all.truth.format-added.vcf.gz"
     benchmark: "seqc2-wes"
     tumor_sample_name: "truth"
     vaf-field: 
