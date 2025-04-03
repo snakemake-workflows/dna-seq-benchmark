@@ -113,7 +113,7 @@ def get_plot_cov_labels():  # TODO check if ever used anywhere
     def label(name):
         lower, upper = get_cov_interval(name)
         if upper:
-            return f"{lower}-{upper - 1}"
+            return f"{lower}-{upper-1}"
         return f"≥{lower}"
 
     return {name: label(name) for name in low_coverages}
@@ -253,10 +253,22 @@ def get_callset_correct_contigs_liftover_merge(wildcards):
         return get_raw_callset(wildcards)
 
 
-def get_raw_callset(wildcards, suffix=""):
+def get_raw_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     path = callset["path"]
     if isinstance(path, dict):
+        return {"snvs": path["snvs"] + suffix, "indels": path["indels"] + suffix}
+    return path
+
+
+def get_raw_callset_index(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    path = callset["path"]
+    if isinstance(path, dict):
+        if path["snvs"].split(".")[-1] == "bcf":
+            suffix = ".csi"
+        else:
+            suffix = ".tbi"
         return {"snvs": path["snvs"] + suffix, "indels": path["indels"] + suffix}
     return path
 

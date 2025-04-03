@@ -12,12 +12,11 @@ rule get_reference_dict:
 
 
 rule merge_callsets:
-    # TODO: this does only work if the callsets are handed as vcf.gz
     input:
         snv_vcf=lambda wildcards: get_raw_callset(wildcards)["snvs"],
         indel_vcf=lambda wildcards: get_raw_callset(wildcards)["indels"],
-        snv_tbi=lambda wildcards: get_raw_callset(wildcards, ".tbi")["snvs"],
-        indel_tbi=lambda wildcards: get_raw_callset(wildcards, ".tbi")["indels"],
+        snv_tbi=lambda wildcards: get_raw_callset_index(wildcards)["snvs"],
+        indel_tbi=lambda wildcards: get_raw_callset_index(wildcards)["indels"],
     output:
         "results/merge-callsets/{callset}.merged.vcf.gz",
     log:

@@ -13,7 +13,7 @@ rule index_bcf:
     input:
         "{prefix}.bcf",
     output:
-        "{prefix}.bcf",
+        "{prefix}.bcf.csi",
     log:
         "logs/bcftools-index-bcf/{prefix}.log",
     wrapper:
