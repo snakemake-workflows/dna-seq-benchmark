@@ -10,9 +10,11 @@ variant-calls:
       site: University of Duisburg-Essen
     # Optional subcategory for separating callsets in the report. Comment out if not needed.
     subcategory: agilent
-    path: # either path to unified file here
-      snvs: # or snv vcf
-      indels: # and indel vcf here (f. ex. strelka)
+    path: "path/to/unified.vcf.gz" # either path to a unified VCF file
+    # OR, for separate files, use:
+    # path:
+    #   snvs: "path/to/snvs.vcf.gz"
+    #   indels: "path/to/indels.vcf.gz"
     tumor_sample_name: <tumor-sample-name> # via bcftools query -l <your-vcf>
     # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
     benchmark: giab-na12878-exome
