@@ -102,7 +102,7 @@ genomes:
   na12878-somatic:
     version: 4.2.1
     truth:
-      grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz
+      grch38: https://zenodo.org/records/15120550/files/NA12878.unique.vcf.gz?download=1
     confidence-regions:
       grch38: https://download.imgag.de/public/validation_dataset_somatic/benchmark_region.bed
     somatic: true
