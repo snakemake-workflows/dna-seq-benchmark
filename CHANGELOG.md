@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.12.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.7...v1.12.0) (2025-04-03)
+
+
+### Features
+
+* Add heatmap coloring for coverage stratification in fp fn report, hide class label. ([#112](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/112)) ([e0d3ea9](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/e0d3ea9ddf3a01ab8e02cf9a699186943e3d2c17))
+* automate picking of rename file based on reference genome used for calling + setup for more than 2 reference genomes ([#113](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/113)) ([2bbb9ae](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/2bbb9ae5844982fb733fe30dbbf340cf462249b0))
+* Report FP / FN negative variants in single table ([#107](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/107)) ([0464700](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/04647001dd78648309aa71d9c44152ffba4c73b6))
+* add rule merge_callsets for snv/indel callsets ([#115](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/115)) ([7e5fdde](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/7e5fdde887cf8d693d2b39e2615c6ee0fea1cbac))
+
+
+### Bug Fixes
+* catch when FORMAT field is present in truth ([#114](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/114)) ([0e8e4be](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/0e8e4be88ba41510588060df779e14334f0b42a8))
+* change vaf_field to dict ([#110](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/110)) ([e78abbb](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/e78abbbe6f999d24dedf9f934271c0335578f883))
+* fix missing index as input for restrict_to_reference_contigs ([#102](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/102)) ([c55c503](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/c55c50322ea9d836702cfed4c753b87358f32ae9))
+* link to truth vcf for na12878-somatic ([#116](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/116)) ([724ce2d](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/724ce2d22de2ec95000447db1deb6642e2c81e91))
+
+
+### Performance Improvements
+
+* update datavzrd wrapper ([#104](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/104)) ([db68793](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/db68793142b2fc98d444a18112f3da8802f777c0))
+
 ### [1.11.7](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.6...v1.11.7) (2024-09-12)
 
 
