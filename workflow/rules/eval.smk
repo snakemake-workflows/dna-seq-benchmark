@@ -115,7 +115,7 @@ rule calculate_vaf:
     output:
         "results/calculate-vaf/{callset}.added-vaf.bcf",
     log:
-        "logs/calculate-vaf/",
+        "logs/calculate-vaf/{callset}.log",
     conda:
         "../envs/cyvcf.yaml"
     script:
