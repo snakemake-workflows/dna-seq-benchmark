@@ -30,8 +30,34 @@ views:
           plot:
             heatmap:
               scale: ordinal
+              ?if params.high_coverage:
+                domain:
+                  - very_low
+                  - low
+                  - medium
+                  - upper_medium
+                  - high
+                  - very_high
+                range:
+                  - "#d8e6f4"
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#74b2d7"
+                  - "#3181bd"
+                  - "#1e68a7"
+              ?else:
+                domain:
+                  - low
+                  - medium
+                  - high
+                range:
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#6baed6"
         ?if params.somatic:
           true_genotype:
             display-mode: hidden
           predicted_genotype:
             display-mode: hidden
+        class:
+          display-mode: hidden

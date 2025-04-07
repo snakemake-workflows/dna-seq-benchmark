@@ -53,17 +53,6 @@ rule get_truth:
         ") 2> {log}"
 
 
-rule index_truthsets:
-    input:
-        bcf="resources/variants/{genome}/{truthset}.truth.bcf",
-    output:
-        "resources/variants/{genome}/{truthset}.truth.bcf.csi",
-    log:
-        "logs/index-truthsets/{genome}/{truthset}.log",
-    wrapper:
-        "v1.9.0/bio/bcftools/index"
-
-
 rule merge_truthsets:
     input:
         bcf=get_truthsets(),
@@ -158,7 +147,7 @@ rule get_reference:
     params:
         species="homo_sapiens",
         datatype="dna",
-        build="GRCh37" if config["grch37"] else "GRCh38",
+        build=get_reference_genome_build(),
         release="104",
         chromosome="1" if config.get("limit-reads") else None,
     log:

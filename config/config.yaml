@@ -10,18 +10,24 @@ variant-calls:
       site: University of Duisburg-Essen
     # Optional subcategory for separating callsets in the report. Comment out if not needed.
     subcategory: agilent
-    path: <path>
+    path: "path/to/unified.vcf.gz" # either path to a unified VCF file
+    # OR, for separate files, use:
+    # path:
+    #   snvs: "path/to/snvs.vcf.gz"
+    #   indels: "path/to/indels.vcf.gz"
     tumor_sample_name: <tumor-sample-name> # via bcftools query -l <your-vcf>
     # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
     benchmark: giab-na12878-exome
-    # Uncomment and point to file containing contig name replacements
-    # as needed for 'bcftools annotate --rename-chrs'
-    # rename-contigs: path/to/rename-contigs.txt
     vaf-field: # needs to be checked with bcftools view -h
-      - FORMAT
-      - AF
-    # Uncomment if callset was produced using grch37 as reference, then a liftover to grch38 will be performed
-    # grch37: true
+      field: FORMAT
+      name: AF
+    # Set the reference genome used for variant calling
+    # Supported values: grch37, grch38
+    # A liftover to grch38 will be performed if needed
+    genome-build: grch38
+    # Set to true if your file needs to be translated from UCSC to Ensembl
+    # or point to a file containing contig name replacements
+    rename-contigs: false
 
 # Optional custom benchmarks
 custom-benchmarks:
@@ -45,8 +51,8 @@ custom-benchmarks:
 # Optional for testing: limit to first 10000 reads
 limit-reads: false
 
-# whether evaluation shall happen on grch37
-grch37: false
+# whether evaluation shall happen on grch37 or grch38
+reference-genome: grch38
 
 # maximum number of entries in the FP and FN tables
 # (this might be exceeded because each chromosome is always fully included)

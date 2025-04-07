@@ -11,6 +11,22 @@ rule get_reference_dict:
         "picard CreateSequenceDictionary  -R {input.reference} -O {input.reference}.dict &> {log}"
 
 
+rule merge_callsets:
+    input:
+        snv_vcf=lambda wildcards: get_raw_callset(wildcards)["snvs"],
+        indel_vcf=lambda wildcards: get_raw_callset(wildcards)["indels"],
+        snv_tbi=lambda wildcards: get_raw_callset_index(wildcards)["snvs"],
+        indel_tbi=lambda wildcards: get_raw_callset_index(wildcards)["indels"],
+    output:
+        "results/merge-callsets/{callset}.merged.vcf.gz",
+    log:
+        "logs/merge-callsets/{callset}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools concat -O z --allow-overlap {input.snv_vcf} {input.indel_vcf} > {output} 2> {log}"
+
+
 rule liftover_callset:
     input:
         callset=get_callset_correct_contigs,
@@ -31,7 +47,7 @@ rule liftover_callset:
 
 rule rename_contigs:
     input:
-        calls=get_raw_callset,
+        calls=get_callset_correct_contigs_liftover_merge,
         repl_file=get_rename_contig_file,
     output:
         "results/normalized-variants/{callset}.replaced-contigs.vcf.gz",
@@ -63,7 +79,7 @@ rule add_genotype_field:
 
 rule add_format_field:
     input:
-        "resources/variants/{genome}/all.truth.norm.bcf",
+        bcf="resources/variants/{genome}/all.truth.norm.bcf",
     output:
         "resources/variants/{genome}/all.truth.format-added.vcf.gz",
     log:
@@ -71,11 +87,13 @@ rule add_format_field:
     conda:
         "../envs/vatools.yaml"
     shell:
-        # TODO: Optional - Check first if FORMAT field is present for example with
-        # TODO: bcftools view -h out.vcf.gz | grep FORMAT oder bcftools query -l all.bcf
-        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
-        # adds FORMAT field with GT field and sample name 'truth'
-        "vcf-genotype-annotator <(bcftools convert -Ov {input}) truth 0/1 -o {output} &> {log}"
+        """
+        if bcftools view -h {input.bcf} | grep -q FORMAT; then
+            bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output}
+        else
+            vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}
+        fi
+        """
 
 
 rule remove_non_pass:
@@ -117,17 +135,6 @@ rule intersect_calls_with_target_regions:
     shell:
         "(bedtools intersect -b {input.regions} -a "
         "<(bcftools view {input.bcf}) -wa -f 1.0 -header > {output}) 2> {log}"
-
-
-rule index_callset:
-    input:
-        "results/filtered-variants/{callset}.bcf",
-    output:
-        "results/filtered-variants/{callset}.bcf.csi",
-    log:
-        "logs/bcftools-index/{callset}.log",
-    wrapper:
-        "v1.7.2/bio/bcftools/index"
 
 
 rule restrict_to_reference_contigs:
@@ -256,7 +263,7 @@ rule benchmark_variants:
         "../envs/rtg-tools.yaml"
     threads: 32
     shell:
-        "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records "
+        "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
         "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
         "--output {params.output} --template {input.genome} {params.somatic} &> {log}"
 
@@ -471,5 +478,6 @@ rule report_fp_fn_callset:
         genome=get_genome_name,
         version=get_genome_version,
         somatic=get_somatic_status,
+        high_coverage=get_high_coverage_status,
     wrapper:
         "v5.0.1/utils/datavzrd"

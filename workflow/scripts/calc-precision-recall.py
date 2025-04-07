@@ -24,10 +24,10 @@ class Classifications:
             self.fp = 0
         else:
             self.stratify_by_vaf = True
-            self.vaf_field_query = vaf_fields[0][0]
-            self.vaf_field_name_query = vaf_fields[0][1]
-            self.vaf_field_truth = vaf_fields[1][0]
-            self.vaf_field_name_truth = vaf_fields[1][1]
+            self.vaf_field_query = vaf_fields[0]["field"]
+            self.vaf_field_name_query = vaf_fields[0]["name"]
+            self.vaf_field_truth = vaf_fields[1]["field"]
+            self.vaf_field_name_truth = vaf_fields[1]["name"]
             # arrays with 10 fields (VAF from 0% to 100%)
             self.tp_query = np.zeros(10, dtype=np.uint)
             self.tp_truth = np.zeros(10, dtype=np.uint)
@@ -43,6 +43,8 @@ class Classifications:
                 vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth]
             if type(vaf) == tuple:
                 vaf = vaf[0]
+            if type(vaf) == str:
+                vaf = float(vaf.replace("%", "")) / 100
             # 10 equally sized bins
             bin = max(0, int(vaf*10) - 1)
             counter[bin] += 1

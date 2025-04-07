@@ -4,11 +4,13 @@ benchmarks:
     bam-url: ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam
     target-regions: ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed
     grch37: true
+    high-coverage: false
 
   chm-eval:
     genome: chm-eval
     bam-url: ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341796/CHM1_CHM13_2.bam
     grch37: false
+    high-coverage: false
 
   seqc2-wes:
     genome: seqc2-somatic
@@ -16,8 +18,8 @@ benchmarks:
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
     grch37: false
     vaf-field:
-      - INFO # either FORMAT or INFO
-      - TVAF # name of tumor variant allele frequency
+      field: INFO # either FORMAT or INFO
+      name: TVAF # name of tumor variant allele frequency
     high-coverage: true
 
   seqc2-wgs:
@@ -25,9 +27,9 @@ benchmarks:
     bam-url: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/WGS/WGS_NS_T_1.bwa.dedup.bam
     grch37: false
     vaf-field:
-      - INFO # either FORMAT or INFO
-      - TVAF # name of tumor variant allele frequency
-    high-coverage: true
+      field: INFO # either FORMAT or INFO
+      name: TVAF # name of tumor variant allele frequency
+    high-coverage: false
 
   seqc2-ffpe:
     genome: seqc2-somatic
@@ -35,8 +37,8 @@ benchmarks:
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
     grch37: false
     vaf-field:
-      - INFO # either FORMAT or INFO
-      - TVAF # name of tumor variant allele frequency
+      field: INFO # either FORMAT or INFO
+      name: TVAF # name of tumor variant allele frequency
     high-coverage: true
 
   imgag-5:
@@ -100,7 +102,7 @@ genomes:
   na12878-somatic:
     version: 4.2.1
     truth:
-      grch38: https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv4.2.1/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz
+      grch38: https://zenodo.org/records/15120550/files/NA12878.unique.vcf.gz?download=1
     confidence-regions:
       grch38: https://download.imgag.de/public/validation_dataset_somatic/benchmark_region.bed
     somatic: true
