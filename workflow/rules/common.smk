@@ -208,9 +208,9 @@ def get_callset(wildcards):
     vcf = callset["path"]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif callset.get("rename-contigs", False) != False:
+    elif callset.get("rename-contigs", False) == True:
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif callset["genome-build"] == "grch37":
+    elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     elif isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
@@ -221,9 +221,9 @@ def get_callset(wildcards):
 def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
-    if "rename-contigs" in callset:
+    if callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif callset["genome-build"] == "grch37":
+    elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     elif isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
@@ -234,9 +234,9 @@ def get_callset_correct_contigs(wildcards):
 def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
-    if callset["genome-build"] == "grch37":
+    if callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
-    elif callset.get("rename-contigs", False) != False:
+    elif callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
@@ -388,17 +388,17 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    if config["variant-calls"][wildcards.callset][
-        "genome-build"
-    ] == "grch37" and config["variant-calls"][wildcards.callset].get(
+    if config["variant-calls"][wildcards.callset].get(
+        "genome-build", "grch38"
+    ) == "grch37" and config["variant-calls"][wildcards.callset].get(
         "rename-contigs", False
     ):
         return workflow.source_path(
             "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
         )
-    if config["variant-calls"][wildcards.callset][
-        "genome-build"
-    ] == "grch38" and config["variant-calls"][wildcards.callset].get(
+    if config["variant-calls"][wildcards.callset].get(
+        "genome-build", "grch38"
+    ) == "grch38" and config["variant-calls"][wildcards.callset].get(
         "rename-contigs", False
     ):
         return workflow.source_path(
