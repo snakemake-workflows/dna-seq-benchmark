@@ -208,7 +208,7 @@ def get_callset(wildcards):
     vcf = callset["path"]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif callset.get("rename-contigs", False) == True:
+    elif callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
