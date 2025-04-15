@@ -15,6 +15,10 @@ if "variant-calls" in config:
 
     include: "rules/eval.smk"
 
+    rule all:
+        input:
+            ["results/report/precision-recall/", "results/report/fp-fn/"],
+
     rule eval:
         input:
             expand(
