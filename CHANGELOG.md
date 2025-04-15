@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.12.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.1...v1.12.2) (2025-04-15)
+
+
+### Bug Fixes
+
+* add dirs with results to rule all ([#120](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/120)) ([4dfdf6d](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/4dfdf6dd33c1e84d82f9647b24b8872e5d688f41))
+
 ### [1.12.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.0...v1.12.1) (2025-04-11)
 
 
