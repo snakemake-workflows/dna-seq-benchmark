@@ -41,6 +41,11 @@ if "variant-calls" in config:
                 callset=used_callsets,
                 classification=["fp", "fn"],
             ),
+            expand(
+                "results/fp-fn/{benchmark}.{classification}.tsv",
+                benchmark=used_benchmarks,
+                classification=["fp", "fn"],
+            ),
             get_fp_fn_reports,
             # collect the checkpoint inputs to avoid issues when
             # --all-temp is used: --all-temp leads to premature deletion
