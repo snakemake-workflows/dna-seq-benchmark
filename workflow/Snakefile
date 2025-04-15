@@ -15,6 +15,20 @@ if "variant-calls" in config:
 
     include: "rules/eval.smk"
 
+    rule all:
+        input:
+            expand(
+                "results/report/precision-recall/{benchmark}/{vartype}",
+                benchmark=used_benchmarks,
+                vartype=["snvs", "indels"],
+            ),
+            expand(
+                "results/report/fp-fn/callsets/{callset}/{classification}",
+                callset=used_callsets,
+                classification=["fp", "fn"],
+            ),
+            get_fp_fn_reports,
+
     rule eval:
         input:
             expand(
@@ -25,6 +39,11 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
+                classification=["fp", "fn"],
+            ),
+            expand(
+                "results/fp-fn/{benchmark}.{classification}.tsv",
+                benchmark=used_benchmarks,
                 classification=["fp", "fn"],
             ),
             get_fp_fn_reports,
