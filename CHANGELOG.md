@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.12.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.0...v1.12.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* add .get() for optional values in config instead of dict access ([#118](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/118)) ([94d9294](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/94d92945732fd6b30aa08ff8e267f8929098ce22))
+
 ## [1.12.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.7...v1.12.0) (2025-04-03)
 
 
