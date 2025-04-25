@@ -178,38 +178,71 @@ rule samtools_faidx:
         "v1.7.2/bio/samtools/faidx"
 
 
-rule bwa_index:
+# rule bwa_index:
+#     input:
+#         "resources/reference/genome.fasta",
+#     output:
+#         idx=multiext(
+#             "resources/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+#         ),
+#     log:
+#         "logs/bwa-index.log",
+#     wrapper:
+#         "v1.8.0/bio/bwa/index"
+
+# rule bwa_mem:
+#     input:
+#         reads=get_bwa_input,
+#         idx=rules.bwa_index.output,
+#     output:
+#         "results/read-alignments/{benchmark}.bam",
+#     log:
+#         "logs/bwa-mem/{benchmark}.log",
+#     params:
+#         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
+#         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
+#     threads: 8
+#     wrapper:
+#         "v1.8.0/bio/bwa/mem"
+
+
+rule bwa_mem2_index:
     input:
         "resources/reference/genome.fasta",
     output:
         idx=multiext(
-            "resources/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+            "resources/reference/genome",
+            ".0123",
+            ".amb",
+            ".ann",
+            ".bwt.2bit.64",
+            ".pac",
         ),
     log:
-        "logs/bwa-index.log",
+        "logs/bwa-mem2-index.log",
     wrapper:
-        "v1.8.0/bio/bwa/index"
+        "v6.0.1/bio/bwa-mem2/index"
 
 
-rule bwa_mem:
+rule bwa_mem2_mem:
     input:
         reads=get_bwa_input,
-        idx=rules.bwa_index.output,
+        idx=rules.bwa_mem2_index.output,
     output:
-        "results/read-alignments/{benchmark}.bam",
+        "results/read-alignments/{benchmark}.mem2.bam",
     log:
-        "logs/bwa-mem/{benchmark}.log",
+        "logs/bwa-mem2/{benchmark}.log",
     params:
-        sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
-        sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
+        sort="samtools",  # Can be 'none', 'samtools', or 'picard'.
+        sort_order="coordinate",  # Can be 'coordinate' (default) or 'queryname'.
     threads: 8
     wrapper:
-        "v1.8.0/bio/bwa/mem"
+        "v6.0.1/bio/bwa-mem2/mem"
 
 
 rule mark_duplicates:
     input:
-        bams="results/read-alignments/{benchmark}.bam",
+        bams="results/read-alignments/{benchmark}.mem2.bam",
     output:
         bam="results/read-alignments/{benchmark}.dedup.bam",
         metrics="results/read-alignments/{benchmark}.dedup.metrics.txt",
