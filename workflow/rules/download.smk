@@ -1,12 +1,10 @@
-rule get_reads:
+rule get_bams:
     output:
-        r1="resources/reads/{benchmark}.1.fq",
-        r2="resources/reads/{benchmark}.2.fq",
+        bam="resources/bams/{benchmark}.bam",
     params:
-        limit=get_read_limit_param,
         bam_url=get_benchmark_bam_url,
     log:
-        "logs/download-reads/{benchmark}.log",
+        "logs/download-bams/{benchmark}.log",
     conda:
         "../envs/tools.yaml"
     resources:
@@ -14,8 +12,27 @@ rule get_reads:
     threads: 32
     retries: 3
     shell:
+        "curl {params.bam_url} --output {output.bam} 2> {log}"
+
+
+rule get_reads:
+    input:
+        bam="resources/bams/{benchmark}.bam",
+    output:
+        r1="resources/reads/{benchmark}.1.fq",
+        r2="resources/reads/{benchmark}.2.fq",
+    params:
+        limit=get_read_limit_param,
+    log:
+        "logs/split-into-reads/{benchmark}.log",
+    conda:
+        "../envs/tools.yaml"
+    resources:
+        sort_threads=lambda _, threads: max(threads - 2, 1),
+    threads: 32
+    shell:
         "(set +o pipefail; samtools view -f3 -h"
-        " {params.bam_url}"
+        " {input.bam}"
         " {params.limit} |"
         " samtools sort -n -O BAM --threads {resources.sort_threads} | "
         " samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
