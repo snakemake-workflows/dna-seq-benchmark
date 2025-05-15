@@ -15,6 +15,7 @@ benchmarks:
   seqc2-wes:
     genome: seqc2-somatic
     bam-url: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/WES/WES_EA_T_1.bwa.dedup.bam
+    bam-md5: 91ab8215bdefc829f7c4955a84227166
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
     grch37: false
     vaf-field:
@@ -25,6 +26,7 @@ benchmarks:
   seqc2-wgs:
     genome: seqc2-somatic
     bam-url: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/WGS/WGS_NS_T_1.bwa.dedup.bam
+    bam-md5: ddc0cf78eb1fa9a59eab284f904e419
     grch37: false
     vaf-field:
       field: INFO # either FORMAT or INFO
@@ -34,6 +36,7 @@ benchmarks:
   seqc2-ffpe:
     genome: seqc2-somatic
     bam-url: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/data/FFX/FFX_IL_T_24h_1.bwa.dedup.bam
+    bam-md5: 0d241fba856e0a7487dacdf65912a493
     target-regions: https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/seqc/Somatic_Mutation_WG/technical/reference_genome/Exome_Target_bed/S07604624_Covered_human_all_v6_plus_UTR.liftover.to.hg38.bed6.gz
     grch37: false
     vaf-field:
