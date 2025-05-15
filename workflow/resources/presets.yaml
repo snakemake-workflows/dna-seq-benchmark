@@ -2,6 +2,7 @@ benchmarks:
   giab-na12878-exome:
     genome: na12878
     bam-url: ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/NIST-hg001-7001-ready.bam
+    bam-md5: 634bd46801101d435025c797f96f608a
     target-regions: ftp://ftp-trace.ncbi.nih.gov/ReferenceSamples/giab/data/NA12878/Nebraska_NA12878_HG001_TruSeq_Exome/TruSeq_exome_targeted_regions.hg19.bed
     grch37: true
     high-coverage: false
