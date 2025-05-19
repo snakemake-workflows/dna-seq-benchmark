@@ -14,7 +14,7 @@ rule get_reads:
     threads: 32
     retries: 3
     shell:
-        "(set +o pipefail; samtools view -f3 -h"
+        "(samtools view -f3 -h"
         " {params.bam_url}"
         " {params.limit} |"
         " samtools sort -n -O BAM --threads {resources.sort_threads} | "
