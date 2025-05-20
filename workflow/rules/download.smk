@@ -3,7 +3,11 @@ rule get_reads:
         r1="resources/reads/{benchmark}.1.fq",
         r2="resources/reads/{benchmark}.2.fq",
     params:
-        limit=branch(lookup("limit-reads", within=config, default=False), then=100000, otherwise=None),
+        limit=branch(
+            lookup("limit-reads", within=config, default=False),
+            then=100000,
+            otherwise=None,
+        ),
         bam_url=get_benchmark_bam_url,
     log:
         "logs/download-reads/{benchmark}.log",
