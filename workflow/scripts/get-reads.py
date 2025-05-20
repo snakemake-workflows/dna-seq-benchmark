@@ -42,3 +42,6 @@ with dnaio.open(snakemake.output[0], snakemake.output[1], mode="w") as fqwriter:
 
             fqwriter.write(aln_to_fq(qname, aln), aln_to_fq(qname, mate_aln))
             n_written += 1
+
+if buffer:
+    print(f"Warning: {len(buffer)} reads had no mate pairs and were skipped", file=sys.stderr)
