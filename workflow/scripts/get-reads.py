@@ -16,7 +16,7 @@ def aln_to_fq(qname, aln):
     )
 
 
-limit = snakemake.params.limit
+limit = snakemake.params.limit or None
 assert limit is None or limit > 0, "limit must be None or a positive integer"
 bam = pysam.AlignmentFile(snakemake.params.bam_url)
 
