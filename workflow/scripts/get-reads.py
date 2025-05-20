@@ -21,7 +21,7 @@ buffer = {}
 n_written = 0
 with dnaio.open(snakemake.output[0], snakemake.output[1], "w") as fqwriter:
     for aln in bam:
-        if n_written >= limit:
+        if limit is not None and n_written >= limit:
             break
         if not aln.is_secondary or aln.is_supplementary:
             continue
