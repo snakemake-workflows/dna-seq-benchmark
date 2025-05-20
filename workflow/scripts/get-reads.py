@@ -23,7 +23,7 @@ with dnaio.open(snakemake.output[0], snakemake.output[1], "w") as fqwriter:
     for aln in bam:
         if limit is not None and n_written >= limit:
             break
-        if not aln.is_secondary or aln.is_supplementary:
+        if aln.is_secondary or aln.is_supplementary:
             continue
 
         qname = aln.query_name.removesuffix("/1").removesuffix("/2")
