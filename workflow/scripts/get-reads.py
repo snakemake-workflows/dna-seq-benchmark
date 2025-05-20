@@ -10,7 +10,9 @@ def aln_to_fq(qname, aln):
     return dnaio.SequenceRecord(
         name=qname,
         sequence=aln.get_forward_sequence(),
-        qualities=aln.query_qualities,
+        qualities="".join(
+            map(lambda qual: chr(qual + 33), aln.get_forward_qualities())
+        ),
     )
 
 
