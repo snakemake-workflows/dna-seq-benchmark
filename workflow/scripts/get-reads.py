@@ -6,11 +6,11 @@ import pysam
 import dnaio
 
 
-def aln_to_fq(aln):
+def aln_to_fq(qname, aln):
     return dnaio.SequenceRecord(
-        name=aln.query_name,
+        name=qname,
         sequence=aln.get_forward_sequence(),
-        quality=aln.query_qualities,
+        qualities=aln.query_qualities,
     )
 
 
@@ -28,12 +28,12 @@ with dnaio.open(snakemake.output[0], snakemake.output[1], mode="w") as fqwriter:
 
         qname = aln.query_name.removesuffix("/1").removesuffix("/2")
 
-        mate_aln = buffer.get(aln.query_name)
+        mate_aln = buffer.get(qname)
         if mate_aln is None:
-            buffer[aln.query_name] = aln
+            buffer[qname] = aln
         else:
             if aln.is_read2:
                 aln, mate_aln = mate_aln, aln
 
-            fqwriter.write(aln_to_fq(aln), aln_to_fq(mate_aln))
+            fqwriter.write(aln_to_fq(qname, aln), aln_to_fq(qname, mate_aln))
             n_written += 1
