@@ -19,7 +19,7 @@ bam = pysam.AlignmentFile(snakemake.params.bam_url)
 
 buffer = {}
 n_written = 0
-with dnaio.open(snakemake.output[0], snakemake.output[1], "w") as fqwriter:
+with dnaio.open(snakemake.output[0], snakemake.output[1], mode="w") as fqwriter:
     for aln in bam:
         if limit is not None and n_written >= limit:
             break
