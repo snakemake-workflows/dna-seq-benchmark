@@ -168,7 +168,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "v1.7.2/bio/samtools/faidx"
+        "v6.2.0/bio/samtools/faidx"
 
 
 rule bwa_index:
