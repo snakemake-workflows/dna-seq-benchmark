@@ -14,7 +14,7 @@ rule get_reads:
     threads: 32
     retries: 3
     shell:
-        "(wget --no-progress -O - {params.bam_url} |"
+        "(wget -nv -O - {params.bam_url} |"
         " samtools sort -n -O BAM --threads {resources.sort_threads} {params.limit} | "
         " samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
 
