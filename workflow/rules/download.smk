@@ -11,7 +11,7 @@ rule get_reads:
         "../envs/pysam.yaml"
     retries: 3
     script:
-        "scripts/get-reads.py"
+        "../scripts/get-reads.py"
 
 
 rule get_archive:
