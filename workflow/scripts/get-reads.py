@@ -28,6 +28,8 @@ with dnaio.open(snakemake.output[0], snakemake.output[1], mode="w") as fqwriter:
         if aln.is_secondary or aln.is_supplementary:
             continue
 
+        # Some aligners (e.g. minimap2) add /1 and /2 to the read name.
+        # We remove them here to get the same name for both reads of a pair.
         qname = aln.query_name.removesuffix("/1").removesuffix("/2")
 
         mate_aln = buffer.get(qname)
@@ -36,6 +38,7 @@ with dnaio.open(snakemake.output[0], snakemake.output[1], mode="w") as fqwriter:
         else:
             if aln.is_read2:
                 aln, mate_aln = mate_aln, aln
+            del buffer[qname]
 
             fqwriter.write(aln_to_fq(qname, aln), aln_to_fq(qname, mate_aln))
             n_written += 1
