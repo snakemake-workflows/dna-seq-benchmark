@@ -175,33 +175,39 @@ rule samtools_faidx:
         "v6.2.0/bio/samtools/faidx"
 
 
-rule bwa_index:
+rule bwa_mem2_index:
     input:
         "resources/reference/genome.fasta",
     output:
         idx=multiext(
-            "resources/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+            "resources/reference/genome",
+            ".0123",
+            ".amb",
+            ".ann",
+            ".bwt.2bit.64",
+            ".pac",
         ),
     log:
-        "logs/bwa-index.log",
+        "logs/bwa-mem2-index.log",
     wrapper:
-        "v1.8.0/bio/bwa/index"
+        "v6.0.1/bio/bwa-mem2/index"
 
 
-rule bwa_mem:
+rule bwa_mem2_mem:
     input:
         reads=get_bwa_input,
-        idx=rules.bwa_index.output,
+        idx=rules.bwa_mem2_index.output,
     output:
         "results/read-alignments/{benchmark}.bam",
     log:
-        "logs/bwa-mem/{benchmark}.log",
+        "logs/bwa-mem2/{benchmark}.log",
     params:
-        sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
-        sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
+        sort="samtools",  # Can be 'none', 'samtools', or 'picard'.
+        sort_order="coordinate",  # Can be 'coordinate' (default) or 'queryname'.
+        #sort_extra="-m 500M" 
     threads: 8
     wrapper:
-        "v1.8.0/bio/bwa/mem"
+        "v6.0.1/bio/bwa-mem2/mem"
 
 
 rule mark_duplicates:
