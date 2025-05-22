@@ -3,22 +3,19 @@ rule get_reads:
         r1="resources/reads/{benchmark}.1.fq",
         r2="resources/reads/{benchmark}.2.fq",
     params:
-        limit=get_read_limit_param,
+        limit=branch(
+            lookup("limit-reads", within=config, default=False),
+            then=100000,
+            otherwise=None,
+        ),
         bam_url=get_benchmark_bam_url,
     log:
         "logs/download-reads/{benchmark}.log",
     conda:
-        "../envs/tools.yaml"
-    resources:
-        sort_threads=lambda _, threads: max(threads - 2, 1),
-    threads: 32
+        "../envs/pysam.yaml"
     retries: 3
-    shell:
-        "(set +o pipefail; samtools view -f3 -h"
-        " {params.bam_url}"
-        " {params.limit} |"
-        " samtools sort -n -O BAM --threads {resources.sort_threads} | "
-        " samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
+    script:
+        "../scripts/get-reads.py"
 
 
 rule get_archive:
@@ -175,7 +172,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "v1.7.2/bio/samtools/faidx"
+        "v6.2.0/bio/samtools/faidx"
 
 
 rule bwa_index:
