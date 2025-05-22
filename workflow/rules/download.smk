@@ -198,7 +198,7 @@ rule bwa_mem2_mem:
         reads=get_bwa_input,
         idx=rules.bwa_mem2_index.output,
     output:
-        "results/read-alignments/{benchmark}.mem2.bam",
+        "results/read-alignments/{benchmark}.bam",
     log:
         "logs/bwa-mem2/{benchmark}.log",
     params:
@@ -212,7 +212,7 @@ rule bwa_mem2_mem:
 
 rule mark_duplicates:
     input:
-        bams="results/read-alignments/{benchmark}.mem2.bam",
+        bams="results/read-alignments/{benchmark}.bam",
     output:
         bam="results/read-alignments/{benchmark}.dedup.bam",
         metrics="results/read-alignments/{benchmark}.dedup.metrics.txt",
