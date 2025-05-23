@@ -91,6 +91,7 @@ rule get_confidence_bed:
         cmd=get_confidence_bed_cmd,
     conda:
         "../envs/tools.yaml"
+    retries: 3
     shell:
         "({params.cmd} | sed {params.repl_chr} > {output}) 2> {log}"
 
@@ -119,6 +120,7 @@ rule get_target_bed:
         "logs/get-target-bed/{benchmark}.log",
     conda:
         "../envs/tools.yaml"
+    retries: 3
     shell:
         "({params.get_bed} {params.liftover}) 2> {log}"
 
