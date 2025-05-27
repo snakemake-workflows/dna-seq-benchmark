@@ -151,7 +151,7 @@ def collect_results(vartype):
             mismatched_genotype_rate = 0.0
 
         d = pd.DataFrame(
-            {
+            {   "#variants_truth": [classifications_existence.tp_truth + classifications_existence.fn],
                 "precision": [classifications_existence.precision()],
                 "tp_query": [classifications_existence.tp_query],
                 "fp": [classifications_existence.fp],
@@ -164,7 +164,7 @@ def collect_results(vartype):
         )
 
         return d[
-            [
+            [   "#variants_truth",
                 "precision",
                 "tp_query",
                 "fp",
@@ -183,6 +183,7 @@ def collect_results(vartype):
         d = pd.DataFrame(
             {
                 "vaf": vafs,
+                "#variants_truth": classifications_existence.tp_truth + classifications_existence.fn,
                 "precision": classifications_existence.precision(),
                 "tp_query": classifications_existence.tp_query,
                 "fp": classifications_existence.fp,
@@ -196,6 +197,7 @@ def collect_results(vartype):
         return d[
             [
                 "vaf",
+                "#variants_truth",
                 "precision",
                 "tp_query",
                 "fp",
