@@ -2,9 +2,7 @@ rule get_reads:
     output:
         r1="resources/reads/{benchmark}.1.fq",
         r2="resources/reads/{benchmark}.2.fq",
-        bai=lambda wildcards: get_benchmark_bam_url(wildcards)
-        .split("/")[-1]
-        .replace(".bam", ".bam.bai"),
+        bai="resources/reads/{benchmark}.bam.bai",
     params:
         limit=branch(
             lookup("limit-reads", within=config, default=False),
