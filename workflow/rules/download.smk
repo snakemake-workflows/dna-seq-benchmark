@@ -179,13 +179,15 @@ rule bwa_index:
     input:
         "resources/reference/genome.fasta",
     output:
-        idx=multiext(
-            "resources/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+        multiext(
+            "resources/reference/{genome}.{alg}", ".amb", ".ann", ".bwt", ".pac", ".sa"
         ),
     log:
-        "logs/bwa-index.log",
+        "logs/bwa_index/{genome}.{alg}.log",
+    params:
+        extra=lambda w: f"-a {w.alg}",
     wrapper:
-        "v1.8.0/bio/bwa/index"
+        "v7.0.0/bio/bwa/index"
 
 
 rule bwa_mem:
@@ -197,11 +199,12 @@ rule bwa_mem:
     log:
         "logs/bwa-mem/{benchmark}.log",
     params:
+        extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v1.8.0/bio/bwa/mem"
+        "v7.0.0/bio/bwa/mem"
 
 
 rule mark_duplicates:
