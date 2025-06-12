@@ -180,12 +180,10 @@ rule bwa_index:
         "resources/reference/genome.fasta",
     output:
         idx=multiext(
-            "resources/reference/{genome}.{alg}", ".amb", ".ann", ".bwt", ".pac", ".sa"
+            "resources/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
         ),
     log:
-        "logs/bwa_index/{genome}.{alg}.log",
-    params:
-        extra=lambda w: f"-a {w.alg}",
+        "logs/bwa_index/genome.log",
     wrapper:
         "v7.0.0/bio/bwa/index"
 
