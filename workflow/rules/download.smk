@@ -197,7 +197,7 @@ rule bwa_mem:
     log:
         "logs/bwa-mem/{benchmark}.log",
     params:
-        extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
+        extra=r"-R '@RG\tID:{benchmark}\tSM:{benchmark}'",
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
