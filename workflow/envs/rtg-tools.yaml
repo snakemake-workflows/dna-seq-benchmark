@@ -3,4 +3,4 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - rtg-tools =3.12.1
+  - rtg-tools =3.13
