@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.12.3](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.2...v1.12.3) (2025-06-12)
+
+
+### Bug Fixes
+
+* link to snakemake workflow catalog ([#129](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/129)) ([1c49f2f](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/1c49f2f5b9777d8b46d691efcd97d063e6afc911))
+* use buffered and script based get-reads implementation ([#126](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/126)) ([b9d4360](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/b9d43605e736a3e919a74d811dadf93fad8c5cef))
+
 ### [1.12.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.1...v1.12.2) (2025-04-15)
 
 
