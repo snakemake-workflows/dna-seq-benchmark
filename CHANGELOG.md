@@ -11,6 +11,7 @@
 ### Performance Improvements
 
 * update snakemake wrappers to 7.0.0 ([#131](https://github.com/snakemake-workflows/dna-seq-benchmark/pull/131)) ([d7d9f0e](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/d7d9f0ebbd3ef33ef4a1165d3f96656c9b366ba8))
+
 ### [1.12.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.1...v1.12.2) (2025-04-15)
 
 
