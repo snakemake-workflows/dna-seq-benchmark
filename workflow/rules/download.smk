@@ -179,7 +179,7 @@ rule bwa_index:
     input:
         "resources/reference/genome.fasta",
     output:
-        multiext(
+        idx=multiext(
             "resources/reference/{genome}.{alg}", ".amb", ".ann", ".bwt", ".pac", ".sa"
         ),
     log:
