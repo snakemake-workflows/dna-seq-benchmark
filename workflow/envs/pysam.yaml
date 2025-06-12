@@ -6,4 +6,4 @@ dependencies:
   - python =3.11
   - pysam =0.23.3
   - pandas =2.3.0
-  - dnaio =1.2.3
+  - dnaio =1.2
