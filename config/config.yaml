@@ -16,7 +16,9 @@ variant-calls:
     #   snvs: "path/to/snvs.vcf.gz"
     #   indels: "path/to/indels.vcf.gz"
     tumor_sample_name: <tumor-sample-name> # via bcftools query -l <your-vcf>
-    # benchmark to use (giab-NA12878-exome or any custom benchmark name provided from below)
+    # benchmark to use
+    # see benchmarks in https://github.com/snakemake-workflows/dna-seq-benchmark/blob/main/workflow/resources/presets.yaml
+    # or any custom benchmark name provided below under custom-benchmarks
     benchmark: giab-na12878-exome
     vaf-field: # needs to be checked with bcftools view -h
       field: FORMAT
