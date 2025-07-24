@@ -265,11 +265,12 @@ rule calc_precision_recall:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
-        snvs="results/precision-recall/callsets/{callset}/{cov}.{vartype}.tsv",
+        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
     log:
-        "logs/calc-precision-recall/{callset}/{cov}/{vartype}.log",
+        "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
     params:
         vaf_fields=get_vaf_fields,
+        vaf_status=get_vaf_status,
     conda:
         "../envs/pysam.yaml"
     script:
@@ -280,12 +281,12 @@ rule collect_stratifications:
     input:
         get_collect_stratifications_input,
     output:
-        "results/precision-recall/callsets/{callset}.{vartype}.tsv",
+        "results/precision-recall/callsets/{callset}.{vartype}.{mode}.tsv",
     params:
         coverages=get_nonempty_coverages,
         coverage_lower_bounds=get_coverages,
     log:
-        "logs/collect-stratifications/{callset}/{vartype}.log",
+        "logs/collect-stratifications/{callset}/{vartype}.{mode}.log",
     conda:
         "../envs/stats.yaml"
     # We want this to be determined before FP/FN collection in order to avoid memory
@@ -299,13 +300,13 @@ rule collect_precision_recall:
     input:
         tables=get_collect_precision_recall_input,
     output:
-        "results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
+        "results/precision-recall/benchmarks/{benchmark}.{vartype}.{mode}.tsv",
     params:
         callsets=lambda w: get_benchmark_callsets(w.benchmark),
         labels=get_collect_precision_recall_labels,
         vaf=get_vaf_status,
     log:
-        "logs/collect-precision-recall/{benchmark}/{vartype}.log",
+        "logs/collect-precision-recall/{benchmark}/{vartype}.{mode}.log",
     conda:
         "../envs/stats.yaml"
     script:
@@ -317,7 +318,7 @@ rule report_precision_recall:
         config=workflow.source_path(
             "../resources/datavzrd/precision-recall-config.yte.yaml"
         ),
-        table="results/precision-recall/benchmarks/{benchmark}.{vartype}.tsv",
+        tables=get_report_precision_recall_input,
     output:
         report(
             directory("results/report/precision-recall/{benchmark}/{vartype}"),
