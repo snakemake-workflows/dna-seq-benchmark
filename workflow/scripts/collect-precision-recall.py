@@ -24,7 +24,7 @@ def cov_key(cov_label):
         return int(cov_label.split("..")[0])
     else:
         return int(cov_label[1:])
-    
+
 
 
 def sort_key(col):
@@ -36,10 +36,11 @@ def sort_key(col):
         return col
 
 
-if snakemake.params.vaf:
-    results.sort_values(["callset", "vaf", "coverage"], inplace=True, key=sort_key)
-else:
+if snakemake.wildcards.mode == "base":
     results.sort_values(["callset", "coverage"], inplace=True, key=sort_key)
     results["sort_index"] = results["coverage"].apply(cov_key)
+else:
+    results.sort_values(["callset", "vaf", "coverage"], inplace=True, key=sort_key)
+
 
 results.to_csv(snakemake.output[0], sep="\t", index=False)

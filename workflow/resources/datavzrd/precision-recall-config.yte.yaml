@@ -7,18 +7,25 @@ __variables__:
 name: ?f"Precision/recall analysis of {wildcards.benchmark}"
 
 webview-controls: true
-default-view: results-table
 
 datasets:
   results:
-    path: ?input.table
+    path: ?input.tables[0]
     separator: "\t"
     offer-excel: true
     links:
       link to table:
         column: callset
         table-row: results-table/callset
-
+  ?if params.vaf:
+    results-vaf-stratified:
+      path: ?input.tables[1]
+      separator: "\t"
+      offer-excel: true
+      links:
+        link to table:
+          column: callset
+          table-row: results-vaf-stratified-table/callset
 views:
   results-plot:
     dataset: results
@@ -74,173 +81,174 @@ views:
 
   results-table:
     dataset: results
-    ?if params.vaf:
-      desc: |
-        ?f"""
-        Precision and recall are calculated by matching variants between each callset
-        and truth, stratified by coverage categories. Stratified by VAF.
-        The F*-measure provides a unified assessment of precision and recall with [additional
-        interpretability compared to the classical F-measure](https://doi.org/10.1145/3606367).
-        It can be seen as the probability that a random variant taken from the union of 
-        prediction and truth is predicted correctly.
+    desc: |
+      ?f"""
+      Precision and recall are calculated by matching variants between each callset
+      and truth, stratified by coverage categories. The matching ignores genotype
+      differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate"
+      column.
+      The F*-measure provides a unified assessment of precision and recall with [additional
+      interpretability compared to the classical F-measure](https://doi.org/10.1145/3606367).
+      It can be seen as the probability that a random variant taken from the union of
+      prediction and truth is predicted correctly.
 
-        Benchmark version: {params.genome} {params.version}
-        """
-      page-size: 12
-      render-table:
-        columns:
-          callset:
-            plot:
-              heatmap:
-                scale: ordinal
-                color-scheme: category20
-          precision:
-            precision: 3
-            plot:
-              ticks:
-                scale: linear
-          recall:
-            precision: 3
-            plot:
-              ticks:
-                scale: linear
-          "F*":
-            precision: 3
-            plot:
-              ticks:
-                scale: linear
-          coverage:
-            plot:
-              heatmap:
-                scale: ordinal
-                ?if params.high_coverage:
-                  domain:
-                    - very_low
-                    - low
-                    - medium
-                    - upper_medium
-                    - high
-                    - very_high
-                  range:
-                    - "#d8e6f4"
-                    - "#c6dbef"
-                    - "#9ecae1"
-                    - "#74b2d7"
-                    - "#3181bd"
-                    - "#1e68a7"
-                ?else:
-                  domain:
-                    - low
-                    - medium
-                    - high
-                  range:
-                    - "#c6dbef"
-                    - "#9ecae1"
-                    - "#6baed6"
-          vaf:
-            plot:
-              heatmap:
-                scale: linear
-                custom-content:
-                  function(value, row) {
-                    let lower = value - 0.1;
-                    return `${lower.toFixed(1)}..${parseFloat(value).toFixed(1)}`
-                  }
-                domain:
-                  - 0.1
-                  - 0.2
-                  - 0.3
-                  - 0.4
-                  - 0.5
-                  - 0.6
-                  - 0.7
-                  - 0.8
-                  - 0.9
-                  - 1.0
-                range:
-                  - "#c0e6baff"
-                  - "#abdda5ff"
-                  - "#94d391ff"
-                  - "#7bc77dff"
-                  - "#60ba6cff"
-                  - "#46ab5eff"
-                  - "#329a51ff"
-                  - "#208943ff"
-                  - "#0e7735ff"
-                  - "#1a833fff"
-    ?else:
-      desc: |
-        ?f"""
-        Precision and recall are calculated by matching variants between each callset
-        and truth, stratified by coverage categories. The matching ignores genotype
-        differences. Instead, genotype mismatches are displayed in the "genotype mismatch rate"
-        column.
-        The F*-measure provides a unified assessment of precision and recall with [additional
-        interpretability compared to the classical F-measure](https://doi.org/10.1145/3606367).
-        It can be seen as the probability that a random variant taken from the union of 
-        prediction and truth is predicted correctly.
-
-        Benchmark version: {params.genome} {params.version}
-        """
-      page-size: 12
-      render-table:
-        columns:
-          callset:
-            plot:
-              heatmap:
-                scale: ordinal
-                color-scheme: category20
-          precision:
-            precision: 3
-            plot:
-              ticks:
-                scale: linear
-          recall:
-            precision: 3
-            plot:
-              ticks:
-                scale: linear
-          genotype_mismatch_rate:
-            ?if params.somatic:
-              display-mode: hidden
-            ?else:
-              display-mode: normal
-            precision: 3
-            plot:
-              ticks:
-                scale: linear
-          "F*":
-            precision: 3
-            plot:
-              ticks:
-                scale: linear
-          sort_index:
+      Benchmark version: {params.genome} {params.version}
+      """
+    page-size: 12
+    render-table:
+      columns:
+        callset:
+          plot:
+            heatmap:
+              scale: ordinal
+              color-scheme: category20
+        precision:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        recall:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        genotype_mismatch_rate:
+          ?if params.somatic:
             display-mode: hidden
-          coverage:
-            plot:
-              heatmap:
-                scale: ordinal
-                ?if params.high_coverage:
-                  domain:
-                    - very_low
-                    - low
-                    - medium
-                    - upper_medium
-                    - high
-                    - very_high
-                  range:
-                    - "#d8e6f4"
-                    - "#c6dbef"
-                    - "#9ecae1"
-                    - "#74b2d7"
-                    - "#3181bd"
-                    - "#1e68a7"
-                ?else:
-                  domain:
-                    - low
-                    - medium
-                    - high
-                  range:
-                    - "#c6dbef"
-                    - "#9ecae1"
-                    - "#6baed6"
+          ?else:
+            display-mode: normal
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        "F*":
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        sort_index:
+          display-mode: hidden
+        coverage:
+          plot:
+            heatmap:
+              scale: ordinal
+              ?if params.high_coverage:
+                domain:
+                  - very_low
+                  - low
+                  - medium
+                  - upper_medium
+                  - high
+                  - very_high
+                range:
+                  - "#d8e6f4"
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#74b2d7"
+                  - "#3181bd"
+                  - "#1e68a7"
+              ?else:
+                domain:
+                  - low
+                  - medium
+                  - high
+                range:
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#6baed6"
+
+  results-vaf-stratified-table:
+    dataset: results-vaf-stratified
+    desc: |
+      ?f"""
+      Precision and recall are calculated by matching variants between each callset
+      and truth, stratified by coverage categories. Stratified by VAF.
+      The F*-measure provides a unified assessment of precision and recall with [additional
+      interpretability compared to the classical F-measure](https://doi.org/10.1145/3606367).
+      It can be seen as the probability that a random variant taken from the union of
+      prediction and truth is predicted correctly.
+
+      Benchmark version: {params.genome} {params.version}
+      """
+    page-size: 12
+    render-table:
+      columns:
+        callset:
+          plot:
+            heatmap:
+              scale: ordinal
+              color-scheme: category20
+        precision:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        recall:
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        "F*":
+          precision: 3
+          plot:
+            ticks:
+              scale: linear
+        coverage:
+          plot:
+            heatmap:
+              scale: ordinal
+              ?if params.high_coverage:
+                domain:
+                  - very_low
+                  - low
+                  - medium
+                  - upper_medium
+                  - high
+                  - very_high
+                range:
+                  - "#d8e6f4"
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#74b2d7"
+                  - "#3181bd"
+                  - "#1e68a7"
+              ?else:
+                domain:
+                  - low
+                  - medium
+                  - high
+                range:
+                  - "#c6dbef"
+                  - "#9ecae1"
+                  - "#6baed6"
+        vaf:
+          plot:
+            heatmap:
+              scale: linear
+              custom-content:
+                function(value, row) {
+                  let lower = value - 0.1;
+                  return `${lower.toFixed(1)}..${parseFloat(value).toFixed(1)}`
+                }
+              domain:
+                - 0.1
+                - 0.2
+                - 0.3
+                - 0.4
+                - 0.5
+                - 0.6
+                - 0.7
+                - 0.8
+                - 0.9
+                - 1.0
+              range:
+                - "#c0e6baff"
+                - "#abdda5ff"
+                - "#94d391ff"
+                - "#7bc77dff"
+                - "#60ba6cff"
+                - "#46ab5eff"
+                - "#329a51ff"
+                - "#208943ff"
+                - "#0e7735ff"
+                - "#1a833fff"
