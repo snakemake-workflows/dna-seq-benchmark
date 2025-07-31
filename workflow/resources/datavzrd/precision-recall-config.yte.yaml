@@ -227,8 +227,12 @@ views:
               scale: linear
               custom-content:
                 function(value, row) {
-                  let lower = value - 0.1;
-                  return `${lower.toFixed(1)}..${parseFloat(value).toFixed(1)}`
+                const num = parseFloat(value);
+                  if (num === null || isNaN(num)) {
+                    return "0.1..1.0";
+                  }
+                  let lower = num - 0.1;
+                  return `${lower.toFixed(1)}..${num.toFixed(1)}`
                 }
               domain:
                 - 0.1
