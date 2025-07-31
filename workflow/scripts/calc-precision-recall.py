@@ -233,8 +233,10 @@ vartype = "SNV" if snakemake.wildcards.vartype == "snvs" else "INDEL"
 
 results, results_vaf = collect_results(vartype)
 if snakemake.wildcards.mode == "base":
-    print("base", results)
     results.to_csv(snakemake.output[0], sep="\t", index=False)
 else:
-    print("vaf:", results_vaf)
-    results_vaf.to_csv(snakemake.output[0], sep="\t", index=False)
+    if results_vaf is not None:
+        results_vaf.to_csv(snakemake.output[0], sep="\t", index=False)
+    else: # if benchmark has stratified VAF results, but this callset not, then also write unstratified results
+        results.to_csv(snakemake.output[0], sep="\t", index=False)
+
