@@ -18,6 +18,7 @@
 
 * add bot to automatically update github actions monthly ([#134](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/134)) ([e1ac2d5](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/e1ac2d5b0c67444adeff8af667f97249ef9073eb))
 * update tools in conda environments ([#132](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/132)) ([6d2dbc1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/6d2dbc1fa4ce97cfc3754e9050a266a9b499e3e5))
+* update snakemake wrappers to 7.0.0 ([#131](https://github.com/snakemake-workflows/dna-seq-benchmark/pull/131)) ([d7d9f0e](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/d7d9f0ebbd3ef33ef4a1165d3f96656c9b366ba8))
 
 ### [1.12.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.1...v1.12.2) (2025-04-15)
 
