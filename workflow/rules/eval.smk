@@ -415,6 +415,21 @@ rule collect_fp_fn_benchmark:
         "../scripts/collect-fp-fn-benchmarks.py"
 
 
+rule write_fn_vcf:
+    input:
+        benchmark_table="results/fp-fn/in-all-callsets/{benchmark}.fn.tsv",
+        truth_vcf=get_benchmark_truth,
+        truth_vcf_index=get_benchmark_truth(index=true),
+    output:
+        "results/fp-fn/vcf/{callset}.{classification}.vcf.gz",
+    log:
+        "logs/write-fp-fn-vcf/{callset}.{classification}.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/write-fp-fn-vcf.py"
+
+
 rule report_fp_fn:
     input:
         main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
