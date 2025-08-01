@@ -50,9 +50,9 @@ class Classifications:
                     vaf = r.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else r.samples[0][self.vaf_field_name_query]
                 else:
                     vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth]
-                if type(vaf) == tuple:
+                if isinstance(vaf, tuple):
                     vaf = vaf[0]
-                if type(vaf) == str:
+                if isinstance(vaf, str):
                     vaf = float(vaf.replace("%", "")) / 100
                 # 10 equally sized bins
                 bin = max(0, int(vaf*10) - 1)
