@@ -76,7 +76,7 @@ class Classifications:
             elif c.cls is Class.FP:
                 (self.fp, self.fp_vaf) = self.increment_counter(record, query, self.fp, self.fp_vaf, True)
             else:
-                assert False, "unexpected case"
+                raise AssertionError("unexpected case")
 
     def precision(self):
         if self.stratify_by_vaf:
