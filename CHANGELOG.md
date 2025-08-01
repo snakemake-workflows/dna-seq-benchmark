@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.13.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.2...v1.13.0) (2025-08-01)
+
+
+### Features
+
+* add number of expected variants to report and improve the views ([#130](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/130)) ([4ada0c1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/4ada0c1f16d9e4ebdee104b112e066574aa31c5a))
+
+
+### Bug Fixes
+
+* link to snakemake workflow catalog ([#129](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/129)) ([1c49f2f](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/1c49f2f5b9777d8b46d691efcd97d063e6afc911))
+* use buffered and script based get-reads implementation ([#126](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/126)) ([b9d4360](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b9d43605e736a3e919a74d811dadf93fad8c5cef))
+
+
+### Performance Improvements
+
+* add bot to automatically update github actions monthly ([#134](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/134)) ([e1ac2d5](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/e1ac2d5b0c67444adeff8af667f97249ef9073eb))
+* update tools in conda environments ([#132](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/132)) ([6d2dbc1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/6d2dbc1fa4ce97cfc3754e9050a266a9b499e3e5))
+
 ### [1.12.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.1...v1.12.2) (2025-04-15)
 
 
