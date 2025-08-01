@@ -415,11 +415,24 @@ rule collect_fp_fn_benchmark:
         "../scripts/collect-fp-fn-benchmarks.py"
 
 
+rule filter_fn:
+    input:
+        table="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
+    output:
+        "results/fp-fn/callsets/{benchmark}.fn.shared.tsv"",
+    log:
+        "logs/filter-fp-fn/{benchmark}.fn.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/filter-fp-fn.py"
+
+
 rule write_fn_vcf:
     input:
-        benchmark_table="results/fp-fn/in-all-callsets/{benchmark}.fn.tsv",
+        benchmark_table="results/fp-fn/callsets/{benchmark}.fn.shared.tsv",
         truth_vcf=get_benchmark_truth,
-        truth_vcf_index=get_benchmark_truth(index=true),
+        truth_vcf_index=get_benchmark_truth(index=True),
     output:
         "results/fp-fn/vcf/{callset}.{classification}.vcf.gz",
     log:
