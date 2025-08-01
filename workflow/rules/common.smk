@@ -510,11 +510,16 @@ def get_vaf_fields(wildcards):
 
 
 def get_vaf_status(wildcards):
-    vaf_benchmark = benchmarks[wildcards.benchmark].get("vaf-field")
+    if hasattr(wildcards, "benchmark"):
+        benchmark = wildcards.benchmark
+    else:
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+
+    vaf_benchmark = benchmarks[benchmark].get("vaf-field")
     if vaf_benchmark is None:
         return False
     else:
-        callsets = get_benchmark_callsets(wildcards.benchmark)
+        callsets = get_benchmark_callsets(benchmark)
         vaf_callsets = [
             config["variant-calls"][callset].get("vaf-field") for callset in callsets
         ]
@@ -537,7 +542,7 @@ def get_collect_stratifications_input(wildcards):
     import json
 
     return expand(
-        "results/precision-recall/callsets/{{callset}}/{cov}.{{vartype}}.tsv",
+        "results/precision-recall/callsets/{{callset}}/{cov}.{{vartype}}.{{mode}}.tsv",
         cov=get_nonempty_coverages(wildcards),
     )
 
@@ -583,8 +588,18 @@ def get_benchmark_callsets(benchmark):
 def get_collect_precision_recall_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
     return expand(
-        "results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets
+        "results/precision-recall/callsets/{callset}.{{vartype}}.{{mode}}.tsv",
+        callset=callsets,
     )
+
+
+def get_report_precision_recall_input(wildcards):
+    table = "results/precision-recall/benchmarks/{benchmark}.{vartype}.base.tsv"
+    if get_vaf_status(wildcards):
+        stratified_table = "results/precision-recall/benchmarks/{benchmark}.{vartype}.vaf-stratified.tsv"
+        return [table, stratified_table]
+    else:
+        return [table]
 
 
 def get_collect_fp_fn_benchmark_input(wildcards):
