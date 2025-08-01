@@ -599,7 +599,7 @@ def get_report_precision_recall_input(wildcards):
         stratified_table = "results/precision-recall/benchmarks/{benchmark}.{vartype}.vaf-stratified.tsv"
         return [table, stratified_table]
     else:
-        return table
+        return [table]
 
 
 def get_collect_fp_fn_benchmark_input(wildcards):
