@@ -420,7 +420,7 @@ rule filter_fn:
     input:
         table="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
     output:
-        "results/fp-fn/callsets/{benchmark}.fn.shared.tsv"",
+        "results/fp-fn/callsets/{benchmark}.fn.shared.tsv",
     log:
         "logs/filter-fp-fn/{benchmark}.fn.log",
     conda:
@@ -433,7 +433,7 @@ rule write_fn_vcf:
     input:
         benchmark_table="results/fp-fn/callsets/{benchmark}.fn.shared.tsv",
         truth_vcf=get_benchmark_truth,
-        truth_vcf_index=get_benchmark_truth(index=True),
+        truth_vcf_index=get_benchmark_truth_index,
     output:
         "results/fp-fn/vcf/{callset}.{classification}.vcf.gz",
     log:

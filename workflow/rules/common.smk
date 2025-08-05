@@ -354,17 +354,20 @@ def get_genome_truth(wildcards):
         return f"resources/variants/{genome_name}.merged.truth.bcf"
 
 
-def get_benchmark_truth(wildcards, index=False):
+def get_benchmark_truth(wildcards):
     genome = get_benchmark(wildcards.benchmark)["genome"]
-    if index:
-        if get_somatic_status(wildcards):
-            return f"resources/variants/{genome}/all.truth.format-added.vcf.gz.tbi"
-        else:
-            return f"resources/variants/{genome}/all.truth.norm.bcf.csi"
     if get_somatic_status(wildcards):
         return f"resources/variants/{genome}/all.truth.format-added.vcf.gz"
     else:
         return f"resources/variants/{genome}/all.truth.norm.bcf"
+
+
+def get_benchmark_truth_index(wildcards):
+    genome = get_benchmark(wildcards.benchmark)["genome"]
+    if get_somatic_status(wildcards):
+        return f"resources/variants/{genome}/all.truth.format-added.vcf.gz.tbi"
+    else:
+        return f"resources/variants/{genome}/all.truth.norm.bcf.csi"
 
 
 def get_stratified_truth(suffix=""):
