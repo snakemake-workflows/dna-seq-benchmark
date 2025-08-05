@@ -518,6 +518,8 @@ def get_vaf_status(wildcards):
     vaf_benchmark = benchmarks[benchmark].get("vaf-field")
     if vaf_benchmark is None:
         return False
+    if vaf_benchmark == "tbc":
+        return True
     else:
         callsets = get_benchmark_callsets(benchmark)
         vaf_callsets = [
