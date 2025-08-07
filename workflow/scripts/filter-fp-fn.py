@@ -4,9 +4,19 @@ import pandas as pd
 sys.stderr = open(snakemake.log[0], "w")
 
 
-def load_variant_table(file_path: str) -> pd.DataFrame:
+def load_variant_table(file_path: str, cls) -> pd.DataFrame:
     """Load TSV file into a pandas DataFrame."""
-    return pd.read_csv(file_path, sep="\t")
+    variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
+    df = pd.read_csv(file_path, sep="\t")
+
+    callset_variant_totals = df.groupby("callset").size().to_dict()
+    total_callsets = df["callset"].nunique()
+    print(f"total number {snakemake.wildcards.benchmark} callsets containing {cls}:", total_callsets, file=sys.stderr)
+
+    # Annotate with number of callsets per variant
+    df = annotate_variant_callset_counts(df, variant_cols)
+
+    return (df, callset_variant_totals, total_callsets)
 
 
 def write_output(df: pd.DataFrame, filename: str):
@@ -18,7 +28,7 @@ def write_output(df: pd.DataFrame, filename: str):
     print(f"Written: {filename}", file=sys.stderr)
 
 
-def write_per_callset_variants(df: pd.DataFrame, output_dir: str, benchmark: str, cls: str, summary_rows: list, callset_totals: dict):
+def write_per_callset_variants(df: pd.DataFrame, output_dir: str): #, benchmark: str, cls: str, callset_totals: dict):
     """Write one TSV per callset for variants that occur only in that callset and collect summary info."""
     os.makedirs(output_dir, exist_ok=True)  # create output folder if missing
     for callset, group_df in df.groupby("callset"):
@@ -28,9 +38,6 @@ def write_per_callset_variants(df: pd.DataFrame, output_dir: str, benchmark: str
             print(f"Warning: DataFrame is empty. Not writing to {filename}", file=sys.stderr)
             continue
         write_output(group_df, filename)
-        summary_rows.append(
-            collect_summary(group_df, benchmark, cls, "unique_to_one", callset, callset_totals)
-        )
 
 
 def annotate_variant_callset_counts(df: pd.DataFrame, variant_cols: list) -> pd.DataFrame:
@@ -108,23 +115,21 @@ def collect_summary(df: pd.DataFrame, benchmark: str, cls: str, filter_type: str
     return result
 
 
-df = load_variant_table(snakemake.input[0])
-variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
-callset_variant_totals = df.groupby("callset").size().to_dict()
-total_callsets = df["callset"].nunique()
-print(f"total number {snakemake.wildcards.benchmark} callsets containing fn:", total_callsets, file=sys.stderr)
 
-# Annotate with number of callsets per variant
-df = annotate_variant_callset_counts(df, variant_cols)
+# fp variants present only in one callset
+df_fp, callset_variant_totals_fp, total_callsets_fp = load_variant_table(snakemake.input.fp, "fp")
+one_callset_df_fp = filter_variants(df_fp, callset_count=1)
+output_dir = snakemake.output.unique_fp
+write_per_callset_variants(one_callset_df_fp, output_dir) #, snakemake.wildcards.benchmark, "fp", df_fp, callset_variant_totals_fp)
 
-# # Variants present only in one callset
-# one_callset_df = filter_variants(df, callset_count=1)
-# output_dir = f"{output_prefix}unique_variants_by_callset"
-# write_per_callset_variants(one_callset_df, output_dir, benchmark, cls, summary_rows, callset_variant_totals)
 
+
+df_fn, callset_variant_totals_fn, total_callsets_fn = load_variant_table(snakemake.input.fn, "fn")
 # Variants present in all callsets
-all_callsets_df = filter_variants(df, callset_count=total_callsets)
-write_output(all_callsets_df, snakemake.output[0])
-# summary_rows.append(
-#     collect_summary(all_callsets_df, benchmark, cls, "in_all_callsets", "ALL")
-#             )
+all_callsets_df_fn = filter_variants(df_fn, callset_count=total_callsets_fn)
+write_output(all_callsets_df_fn, snakemake.output.shared_fn)
+
+# fn variants present only in one callset
+one_callset_df_fn = filter_variants(df_fn, callset_count=1)
+output_dir = snakemake.output.unique_fn
+write_per_callset_variants(one_callset_df_fn, output_dir)#, snakemake.wildcards.benchmark, "fn", df_fn, callset_variant_totals_fn)
