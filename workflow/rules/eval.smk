@@ -422,8 +422,12 @@ rule filter_fp_fn:
         fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
     output:
         shared_fn="results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
-        unique_fn=directory("results/fp-fn/benchmarks/{benchmark}.unique_fn_variants_by_callset/"),
-        unique_fp=directory("results/fp-fn/benchmarks/{benchmark}.unique_fp_variants_by_callset/"),
+        unique_fn=directory(
+            "results/fp-fn/benchmarks/{benchmark}.unique_fn_variants_by_callset/"
+        ),
+        unique_fp=directory(
+            "results/fp-fn/benchmarks/{benchmark}.unique_fp_variants_by_callset/"
+        ),
     log:
         "logs/filter-fp-fn/{benchmark}.fn.log",
     conda:
