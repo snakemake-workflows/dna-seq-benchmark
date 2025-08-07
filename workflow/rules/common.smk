@@ -355,19 +355,25 @@ def get_genome_truth(wildcards):
 
 
 def get_benchmark_truth(wildcards):
-    genome = get_benchmark(wildcards.benchmark)["genome"]
-    if get_somatic_status(wildcards):
-        return f"resources/variants/{genome}/all.truth.format-added.vcf.gz"
+    if hasattr(wildcards, "benchmark"):
+        genome = get_benchmark(wildcards.benchmark)["genome"]
+        if get_somatic_status(wildcards):
+            return f"resources/variants/{genome}/all.truth.format-added.vcf.gz"
+        else:
+            return f"resources/variants/{genome}/all.truth.norm.bcf"
     else:
-        return f"resources/variants/{genome}/all.truth.norm.bcf"
+        return f"resources/variants/{wildcards.genome}/all.truth.norm.bcf"
 
 
 def get_benchmark_truth_index(wildcards):
-    genome = get_benchmark(wildcards.benchmark)["genome"]
-    if get_somatic_status(wildcards):
-        return f"resources/variants/{genome}/all.truth.format-added.vcf.gz.tbi"
+    if hasattr(wildcards, "benchmark"):
+        genome = get_benchmark(wildcards.benchmark)["genome"]
+        if get_somatic_status(wildcards):
+            return f"resources/variants/{genome}/all.truth.format-added.vcf.gz.tbi"
+        else:
+            return f"resources/variants/{genome}/all.truth.norm.bcf.csi"
     else:
-        return f"resources/variants/{genome}/all.truth.norm.bcf.csi"
+        return f"resources/variants/{wildcards.genome}/all.truth.norm.bcf.csi"
 
 
 def get_benchmark_renamed_truth(wildcards):
@@ -399,22 +405,32 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    if config["variant-calls"][wildcards.callset].get(
-        "genome-build", "grch38"
-    ) == "grch37" and config["variant-calls"][wildcards.callset].get(
-        "rename-contigs", False
-    ):
-        return workflow.source_path(
-            "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
-        )
-    if config["variant-calls"][wildcards.callset].get(
-        "genome-build", "grch38"
-    ) == "grch38" and config["variant-calls"][wildcards.callset].get(
-        "rename-contigs", False
-    ):
-        return workflow.source_path(
-            "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
-        )
+    if hasattr(wildcards, "callset"):
+        if config["variant-calls"][wildcards.callset].get(
+            "genome-build", "grch38"
+        ) == "grch37" and config["variant-calls"][wildcards.callset].get(
+            "rename-contigs", False
+        ):
+            return workflow.source_path(
+                "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
+            )
+        if config["variant-calls"][wildcards.callset].get(
+            "genome-build", "grch38"
+        ) == "grch38" and config["variant-calls"][wildcards.callset].get(
+            "rename-contigs", False
+        ):
+            return workflow.source_path(
+                "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
+            )
+    if hasattr(wildcards, "genome"):
+        if config["reference-genome"] == "grch37":
+            return workflow.source_path(
+                "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
+            )
+        elif config["reference-genome"] == "grch38":
+            return workflow.source_path(
+                "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
+            )
     else:
         return config["variant-calls"][wildcards.callset].get("rename-contigs", False)
 
