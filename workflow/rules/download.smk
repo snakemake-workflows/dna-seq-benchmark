@@ -57,7 +57,7 @@ rule rename_truth_contigs:
     output:
         "resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz",
     log:
-        "logs/rename-truth-contigs/{callset}.log",
+        "logs/rename-truth-contigs/{genome}.log",
     conda:
         "../envs/tools.yaml"
     shell:
