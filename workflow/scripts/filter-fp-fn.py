@@ -144,7 +144,7 @@ else:
 
 # fn variants present only in one callset
 if df_fn.empty:
-    write_per_callset_variants(df_fp, output_dir)
+    write_per_callset_variants(df_fn, output_dir)
 else:
     one_callset_df_fn = filter_variants(df_fn, callset_count=1)
     output_dir = snakemake.output.unique_fn
