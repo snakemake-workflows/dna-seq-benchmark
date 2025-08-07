@@ -32,6 +32,10 @@ if "variant-calls" in config:
                 "results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
                 benchmark=used_benchmarks,
             ),
+            expand(
+                "results/fp-fn/vcf/{benchmark}.fn.vcf.gz",
+                benchmark=used_benchmarks,
+            ),
 
     rule eval:
         input:
