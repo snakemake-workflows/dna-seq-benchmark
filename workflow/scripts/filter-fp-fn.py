@@ -1,19 +1,16 @@
 import sys, os
+import pandas as pd
 
 sys.stderr = open(snakemake.log[0], "w")
 
-import pandas as pd
 
 def load_variant_table(file_path: str) -> pd.DataFrame:
     """Load TSV file into a pandas DataFrame."""
     return pd.read_csv(file_path, sep="\t")
 
-def write_output(df: pd.DataFrame, filename: str, output_dir: str = "."):
-    """Write DataFrame to a TSV file."""
-    os.makedirs(output_dir, exist_ok=True)  # create output folder if missing
-    filename = os.path.join(output_dir, filename)
-    if not filename.endswith(".tsv"):
-        filename += ".tsv"
+
+def write_output(df: pd.DataFrame, filename: str):
+    """Write DataFrame to given TSV file."""
     # Ensure the DataFrame is not empty before writing
     if df.empty:
         print(f"Warning: DataFrame is empty. Not writing to {filename}")
@@ -21,6 +18,7 @@ def write_output(df: pd.DataFrame, filename: str, output_dir: str = "."):
     # Write DataFrame to TSV file
     df.to_csv(filename, sep="\t", index=False)
     print(f"Written: {filename}")
+
 
 def write_per_callset_variants(df: pd.DataFrame, output_dir: str, benchmark: str, cls: str, summary_rows: list, callset_totals: dict):
     """Write one TSV per callset for variants that occur only in that callset and collect summary info."""
@@ -43,6 +41,7 @@ def annotate_variant_callset_counts(df: pd.DataFrame, variant_cols: list) -> pd.
     counts.rename(columns={"callset": "callset_count"}, inplace=True)
     return df.merge(counts, on=variant_cols)
 
+
 def filter_variants(df: pd.DataFrame, callset_count: int = None, total_callsets: int = None) -> pd.DataFrame:
     """Filter variants based on number or set of callsets."""
     variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
@@ -52,6 +51,7 @@ def filter_variants(df: pd.DataFrame, callset_count: int = None, total_callsets:
         df = df[df["callset_count"] == total_callsets]
 
     return df
+
 
 def filter_variants_by_exact_sets(df: pd.DataFrame, exact_sets: dict, variant_cols: list) -> dict:
     """Return a dict mapping labels to filtered DataFrames matching each exact callset set."""
@@ -67,6 +67,7 @@ def filter_variants_by_exact_sets(df: pd.DataFrame, exact_sets: dict, variant_co
         label_to_df[label] = matched_variants
 
     return label_to_df
+
 
 def compare_benchmarks(df: pd.DataFrame, benchmark1: str, benchmark2: str) -> pd.DataFrame:
     """Compare two callsets and return a DataFrame with variants unique to each callset."""
@@ -108,27 +109,24 @@ def collect_summary(df: pd.DataFrame, benchmark: str, cls: str, filter_type: str
         }])
     return result
 
-# benchmark = "imgag-5"  # For testing, you can set a specific benchmark
-# cls = "fp"  # For testing, you can set a specific classification
-file_path = f"{path_prefix}{benchmark}.{cls}.tsv"
-df = load_variant_table(file_path)
+
+df = load_variant_table(snakemake.input[0])
 variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
 callset_variant_totals = df.groupby("callset").size().to_dict()
 total_callsets = df["callset"].nunique()
-print(f"total number {benchmark} callsets containing {cls}:", total_callsets)
+print(f"total number {snakemake.wildcards.benchmark} callsets containing fn:", total_callsets)
 
 # Annotate with number of callsets per variant
 df = annotate_variant_callset_counts(df, variant_cols)
 
-# Variants present only in one callset
-one_callset_df = filter_variants(df, callset_count=1)
-output_dir = f"{output_prefix}unique_variants_by_callset"
-write_per_callset_variants(one_callset_df, output_dir, benchmark, cls, summary_rows, callset_variant_totals)
+# # Variants present only in one callset
+# one_callset_df = filter_variants(df, callset_count=1)
+# output_dir = f"{output_prefix}unique_variants_by_callset"
+# write_per_callset_variants(one_callset_df, output_dir, benchmark, cls, summary_rows, callset_variant_totals)
 
 # Variants present in all callsets
 all_callsets_df = filter_variants(df, callset_count=total_callsets)
-output_dir = f"{output_prefix}variants_in_all_callsets"
-write_output(all_callsets_df, f"{benchmark}_{cls}.tsv", output_dir)
-summary_rows.append(
-    collect_summary(all_callsets_df, benchmark, cls, "in_all_callsets", "ALL")
-            )
+write_output(all_callsets_df, snakemake.output[0])
+# summary_rows.append(
+#     collect_summary(all_callsets_df, benchmark, cls, "in_all_callsets", "ALL")
+#             )
