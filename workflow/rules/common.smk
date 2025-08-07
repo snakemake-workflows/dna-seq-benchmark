@@ -370,6 +370,16 @@ def get_benchmark_truth_index(wildcards):
         return f"resources/variants/{genome}/all.truth.norm.bcf.csi"
 
 
+def get_benchmark_renamed_truth(wildcards):
+    genome = get_benchmark(wildcards.benchmark)["genome"]
+    return f"resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz"
+
+
+def get_benchmark_renamed_truth_index(wildcards):
+    genome = get_benchmark(wildcards.benchmark)["genome"]
+    return f"resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz.tbi"
+
+
 def get_stratified_truth(suffix=""):
     def inner(wildcards):
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]

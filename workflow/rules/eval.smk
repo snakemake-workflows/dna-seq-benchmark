@@ -439,8 +439,8 @@ rule filter_fp_fn:
 rule write_shared_fn_vcf:
     input:
         benchmark_table="results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
-        truth_vcf="resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz",
-        truth_vcf_index="resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz.tbi",
+        truth_vcf=get_benchmark_renamed_truth,
+        truth_vcf_index=get_benchmark_renamed_truth_index,
     output:
         "results/fp-fn/vcf/{benchmark}.fn.vcf.gz",
     log:
