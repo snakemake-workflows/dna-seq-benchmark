@@ -31,6 +31,9 @@ def write_output(df: pd.DataFrame, filename: str):
 def write_per_callset_variants(df: pd.DataFrame, output_dir: str): #, benchmark: str, cls: str, callset_totals: dict):
     """Write one TSV per callset for variants that occur only in that callset and collect summary info."""
     os.makedirs(output_dir, exist_ok=True)  # create output folder if missing
+    if df.empty:
+        print(f"Warning: DataFrame is empty. Not writing files into {output_dir}", file=sys.stderr)
+        return
     for callset, group_df in df.groupby("callset"):
         safe_name = callset.replace(" ", "_").replace("/", "_")
         filename = os.path.join(output_dir, f"unique_to_{safe_name}.tsv")
