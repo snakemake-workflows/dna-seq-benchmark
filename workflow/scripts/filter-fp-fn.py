@@ -11,13 +11,11 @@ def load_variant_table(file_path: str) -> pd.DataFrame:
 
 def write_output(df: pd.DataFrame, filename: str):
     """Write DataFrame to given TSV file."""
-    # Ensure the DataFrame is not empty before writing
     if df.empty:
-        print(f"Warning: DataFrame is empty. Not writing to {filename}")
-        return
+        print(f"Warning: DataFrame is empty. Writing empty file to {filename}", file=sys.stderr)
     # Write DataFrame to TSV file
     df.to_csv(filename, sep="\t", index=False)
-    print(f"Written: {filename}")
+    print(f"Written: {filename}", file=sys.stderr)
 
 
 def write_per_callset_variants(df: pd.DataFrame, output_dir: str, benchmark: str, cls: str, summary_rows: list, callset_totals: dict):
@@ -27,7 +25,7 @@ def write_per_callset_variants(df: pd.DataFrame, output_dir: str, benchmark: str
         safe_name = callset.replace(" ", "_").replace("/", "_")
         filename = os.path.join(output_dir, f"unique_to_{safe_name}.tsv")
         if group_df.empty:
-            print(f"Warning: DataFrame is empty. Not writing to {filename}")
+            print(f"Warning: DataFrame is empty. Not writing to {filename}", file=sys.stderr)
             continue
         write_output(group_df, filename)
         summary_rows.append(
@@ -114,7 +112,7 @@ df = load_variant_table(snakemake.input[0])
 variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
 callset_variant_totals = df.groupby("callset").size().to_dict()
 total_callsets = df["callset"].nunique()
-print(f"total number {snakemake.wildcards.benchmark} callsets containing fn:", total_callsets)
+print(f"total number {snakemake.wildcards.benchmark} callsets containing fn:", total_callsets, file=sys.stderr)
 
 # Annotate with number of callsets per variant
 df = annotate_variant_callset_counts(df, variant_cols)
