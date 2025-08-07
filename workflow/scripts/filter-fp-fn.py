@@ -122,21 +122,30 @@ def collect_summary(df: pd.DataFrame, benchmark: str, cls: str, filter_type: str
     return result
 
 
-
+# Filtering fp variants:
 # fp variants present only in one callset
 df_fp, callset_variant_totals_fp, total_callsets_fp = load_variant_table(snakemake.input.fp, "fp")
 one_callset_df_fp = filter_variants(df_fp, callset_count=1)
 output_dir = snakemake.output.unique_fp
-write_per_callset_variants(one_callset_df_fp, output_dir) #, snakemake.wildcards.benchmark, "fp", df_fp, callset_variant_totals_fp)
+if df_fp.empty:
+    write_per_callset_variants(df_fp, output_dir)
+else:
+    write_per_callset_variants(one_callset_df_fp, output_dir)
 
 
-
+# Filtering fn variants:
 df_fn, callset_variant_totals_fn, total_callsets_fn = load_variant_table(snakemake.input.fn, "fn")
-# Variants present in all callsets
-all_callsets_df_fn = filter_variants(df_fn, callset_count=total_callsets_fn)
-write_output(all_callsets_df_fn, snakemake.output.shared_fn)
+# variants present in all callsets
+if df_fn.empty:
+    write_output(df_fn, snakemake.output.shared_fn)
+else:
+    all_callsets_df_fn = filter_variants(df_fn, callset_count=total_callsets_fn)
+    write_output(all_callsets_df_fn, snakemake.output.shared_fn)
 
 # fn variants present only in one callset
-one_callset_df_fn = filter_variants(df_fn, callset_count=1)
-output_dir = snakemake.output.unique_fn
-write_per_callset_variants(one_callset_df_fn, output_dir)#, snakemake.wildcards.benchmark, "fn", df_fn, callset_variant_totals_fn)
+if df_fn.empty:
+    write_per_callset_variants(df_fp, output_dir)
+else:
+    one_callset_df_fn = filter_variants(df_fn, callset_count=1)
+    output_dir = snakemake.output.unique_fn
+    write_per_callset_variants(one_callset_df_fn, output_dir)
