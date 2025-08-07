@@ -30,7 +30,7 @@ if "variant-calls" in config:
             get_fp_fn_reports,
             expand(
                 "results/fp-fn/benchmarks/{benchmark}.fn.shared.tsv",
-                 benchmark=used_benchmarks,
+                benchmark=used_benchmarks,
             ),
 
     rule eval:
