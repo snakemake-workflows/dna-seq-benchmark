@@ -135,6 +135,7 @@ else:
 
 # cFiltering fn variants:
 df_fn, callset_variant_totals_fn, total_callsets_fn = load_variant_table(snakemake.input.fn, "fn")
+output_dir = snakemake.output.unique_fn
 # variants present in all callsets
 if df_fn.empty:
     write_output(df_fn, snakemake.output.shared_fn)
