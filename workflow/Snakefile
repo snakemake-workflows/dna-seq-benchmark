@@ -28,6 +28,14 @@ if "variant-calls" in config:
                 classification=["fp", "fn"],
             ),
             get_fp_fn_reports,
+            expand(
+                "results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
+                benchmark=used_benchmarks,
+            ),
+            expand(
+                "results/fp-fn/vcf/{benchmark}.fn.vcf.gz",
+                benchmark=used_benchmarks,
+            ),
 
     rule eval:
         input:

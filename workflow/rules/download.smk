@@ -50,6 +50,21 @@ rule get_truth:
         ") 2> {log}"
 
 
+rule rename_truth_contigs:
+    input:
+        calls=get_benchmark_truth,
+        repl_file=get_rename_contig_file,
+    output:
+        "resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz",
+    log:
+        "logs/rename-truth-contigs/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
+        "-Oz -o {output} 2> {log}"
+
+
 rule merge_truthsets:
     input:
         bcf=get_truthsets(),

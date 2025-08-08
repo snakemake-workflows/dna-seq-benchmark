@@ -416,6 +416,41 @@ rule collect_fp_fn_benchmark:
         "../scripts/collect-fp-fn-benchmarks.py"
 
 
+rule filter_fp_fn:
+    input:
+        fp="results/fp-fn/benchmarks/{benchmark}.fp.tsv",
+        fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
+    output:
+        shared_fn="results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
+        unique_fn=directory(
+            "results/fp-fn/benchmarks/{benchmark}.unique_fn_variants_by_callset/"
+        ),
+        unique_fp=directory(
+            "results/fp-fn/benchmarks/{benchmark}.unique_fp_variants_by_callset/"
+        ),
+    log:
+        "logs/filter-fp-fn/{benchmark}.fn.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/filter-fp-fn.py"
+
+
+rule write_shared_fn_vcf:
+    input:
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
+        truth_vcf=get_benchmark_renamed_truth,
+        truth_vcf_index=get_benchmark_renamed_truth_index,
+    output:
+        "results/fp-fn/vcf/{benchmark}.fn.vcf.gz",
+    log:
+        "logs/write-fp-fn-vcf/{benchmark}.fn.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/write-fp-fn-vcf.py"
+
+
 rule report_fp_fn:
     input:
         main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
