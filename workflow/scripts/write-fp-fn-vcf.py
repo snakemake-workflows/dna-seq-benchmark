@@ -2,7 +2,7 @@ import sys, os
 
 sys.stderr = open(snakemake.log[0], "w")
 
-import pandas as pd 
+import pandas as pd
 from pysam import VariantFile, VariantRecord
 
 def load_fp_fn_table(file_path: str) -> pd.DataFrame:
@@ -23,8 +23,10 @@ def get_variant_chr_pos(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_variant_record(vcf: VariantFile, chr: str, pos: str) -> VariantRecord:
     """Get a specific variant record from the VCF file."""
-    for record in vcf.fetch(chr, (int(pos)-1), (int(pos)+1)):
-        if record.chrom == chr and record.pos == int(pos):
+    chr = str(chr)
+    pos = int(pos)
+    for record in vcf.fetch(chr, (pos-1), (pos+1)):
+        if record.chrom == chr and record.pos == pos:
             return record
     raise ValueError(f"Variant not found in VCF: {chr}:{pos}")
 
@@ -36,19 +38,19 @@ def collect_records(vcf: VariantFile, df: pd.DataFrame) -> list:
             record = get_variant_record(vcf, row['chromosome'], row['position'])
             records.append(record)
         except ValueError as e:
-            print(f"Error fetching record for {row['chromosome']}:{row['position']}: {e}")
-    print(records)
+            print(f"Error fetching record for {row['chromosome']}:{row['position']}: {e}", file=sys.stderr)
+    print(records, file=sys.stderr)
     return records
 
 def write_vcf(vcf_in: VariantFile, records: list, output_file: str):
     """Write collected records to a VCF file."""
     if not records:
-        print("No records to write.")
+        print("No records to write.", file=sys.stderr)
         return
     with VariantFile(output_file, 'w', header=vcf_in.header) as vcf_out:
         for record in records:
             vcf_out.write(record)
-    print(f"VCF written to {output_file}")
+    print(f"VCF written to {output_file}", file=sys.stderr)
 
 
 output_file = snakemake.output[0]
