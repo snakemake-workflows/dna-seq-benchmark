@@ -57,7 +57,13 @@ output_file = snakemake.output[0]
 table = load_fp_fn_table(snakemake.input.benchmark_table)
 vcf = load_vcf(snakemake.input.truth_vcf)
 
-variants = collect_records(vcf, get_variant_chr_pos(table))
-write_vcf(vcf, variants, output_file)
+if table.empty:
+    print("No variants to process.", file=sys.stderr)
+    # write an empty VCF file
+    vcf_out = VariantFile(output_file, 'w', header=vcf.header)
+    vcf_out.close()
+else:
+    variants = collect_records(vcf, get_variant_chr_pos(table))
+    write_vcf(vcf, variants, output_file)
 
 
