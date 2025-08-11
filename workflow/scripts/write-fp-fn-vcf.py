@@ -66,24 +66,27 @@ if snakemake.params.get("output") == "shared-fn":
         variants = collect_records(vcf, get_variant_chr_pos(table))
         write_vcf(vcf, variants, output_file)
 
+elif snakemake.params.get("output") == "unique-fn":
+    for callset in snakemake.params.callsets:
+        safe_name = callset.replace(" ", "_").replace("/", "_")
+        input_table_filename = os.path.join(snakemake.input.benchmark_table, f"unique_to_{safe_name}.tsv")
+        output_file = os.path.join(snakemake.output, f"{safe_name}.unique-fn.vcf.gz")
+        table = load_fp_fn_table(input_table_filename)
+        vcf = load_vcf(snakemake.input.truth_vcf)
+
+        if table.empty:
+            print("No variants to process.", file=sys.stderr)
+            # write an empty VCF file
+            vcf_out = VariantFile(output_file, 'w', header=vcf.header)
+            vcf_out.close()
+        else:
+            variants = collect_records(vcf, get_variant_chr_pos(table))
+            write_vcf(vcf, variants, output_file)
+
 elif snakemake.params.get("output") == "unique-fp":
     output_file = snakemake.output[0]
     table = load_fp_fn_table(snakemake.input.benchmark_table)
     vcf = load_vcf(snakemake.input.callset_vcf)
-
-    if table.empty:
-        print("No variants to process.", file=sys.stderr)
-        # write an empty VCF file
-        vcf_out = VariantFile(output_file, 'w', header=vcf.header)
-        vcf_out.close()
-    else:
-        variants = collect_records(vcf, get_variant_chr_pos(table))
-        write_vcf(vcf, variants, output_file)
-
-elif snakemake.params.get("output") == "unique-fn":
-    output_file = snakemake.output[0]
-    table = load_fp_fn_table(snakemake.input.benchmark_table)
-    vcf = load_vcf(snakemake.input.truth_vcf)
 
     if table.empty:
         print("No variants to process.", file=sys.stderr)

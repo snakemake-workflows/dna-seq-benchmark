@@ -36,6 +36,10 @@ if "variant-calls" in config:
                 "results/fp-fn/vcf/{benchmark}.shared-fn.vcf.gz",
                 benchmark=used_benchmarks,
             ),
+            expand(
+                "results/fp-fn/vcf/{benchmark}/",
+                benchmark=used_benchmarks,
+            ),
             # expand(
             #     "results/fp-fn/vcf/{benchmark}/{callset}.unique-fn.vcf.gz",
             #     benchmark=used_benchmarks,
