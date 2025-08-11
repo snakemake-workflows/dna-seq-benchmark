@@ -465,6 +465,7 @@ rule write_unique_fn_vcf:
         directory("results/fp-fn/vcf/{benchmark}/"),
     params:
         output="unique-fn",
+        callsets=lambda w: get_benchmark_callsets(w.benchmark),
     log:
         "logs/write-unique-fn-vcf/{benchmark}.unique-fn.log",
     conda:
