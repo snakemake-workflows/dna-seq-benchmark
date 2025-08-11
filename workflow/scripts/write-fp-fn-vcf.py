@@ -20,7 +20,6 @@ def get_variant_chr_pos(df: pd.DataFrame) -> pd.DataFrame:
     chr_pos = df[['chromosome', 'position']].drop_duplicates()
     return chr_pos
 
-
 def get_variant_record(vcf: VariantFile, chr: str, pos: str) -> VariantRecord:
     """Get a specific variant record from the VCF file."""
     chr = str(chr)
@@ -53,17 +52,44 @@ def write_vcf(vcf_in: VariantFile, records: list, output_file: str):
     print(f"VCF written to {output_file}", file=sys.stderr)
 
 
-output_file = snakemake.output[0]
-table = load_fp_fn_table(snakemake.input.benchmark_table)
-vcf = load_vcf(snakemake.input.truth_vcf)
+if snakemake.params.get("output") == "shared-fn":
+    output_file = snakemake.output[0]
+    table = load_fp_fn_table(snakemake.input.benchmark_table)
+    vcf = load_vcf(snakemake.input.truth_vcf)
 
-if table.empty:
-    print("No variants to process.", file=sys.stderr)
-    # write an empty VCF file
-    vcf_out = VariantFile(output_file, 'w', header=vcf.header)
-    vcf_out.close()
-else:
-    variants = collect_records(vcf, get_variant_chr_pos(table))
-    write_vcf(vcf, variants, output_file)
+    if table.empty:
+        print("No variants to process.", file=sys.stderr)
+        # write an empty VCF file
+        vcf_out = VariantFile(output_file, 'w', header=vcf.header)
+        vcf_out.close()
+    else:
+        variants = collect_records(vcf, get_variant_chr_pos(table))
+        write_vcf(vcf, variants, output_file)
 
+elif snakemake.params.get("output") == "unique-fp":
+    output_file = snakemake.output[0]
+    table = load_fp_fn_table(snakemake.input.benchmark_table)
+    vcf = load_vcf(snakemake.input.callset_vcf)
 
+    if table.empty:
+        print("No variants to process.", file=sys.stderr)
+        # write an empty VCF file
+        vcf_out = VariantFile(output_file, 'w', header=vcf.header)
+        vcf_out.close()
+    else:
+        variants = collect_records(vcf, get_variant_chr_pos(table))
+        write_vcf(vcf, variants, output_file)
+
+elif snakemake.params.get("output") == "unique-fn":
+    output_file = snakemake.output[0]
+    table = load_fp_fn_table(snakemake.input.benchmark_table)
+    vcf = load_vcf(snakemake.input.truth_vcf)
+
+    if table.empty:
+        print("No variants to process.", file=sys.stderr)
+        # write an empty VCF file
+        vcf_out = VariantFile(output_file, 'w', header=vcf.header)
+        vcf_out.close()
+    else:
+        variants = collect_records(vcf, get_variant_chr_pos(table))
+        write_vcf(vcf, variants, output_file)

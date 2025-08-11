@@ -442,9 +442,45 @@ rule write_shared_fn_vcf:
         truth_vcf=get_benchmark_renamed_truth,
         truth_vcf_index=get_benchmark_renamed_truth_index,
     output:
-        "results/fp-fn/vcf/{benchmark}.fn.vcf.gz",
+        "results/fp-fn/vcf/{benchmark}.shared-fn.vcf.gz",
+    params:
+        output="shared-fn",
     log:
-        "logs/write-fp-fn-vcf/{benchmark}.fn.log",
+        "logs/write-shared-fn-vcf/{benchmark}.fn.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/write-fp-fn-vcf.py"
+
+
+rule write_unique_fn_vcf:
+    input:
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}.unique_fn_variants_by_callset/{callset}.tsv",
+        truth_vcf=get_benchmark_renamed_truth,
+        truth_vcf_index=get_benchmark_renamed_truth_index,
+    output:
+        "results/fp-fn/vcf/{benchmark}/{callset}.unique-fn.vcf.gz",
+    params:
+        output="unique-fn",
+    log:
+        "logs/write-unique-fn-vcf/{benchmark}/{callset}.unique-fn.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/write-fp-fn-vcf.py"
+
+
+rule write_unique_fp_vcf:
+    input:
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}.unique_fp_variants_by_callset/{callset}.tsv",
+        callset_vcf="results/normalized-variants/{callset}.vcf.gz",
+        callset_vcf_index="results/normalized-variants/{callset}.vcf.gz.tbi",
+    output:
+        "results/fp-fn/vcf/{benchmark}/{callset}.unique-fp.vcf.gz",
+    params:
+        output="unique-fp",
+    log:
+        "logs/write-unique-fp-vcf/{benchmark}/{callset}.unique-fp.log",
     conda:
         "../envs/pysam.yaml"
     script:
