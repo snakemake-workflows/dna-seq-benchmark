@@ -29,7 +29,7 @@ if "variant-calls" in config:
             ),
             get_fp_fn_reports,
             expand(
-                "results/fp-fn/vcf/{benchmark}.shared_fn.vcf.gz",
+                "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.vcf.gz",
                 benchmark=used_benchmarks,
             ),
             expand(
