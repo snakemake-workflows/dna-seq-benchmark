@@ -66,7 +66,7 @@ def filter_by_callset(df: pd.DataFrame, target_callset: str) -> pd.DataFrame:
     return target_variants
 
 
-df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input, snakemake.wildcards.classification)
+df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input.table, snakemake.wildcards.classification)
 
 # Get the target callset from wildcards
 target_callset = snakemake.wildcards.callset

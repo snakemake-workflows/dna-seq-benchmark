@@ -177,7 +177,7 @@ rule filter_shared_fn:
 
 rule filter_unique:
     input:
-        "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
+        table="results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
     output:
         "results/fp-fn/benchmarks/{benchmark}/{callset}.unique_{classification}.tsv",
     log:
