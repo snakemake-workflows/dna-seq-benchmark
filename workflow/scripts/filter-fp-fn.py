@@ -44,7 +44,7 @@ def write_per_callset_variants(df: pd.DataFrame, output_dir: str): #, benchmark:
         if group_df.empty:
             print(f"Warning: DataFrame is empty. Not writing to {filename}", file=sys.stderr)
             continue
-        write_output(group_df, filename)
+        write_output(group_df, output_dir)#filename)
 
 
 def annotate_variant_callset_counts(df: pd.DataFrame, variant_cols: list) -> pd.DataFrame:

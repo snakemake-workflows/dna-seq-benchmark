@@ -416,24 +416,43 @@ rule collect_fp_fn_benchmark:
         "../scripts/collect-fp-fn-benchmarks.py"
 
 
-rule filter_fp_fn:
+rule filter_shared_fn:
     input:
-        fp="results/fp-fn/benchmarks/{benchmark}.fp.tsv",
         fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
     output:
         shared_fn="results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
-        unique_fn=directory(
-            "results/fp-fn/benchmarks/{benchmark}_unique_fn_variants_by_callset/"
-        ),
-        unique_fp=directory(
-            "results/fp-fn/benchmarks/{benchmark}_unique_fp_variants_by_callset/"
-        ),
     log:
-        "logs/filter-fp-fn/{benchmark}.fn.log",
+        "logs/filter-shared-fn/{benchmark}.log",
     conda:
         "../envs/pysam.yaml"
     script:
-        "../scripts/filter-fp-fn.py"
+        "../scripts/filter-shared-fn.py"
+
+
+rule filter_unique_variants:
+    input:
+        fn=lambda wildcards: (
+            "results/fp-fn/benchmarks/{benchmark}.fn.tsv".format(
+                    benchmark=wildcards.benchmark
+                )
+            if wildcards.variant_type == "fn"
+            else []
+        ),
+        fp=lambda wildcards: (
+            "results/fp-fn/benchmarks/{benchmark}.fp.tsv".format(
+                    benchmark=wildcards.benchmark
+                )
+            if wildcards.variant_type == "fp"
+            else []
+        ),
+    output:
+        "results/fp-fn/benchmarks/{benchmark}/unique_{variant_type}/{callset}.tsv",
+    log:
+        "logs/filter-unique-variants/{benchmark}.{variant_type}.{callset}.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/filter-unique-variants.py"
 
 
 rule write_shared_fn_vcf:
@@ -455,19 +474,15 @@ rule write_shared_fn_vcf:
 
 rule write_unique_fn_vcf:
     input:
-        benchmark_table=expand(
-            "results/fp-fn/benchmarks/{benchmark}_unique_fn_variants_by_callset/",
-            benchmark=used_benchmarks,
-        ),
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}/unique_fn/{callset}.tsv",
         truth_vcf=get_benchmark_renamed_truth,
         truth_vcf_index=get_benchmark_renamed_truth_index,
     output:
-        directory("results/fp-fn/vcf/{benchmark}/"),
+        "results/fp-fn/vcf/{benchmark}/{callset}.unique-fn.vcf.gz",
     params:
         output="unique-fn",
-        callsets=lambda w: get_benchmark_callsets(w.benchmark),
     log:
-        "logs/write-unique-fn-vcf/{benchmark}.unique-fn.log",
+        "logs/write-unique-fn-vcf/{benchmark}.unique-fn/{callset}.log",
     conda:
         "../envs/pysam.yaml"
     script:
@@ -476,13 +491,14 @@ rule write_unique_fn_vcf:
 
 rule write_unique_fp_vcf:
     input:
-        benchmark_table="results/fp-fn/benchmarks/{benchmark}_unique_fp_variants_by_callset/unique_to_{callset}.tsv",
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}/unique_fp/{callset}.tsv",
         callset_vcf="results/normalized-variants/{callset}.vcf.gz",
         callset_vcf_index="results/normalized-variants/{callset}.vcf.gz.tbi",
     output:
         "results/fp-fn/vcf/{benchmark}/{callset}.unique-fp.vcf.gz",
     params:
         output="unique-fp",
+        callsets=lambda w: get_benchmark_callsets(w.benchmark),
     log:
         "logs/write-unique-fp-vcf/{benchmark}/{callset}.unique-fp.log",
     conda:
