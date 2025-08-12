@@ -1,4 +1,4 @@
-import sys, os
+import sys
 import pandas as pd
 
 sys.stderr = open(snakemake.log[0], "w")
