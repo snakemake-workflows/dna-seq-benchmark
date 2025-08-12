@@ -13,6 +13,7 @@ include: "rules/download.smk"
 
 if "variant-calls" in config:
 
+    include: "rules/compare.smk"
     include: "rules/eval.smk"
 
     rule all:
