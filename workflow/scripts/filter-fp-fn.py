@@ -15,7 +15,7 @@ def load_variant_table(file_path: str, cls) -> pd.DataFrame:
     else:
         callset_variant_totals = df.groupby("callset").size().to_dict()
         total_callsets = df["callset"].nunique()
-        print(f"total number {snakemake.wildcards.benchmark} callsets containing {cls}:", total_callsets, file=sys.stderr)
+        print(f"total number of {snakemake.wildcards.benchmark} callsets containing {cls}: {total_callsets}", file=sys.stderr)
 
         # Annotate with number of callsets per variant
         df = annotate_variant_callset_counts(df, variant_cols)
@@ -56,7 +56,7 @@ def annotate_variant_callset_counts(df: pd.DataFrame, variant_cols: list) -> pd.
 
 def filter_variants(df: pd.DataFrame, callset_count: int = None, total_callsets: int = None) -> pd.DataFrame:
     """Filter variants based on number or set of callsets."""
-    variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
+    # Use VARIANT_COLS if needed elsewhere in this function
     if callset_count is not None:
         df = df[df["callset_count"] == callset_count]
     elif total_callsets is not None:
@@ -133,7 +133,7 @@ else:
     write_per_callset_variants(one_callset_df_fp, output_dir)
 
 
-# cFiltering fn variants:
+# Filtering fn variants:
 df_fn, callset_variant_totals_fn, total_callsets_fn = load_variant_table(snakemake.input.fn, "fn")
 output_dir = snakemake.output.unique_fn
 # variants present in all callsets

@@ -38,7 +38,7 @@ def collect_records(vcf: VariantFile, df: pd.DataFrame) -> list:
             records.append(record)
         except ValueError as e:
             print(f"Error fetching record for {row['chromosome']}:{row['position']}: {e}", file=sys.stderr)
-    print(records, file=sys.stderr)
+    print(f"Collected {len(records)} records.", file=sys.stderr)
     return records
 
 def write_vcf(vcf_in: VariantFile, records: list, output_file: str):
