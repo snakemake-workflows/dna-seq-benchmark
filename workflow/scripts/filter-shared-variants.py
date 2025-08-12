@@ -4,8 +4,7 @@ import pandas as pd
 sys.stderr = open(snakemake.log[0], "w")
 
 
--def load_variant_table(file_path: str, cls) -> pd.DataFrame:
-+def load_variant_table(file_path: str, cls) -> tuple[pd.DataFrame, dict, int]:
+def load_variant_table(file_path: str, cls) -> tuple[pd.DataFrame, dict, int]:
      """Load TSV file into a pandas DataFrame."""
      variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
      df = pd.read_csv(file_path, sep="\t")

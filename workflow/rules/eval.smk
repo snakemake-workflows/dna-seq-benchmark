@@ -177,11 +177,7 @@ rule filter_shared_fn:
 
 rule filter_unique_fn:
     input:
-        fn=lambda wildcards: (
-            "results/fp-fn/benchmarks/{benchmark}.fn.tsv".format(
-                benchmark=wildcards.benchmark
-            )
-        ),
+        fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
     output:
         "results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fn.tsv",
     params:
@@ -196,11 +192,7 @@ rule filter_unique_fn:
 
 rule filter_unique_fp:
     input:
-        fp=lambda wildcards: (
-            "results/fp-fn/benchmarks/{benchmark}.fp.tsv".format(
-                benchmark=wildcards.benchmark
-            )
-        ),
+        fp="results/fp-fn/benchmarks/{benchmark}.fp.tsv",
     output:
         "results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fp.tsv",
     params:
@@ -216,12 +208,10 @@ rule filter_unique_fp:
 rule write_shared_fn_vcf:
     input:
         benchmark_table="results/fp-fn/benchmarks/{benchmark}.shared_fn.tsv",
-        truth_vcf=get_benchmark_renamed_truth,
-        truth_vcf_index=get_benchmark_renamed_truth_index,
+        base_vcf=get_benchmark_renamed_truth,
+        base_vcf_index=get_benchmark_renamed_truth_index,
     output:
         "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.vcf.gz",
-    params:
-        output="shared-fn",
     log:
         "logs/write-shared-fn-vcf/{benchmark}/{benchmark}.shared_fn.log",
     conda:
@@ -233,12 +223,10 @@ rule write_shared_fn_vcf:
 rule write_unique_fn_vcf:
     input:
         benchmark_table="results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fn.tsv",
-        truth_vcf=get_benchmark_renamed_truth,
-        truth_vcf_index=get_benchmark_renamed_truth_index,
+        base_vcf=get_benchmark_renamed_truth,
+        base_vcf_index=get_benchmark_renamed_truth_index,
     output:
         "results/fp-fn/vcf/{benchmark}/{callset}.unique_fn.vcf.gz",
-    params:
-        output="unique-fn",
     log:
         "logs/write-unique-fp-vcf/{benchmark}/{callset}.unique_fn.log",
     conda:
@@ -250,12 +238,10 @@ rule write_unique_fn_vcf:
 rule write_unique_fp_vcf:
     input:
         benchmark_table="results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fp.tsv",
-        callset_vcf="results/normalized-variants/{callset}.vcf.gz",
-        callset_vcf_index="results/normalized-variants/{callset}.vcf.gz.tbi",
+        base_vcf="results/normalized-variants/{callset}.vcf.gz",
+        base_vcf_index="results/normalized-variants/{callset}.vcf.gz.tbi",
     output:
         "results/fp-fn/vcf/{benchmark}/{callset}.unique_fp.vcf.gz",
-    params:
-        output="unique-fp",
     log:
         "logs/write-unique-fp-vcf/{benchmark}/{callset}.unique_fp.log",
     conda:

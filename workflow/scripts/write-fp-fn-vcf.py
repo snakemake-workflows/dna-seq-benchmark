@@ -66,16 +66,8 @@ def process_variants(table_path: str, vcf_path: str, output_file: str):
         variants = collect_records(vcf, get_variant_chr_pos(table))
         write_vcf(vcf, variants, output_file)
 
-if snakemake.params.get("output") == "shared-fn" or snakemake.params.get("output") == "unique-fn":
-    process_variants(
-        snakemake.input.benchmark_table,
-        snakemake.input.truth_vcf,
-        snakemake.output[0]
-    )
-
-elif snakemake.params.get("output") == "unique-fp":
-    process_variants(
-        snakemake.input.benchmark_table,
-        snakemake.input.callset_vcf,
-        snakemake.output[0]
-    )
+process_variants(
+    snakemake.input.benchmark_table,
+    snakemake.input.base_vcf,
+    snakemake.output[0]
+)
