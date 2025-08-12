@@ -29,23 +29,15 @@ if "variant-calls" in config:
             ),
             get_fp_fn_reports,
             expand(
-                "results/fp-fn/benchmarks/{benchmark}.shared.fn.tsv",
+                "results/fp-fn/vcf/{benchmark}.shared_fn.vcf.gz",
                 benchmark=used_benchmarks,
             ),
             expand(
-                "results/fp-fn/vcf/{benchmark}.shared-fn.vcf.gz",
-                benchmark=used_benchmarks,
-            ),
-            expand(
-                "results/fp-fn/vcf/{benchmark}/{callset}.unique-fn.vcf.gz",
+                "results/fp-fn/vcf/{benchmark}/{callset}.unique_{classification}.vcf.gz",
                 benchmark=used_benchmarks,
                 callset=used_callsets,
+                classification=["fp", "fn"],
             ),
-            # expand(
-            #     "results/fp-fn/vcf/{benchmark}/{callset}.unique-fp.vcf.gz",
-            #     benchmark=used_benchmarks,
-            #     callset=used_callsets,
-            # ),
 
     rule eval:
         input:
