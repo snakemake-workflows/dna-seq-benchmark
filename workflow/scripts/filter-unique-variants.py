@@ -66,14 +66,7 @@ def filter_by_callset(df: pd.DataFrame, target_callset: str) -> pd.DataFrame:
     return target_variants
 
 
-if snakemake.params.get("variant_type") == "fp":
-    df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input.fp, "fp")
-    cls = "fp"
-elif snakemake.params.get("variant_type") == "fn":
-    df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input.fn, "fn")
-    cls = "fn"
-else:
-    raise ValueError("Input must contain either 'fp' or 'fn' key with a valid file path")
+df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input, snakemake.wildcards.classification)
 
 # Get the target callset from wildcards
 target_callset = snakemake.wildcards.callset
@@ -86,6 +79,6 @@ write_output(unique_variants, snakemake.output[0])
 
 # Report summary
 if not unique_variants.empty:
-    print(f"Found {len(unique_variants)} {cls} variants unique to callset '{target_callset}'", file=sys.stderr)
+    print(f"Found {len(unique_variants)} {snakemake.wildcards.classification} variants unique to callset '{target_callset}'", file=sys.stderr)
 else:
-    print(f"No {cls} variants unique to callset '{target_callset}'", file=sys.stderr)
+    print(f"No {snakemake.wildcards.classification} variants unique to callset '{target_callset}'", file=sys.stderr)

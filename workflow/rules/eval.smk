@@ -175,30 +175,13 @@ rule filter_shared_fn:
 # TODO: Add rule to filter shared FP variants
 
 
-rule filter_unique_fn:
+rule filter_unique:
     input:
-        fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
+        "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
     output:
-        "results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fn.tsv",
-    params:
-        variant_type="fn",
+        "results/fp-fn/benchmarks/{benchmark}/{callset}.unique_{classification}.tsv",
     log:
-        "logs/filter-unique-variants/{benchmark}/{callset}.unique_fn.log",
-    conda:
-        "../envs/pysam.yaml"
-    script:
-        "../scripts/filter-unique-variants.py"
-
-
-rule filter_unique_fp:
-    input:
-        fp="results/fp-fn/benchmarks/{benchmark}.fp.tsv",
-    output:
-        "results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fp.tsv",
-    params:
-        variant_type="fp",
-    log:
-        "logs/filter-unique-variants/{benchmark}/{callset}.unique_fp.log",
+        "logs/filter-unique-variants/{benchmark}/{callset}.unique_{classification}.log",
     conda:
         "../envs/pysam.yaml"
     script:
