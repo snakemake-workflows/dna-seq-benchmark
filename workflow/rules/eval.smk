@@ -429,26 +429,38 @@ rule filter_shared_fn:
         "../scripts/filter-shared-fn.py"
 
 
-rule filter_unique_variants:
+rule filter_unique_fn:
     input:
         fn=lambda wildcards: (
             "results/fp-fn/benchmarks/{benchmark}.fn.tsv".format(
-                    benchmark=wildcards.benchmark
-                )
-            if wildcards.variant_type == "fn"
-            else []
-        ),
-        fp=lambda wildcards: (
-            "results/fp-fn/benchmarks/{benchmark}.fp.tsv".format(
-                    benchmark=wildcards.benchmark
-                )
-            if wildcards.variant_type == "fp"
-            else []
+                benchmark=wildcards.benchmark
+            )
         ),
     output:
-        "results/fp-fn/benchmarks/{benchmark}/unique_{variant_type}/{callset}.tsv",
+        "results/fp-fn/benchmarks/{benchmark}/unique_fn/{callset}.tsv",
+    params:
+        variant_type="fn",
     log:
-        "logs/filter-unique-variants/{benchmark}.{variant_type}.{callset}.log",
+        "logs/filter-unique-variants/{benchmark}.fn.{callset}.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/filter-unique-variants.py"
+
+
+rule filter_unique_fp:
+    input:
+        fp=lambda wildcards: (
+            "results/fp-fn/benchmarks/{benchmark}.fp.tsv".format(
+                benchmark=wildcards.benchmark
+            )
+        ),
+    output:
+        "results/fp-fn/benchmarks/{benchmark}/unique_fp/{callset}.tsv",
+    params:
+        variant_type="fp",
+    log:
+        "logs/filter-unique-variants/{benchmark}.fp.{callset}.log",
     conda:
         "../envs/pysam.yaml"
     script:

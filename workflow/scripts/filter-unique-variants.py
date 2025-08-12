@@ -67,18 +67,14 @@ def filter_by_callset(df: pd.DataFrame, target_callset: str) -> pd.DataFrame:
     return target_variants
 
 
-# Determine whether we're processing FP or FN based on input
-is_fp = "fp" in snakemake.input.keys()
-is_fn = "fn" in snakemake.input.keys()
-
-if is_fp:
+if snakemake.params.get("variant_type") == "fp":
     df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input.fp, "fp")
     cls = "fp"
-elif is_fn:
+elif snakemake.params.get("variant_type") == "fn":
     df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input.fn, "fn")
     cls = "fn"
 else:
-    raise ValueError("Input must contain either 'fp' or 'fn' key")
+    raise ValueError("Input must contain either 'fp' or 'fn' key with a valid file path")
 
 # Get the target callset from wildcards
 target_callset = snakemake.wildcards.callset
