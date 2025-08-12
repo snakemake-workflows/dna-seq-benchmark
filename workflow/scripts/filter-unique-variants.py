@@ -4,24 +4,24 @@ import pandas as pd
 sys.stderr = open(snakemake.log[0], "w")
 
 
-def load_variant_table(file_path: str, cls) -> pd.DataFrame:
-    """Load TSV file into a pandas DataFrame."""
-    variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
-    df = pd.read_csv(file_path, sep="\t")
+-def load_variant_table(file_path: str, cls) -> pd.DataFrame:
++def load_variant_table(file_path: str, cls) -> tuple[pd.DataFrame, dict, int]:
+     """Load TSV file into a pandas DataFrame."""
+     variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
+     df = pd.read_csv(file_path, sep="\t")
 
-    if df.empty:
-        callset_variant_totals = 0
-        total_callsets = 0
-    else:
-        callset_variant_totals = df.groupby("callset").size().to_dict()
-        total_callsets = df["callset"].nunique()
-        print(f"total number of {snakemake.wildcards.benchmark} callsets containing {cls}: {total_callsets}", file=sys.stderr)
+     if df.empty:
+         callset_variant_totals = 0
+         total_callsets = 0
+     else:
+         callset_variant_totals = df.groupby("callset").size().to_dict()
+         total_callsets = df["callset"].nunique()
+         print(f"total number of {snakemake.wildcards.benchmark} callsets containing {cls}: {total_callsets}", file=sys.stderr)
 
-        # Annotate with number of callsets per variant
-        df = annotate_variant_callset_counts(df, variant_cols)
+         # Annotate with number of callsets per variant
+         df = annotate_variant_callset_counts(df, variant_cols)
 
-    return (df, callset_variant_totals, total_callsets)
-
+     return (df, callset_variant_totals, total_callsets)
 
 def write_output(df: pd.DataFrame, filename: str):
     """Write DataFrame to given TSV file."""
