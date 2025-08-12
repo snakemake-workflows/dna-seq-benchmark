@@ -420,13 +420,16 @@ rule filter_shared_fn:
     input:
         fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
     output:
-        shared_fn="results/fp-fn/benchmarks/{benchmark}.shared_fn.tsv",
+        shared_fn="results/fp-fn/benchmarks/{benchmark}/{benchmark}.shared_fn.tsv",
     log:
-        "logs/filter-shared-fn/{benchmark}.log",
+        "logs/filter-shared-fn/{benchmark}/{benchmark}.log",
     conda:
         "../envs/pysam.yaml"
     script:
-        "../scripts/filter-shared-fn.py"
+        "../scripts/filter-shared-variants.py"
+
+
+# TODO: Add rule to filter shared FP variants
 
 
 rule filter_unique_fn:
@@ -473,11 +476,11 @@ rule write_shared_fn_vcf:
         truth_vcf=get_benchmark_renamed_truth,
         truth_vcf_index=get_benchmark_renamed_truth_index,
     output:
-        "results/fp-fn/vcf/{benchmark}.shared_fn.vcf.gz",
+        "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.vcf.gz",
     params:
         output="shared-fn",
     log:
-        "logs/write-shared-fn-vcf/{benchmark}.shared_fn.log",
+        "logs/write-shared-fn-vcf/{benchmark}/{benchmark}.shared_fn.log",
     conda:
         "../envs/pysam.yaml"
     script:
@@ -571,3 +574,6 @@ rule report_fp_fn_callset:
         high_coverage=get_high_coverage_status,
     wrapper:
         "v7.0.0/utils/datavzrd"
+
+
+# TODO: Add rules to include unique and shared fp / fn variants in the report
