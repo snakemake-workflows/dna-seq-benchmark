@@ -35,7 +35,7 @@ rule liftover_callset:
         reference_dict="resources/reference/genome.fasta.dict",
     output:
         lifted="results/normalized-variants/{callset}.lifted.vcf.gz",
-        rejected="results/normalized-variants/{callset}.lifted_rejected_variants.vcf",
+        rejected="results/normalized-variants/{callset}.lifted_rejected_variants.vcf.gz",
     log:
         "logs/liftover_callset/{callset}.log",
     conda:
