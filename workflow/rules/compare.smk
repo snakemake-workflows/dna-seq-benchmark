@@ -34,7 +34,8 @@ rule liftover_callset:
         reference="resources/reference/genome.fasta",
         reference_dict="resources/reference/genome.fasta.dict",
     output:
-        "results/normalized-variants/{callset}.lifted.vcf.gz",
+        lifted="results/normalized-variants/{callset}.lifted.vcf.gz",
+        rejected="results/normalized-variants/{callset}.lifted_rejected_variants.vcf",
     log:
         "logs/liftover_callset/{callset}.log",
     conda:
@@ -42,8 +43,12 @@ rule liftover_callset:
     resources:
         mem_mb=64000,
     shell:
-        "picard LiftoverVcf -Xmx64g --MAX_RECORDS_IN_RAM 100000 -I {input.callset} -O {output} --CHAIN {input.liftover_chain} --REJECT {output}_rejected_variants.vcf -R {input.reference} &> {log}"
-
+        "picard LiftoverVcf -Xmx64g --MAX_RECORDS_IN_RAM 100000 \
+         -I {input.callset} \
+         -O {output.lifted} \
+         --CHAIN {input.liftover_chain} \
+         --REJECT {output.rejected} \
+         -R {input.reference} &> {log}"
 
 rule rename_contigs:
     input:
