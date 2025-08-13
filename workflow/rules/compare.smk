@@ -50,6 +50,7 @@ rule liftover_callset:
          --REJECT {output.rejected} \
          -R {input.reference} &> {log}"
 
+
 rule rename_contigs:
     input:
         calls=get_callset_correct_contigs_liftover_merge,
