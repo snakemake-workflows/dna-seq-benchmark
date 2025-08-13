@@ -1,9 +1,13 @@
 # rename-contigs
-The reference is denoted in Ensembl notation. If the caller is using USCS notation, the contigs need to be renamed like 
+
+The reference is denoted in Ensembl notation. If the caller is using USCS notation, the contigs need to be renamed like
+
 ```
-chr12 
+chr12
 ```
+
 becomes
+
 ```
 12
 ```
