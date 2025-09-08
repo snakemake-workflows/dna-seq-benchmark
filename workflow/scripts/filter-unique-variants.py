@@ -1,0 +1,84 @@
+import sys
+import pandas as pd
+
+sys.stderr = open(snakemake.log[0], "w")
+
+
+def load_variant_table(file_path: str, cls) -> tuple[pd.DataFrame, dict, int]:
+     """Load TSV file into a pandas DataFrame."""
+     variant_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
+     df = pd.read_csv(file_path, sep="\t")
+
+     if df.empty:
+         callset_variant_totals = 0
+         total_callsets = 0
+     else:
+         callset_variant_totals = df.groupby("callset").size().to_dict()
+         total_callsets = df["callset"].nunique()
+         print(f"total number of {snakemake.wildcards.benchmark} callsets containing {cls}: {total_callsets}", file=sys.stderr)
+
+         # Annotate with number of callsets per variant
+         df = annotate_variant_callset_counts(df, variant_cols)
+
+     return (df, callset_variant_totals, total_callsets)
+
+def write_output(df: pd.DataFrame, filename: str):
+    """Write DataFrame to given TSV file."""
+    if df.empty:
+        print(f"Warning: DataFrame is empty. Writing empty file to {filename}", file=sys.stderr)
+    # Write DataFrame to TSV file
+    df.to_csv(filename, sep="\t", index=False)
+    print(f"Written: {filename}", file=sys.stderr)
+
+
+def annotate_variant_callset_counts(df: pd.DataFrame, variant_cols: list) -> pd.DataFrame:
+    """Annotate each variant with the number of unique callsets it appears in."""
+    counts = df.groupby(variant_cols)["callset"].nunique().reset_index()
+    counts.rename(columns={"callset": "callset_count"}, inplace=True)
+    return df.merge(counts, on=variant_cols)
+
+
+def filter_variants(df: pd.DataFrame, callset_count: int = None, total_callsets: int = None) -> pd.DataFrame:
+    """Filter variants based on number or set of callsets."""
+    # Return empty dataframe if input is empty or callset_count column doesn't exist
+    if df.empty or "callset_count" not in df.columns:
+        return df
+        
+    if callset_count is not None:
+        df = df[df["callset_count"] == callset_count]
+    elif total_callsets is not None:
+        df = df[df["callset_count"] == total_callsets]
+
+    return df
+
+
+def filter_by_callset(df: pd.DataFrame, target_callset: str) -> pd.DataFrame:
+    """Filter variants for a specific callset that are unique to that callset."""
+    if df.empty:
+        return df
+    
+    # First get all variants where callset_count is 1 (unique to some callset)
+    unique_variants = filter_variants(df, callset_count=1)
+    
+    # Then filter for only the target callset
+    target_variants = unique_variants[unique_variants["callset"] == target_callset]
+    
+    return target_variants
+
+
+df, callset_variant_totals, total_callsets = load_variant_table(snakemake.input.table, snakemake.wildcards.classification)
+
+# Get the target callset from wildcards
+target_callset = snakemake.wildcards.callset
+
+# Filter variants that are unique to the target callset
+unique_variants = filter_by_callset(df, target_callset)
+
+# Write output file
+write_output(unique_variants, snakemake.output[0])
+
+# Report summary
+if not unique_variants.empty:
+    print(f"Found {len(unique_variants)} {snakemake.wildcards.classification} variants unique to callset '{target_callset}'", file=sys.stderr)
+else:
+    print(f"No {snakemake.wildcards.classification} variants unique to callset '{target_callset}'", file=sys.stderr)

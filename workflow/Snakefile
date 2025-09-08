@@ -13,7 +13,8 @@ include: "rules/download.smk"
 
 if "variant-calls" in config:
 
-    include: "rules/eval.smk"
+    include: "rules/compare-vcfs.smk"
+    include: "rules/eval-results.smk"
 
     rule all:
         input:
@@ -28,8 +29,19 @@ if "variant-calls" in config:
                 classification=["fp", "fn"],
             ),
             get_fp_fn_reports,
+            expand(
+                "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.vcf.gz",
+                benchmark=used_benchmarks,
+            ),
+            expand(
+                "results/fp-fn/vcf/{benchmark}/{callset}.unique_{classification}.vcf.gz",
+                benchmark=used_benchmarks,
+                callset=used_callsets,
+                classification=["fp", "fn"],
+            ),
 
     rule eval:
+        # TODO: after integrating unqique/shared fp/fn into report add them here
         input:
             expand(
                 "results/report/precision-recall/{benchmark}/{vartype}",
