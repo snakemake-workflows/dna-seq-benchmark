@@ -6,7 +6,7 @@ rule index_vcf:
     log:
         "logs/bcftools-index-vcf/{prefix}.log",
     wrapper:
-        "v7.0.0/bio/bcftools/index"
+        "v7.2.0/bio/bcftools/index"
 
 
 rule index_bcf:
@@ -17,4 +17,4 @@ rule index_bcf:
     log:
         "logs/bcftools-index-bcf/{prefix}.log",
     wrapper:
-        "v7.0.0/bio/bcftools/index"
+        "v7.2.0/bio/bcftools/index"

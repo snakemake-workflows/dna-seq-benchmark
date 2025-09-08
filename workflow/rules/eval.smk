@@ -106,7 +106,7 @@ rule remove_non_pass:
     params:
         extra="-f 'PASS,.'",
     wrapper:
-        "v7.0.0/bio/bcftools/view"
+        "v7.2.0/bio/bcftools/view"
 
 
 rule intersect_calls_with_target_regions:
@@ -202,7 +202,7 @@ rule index_stratified_truth:
     log:
         "logs/bcftools-index/{benchmark}.truth.{cov}.log",
     wrapper:
-        "v7.0.0/bio/bcftools/index"
+        "v7.2.0/bio/bcftools/index"
 
 
 checkpoint stat_truth:
@@ -338,7 +338,7 @@ rule report_precision_recall:
         genome=get_genome_name,
         version=get_genome_version,
     wrapper:
-        "v7.0.0/utils/datavzrd"
+        "v7.2.0/utils/datavzrd"
 
 
 rule extract_fp_fn:
@@ -438,7 +438,7 @@ rule report_fp_fn:
         labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
         version=get_genome_version,
     wrapper:
-        "v7.0.0/utils/datavzrd"
+        "v7.2.0/utils/datavzrd"
 
 
 rule report_fp_fn_callset:
@@ -468,4 +468,4 @@ rule report_fp_fn_callset:
         somatic=get_somatic_status,
         high_coverage=get_high_coverage_status,
     wrapper:
-        "v7.0.0/utils/datavzrd"
+        "v7.2.0/utils/datavzrd"
