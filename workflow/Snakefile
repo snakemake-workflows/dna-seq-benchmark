@@ -13,8 +13,8 @@ include: "rules/download.smk"
 
 if "variant-calls" in config:
 
-    include: "rules/compare.smk"
-    include: "rules/eval.smk"
+    include: "rules/compare-vcfs.smk"
+    include: "rules/eval-results.smk"
 
     rule all:
         input:
@@ -41,6 +41,7 @@ if "variant-calls" in config:
             ),
 
     rule eval:
+        # TODO: after integrating unqique/shared fp/fn into report add them here
         input:
             expand(
                 "results/report/precision-recall/{benchmark}/{vartype}",
