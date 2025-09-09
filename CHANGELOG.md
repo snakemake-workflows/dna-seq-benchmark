@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.14.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.13.0...v1.14.0) (2025-09-09)
+
+
+### Features
+
+* add fp-fn-filtering and write to vcf ([#137](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/137)) ([95642c1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/95642c149754e9676bc63d5dcb8207a1a3f5715c))
+
+
+### Performance Improvements
+
+* update tools in conda environments and snakemake wrappers to 7.2.0 ([#141](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/141)) ([b645cb6](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b645cb602475d1f523d8dd766254422c73fe341e))
+
 ## [1.13.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.2...v1.13.0) (2025-08-01)
 
 
