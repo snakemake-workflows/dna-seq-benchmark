@@ -6,5 +6,5 @@ dependencies:
   - bcftools =1.22
   - samtools =1.22
   - curl =8
-  - bedtools =2.31
-  - ucsc-liftover =469
+  - bedtools =2.31.1
+  - ucsc-liftover =482

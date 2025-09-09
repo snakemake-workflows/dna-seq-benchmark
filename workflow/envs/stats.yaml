@@ -2,8 +2,8 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - pandas =2.3.0
-  - python =3.13.3
-  - scipy =1.15.2
-  - scikit-learn =1.7.0
-  - statsmodels =0.14.4
+  - pandas =2.3.2
+  - python =3.13.7
+  - scipy =1.16.1
+  - scikit-learn =1.7.1
+  - statsmodels =0.14.5
