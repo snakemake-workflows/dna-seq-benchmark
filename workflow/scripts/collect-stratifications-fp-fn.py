@@ -45,6 +45,7 @@ else:
             col: []
             for col in [
                 "coverage",
+                "vaf",
                 "class",
                 "chromosome	position",
                 "ref_allele",

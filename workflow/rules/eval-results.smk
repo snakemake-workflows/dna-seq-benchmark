@@ -87,11 +87,19 @@ rule report_precision_recall:
 rule extract_fp_fn:
     input:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
+        idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
         common_src=common_src,
+        truth=get_stratified_truth(),
+        truth_idx=get_stratified_truth(".tbi"),
+        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
+        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
         "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     log:
         "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
+    params:
+        vaf_fields=get_vaf_fields,
+        vaf_status=get_vaf_status,
     conda:
         "../envs/vembrane.yaml"
     script:

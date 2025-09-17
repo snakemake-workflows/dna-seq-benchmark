@@ -30,6 +30,7 @@ def read_data(f, callset, chromosome=None):
 
     data = data.set_index(
         [
+            "vaf",
             "chromosome",
             "position",
             "ref_allele",
