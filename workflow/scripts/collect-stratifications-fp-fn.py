@@ -45,10 +45,11 @@ else:
             col: []
             for col in [
                 "coverage",
+                "vaf",
                 "class",
                 "chromosome	position",
                 "ref_allele",
-                "alt_allele"
+                "alt_allele",
                 "true_genotype",
                 "predicted_genotype"
             ]
