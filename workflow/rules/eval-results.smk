@@ -6,7 +6,7 @@ rule calc_precision_recall:
         truth=get_stratified_truth(),
         truth_idx=get_stratified_truth(".tbi"),
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
-        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
+        query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
         "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
     log:
@@ -92,7 +92,7 @@ rule extract_fp_fn:
         truth=get_stratified_truth(),
         truth_idx=get_stratified_truth(".tbi"),
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
-        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
+        query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
         "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     log:

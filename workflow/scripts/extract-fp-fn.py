@@ -14,12 +14,19 @@ varfile = pysam.VariantFile(snakemake.input.calls)
 truth = pysam.VariantFile(snakemake.input.truth)
 query = pysam.VariantFile(snakemake.input.query)
 vaf_fields = snakemake.params.vaf_fields
-if vaf_fields[0] is not None:
+if vaf_fields and len(vaf_fields) > 0 and vaf_fields[0] is not None:
     vaf_field_query = vaf_fields[0]["field"]
     vaf_field_name_query = vaf_fields[0]["name"]
-if vaf_fields[1] is not None:
+else:
+    vaf_field_query = None
+    vaf_field_name_query = None
+if vaf_fields and len(vaf_fields) > 1 and vaf_fields[1] is not None:
     vaf_field_truth = vaf_fields[1]["field"]
     vaf_field_name_truth = vaf_fields[1]["name"]
+else:
+    vaf_field_truth = None
+    vaf_field_name_truth = None
+
 
 with open(snakemake.output[0], "w", newline="") as outfile:
     writer = csv.writer(outfile, delimiter="\t")
@@ -45,7 +52,10 @@ with open(snakemake.output[0], "w", newline="") as outfile:
                     r = list(query.fetch(record.contig, record.start, record.stop))
                     if len(r) > 0:
                         r = r[0]
-                    vaf = r.info[vaf_field_name_query] if vaf_field_query == "INFO" else r.samples[0][vaf_field_name_query]
+                    try:
+                        vaf = r.info[vaf_field_name_query] if vaf_field_query == "INFO" else r.samples[0][vaf_field_name_query]
+                    except (KeyError, IndexError):
+                        vaf = float('nan')
                 else:
                     #No VAF information available -> float na
                     vaf = float('nan')
@@ -58,7 +68,10 @@ with open(snakemake.output[0], "w", newline="") as outfile:
                     r = list(truth.fetch(record.contig, record.start, record.stop))
                     if len(r) > 0:
                         r = r[0]
-                    vaf = r.info[vaf_field_name_truth] if vaf_field_truth == "INFO" else r.samples[0][vaf_field_name_truth]
+                    try:
+                        vaf = r.info[vaf_field_name_truth] if vaf_field_truth == "INFO" else r.samples[0][vaf_field_name_truth]
+                    except (KeyError, IndexError):
+                        vaf = float('nan')
                 else:
                     #No VAF information available -> float na
                     vaf = float('nan')
@@ -69,6 +82,7 @@ with open(snakemake.output[0], "w", newline="") as outfile:
                 vaf = vaf[0]
             if isinstance(vaf, str):
                 vaf = float(vaf.replace("%", "")) / 100
+
             for alt in c.variant.alts:
                 writer.writerow(
                     [
