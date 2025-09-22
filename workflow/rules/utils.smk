@@ -18,3 +18,14 @@ rule index_bcf:
         "logs/bcftools-index-bcf/{prefix}.log",
     wrapper:
         "v7.2.0/bio/bcftools/index"
+
+
+rule sort_vcf:
+    input:
+        "{prefix}.vcf.gz",
+    output:
+        "{prefix}.sorted.vcf.gz",
+    log:
+        "logs/bcftools-sort-vcf/{prefix}.log",
+    wrapper:
+        "v7.2.0/bio/bcftools/sort"
