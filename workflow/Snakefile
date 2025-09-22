@@ -30,11 +30,11 @@ if "variant-calls" in config:
             ),
             get_fp_fn_reports,
             expand(
-                "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.vcf.gz",
+                "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.sorted.vcf.gz",
                 benchmark=used_benchmarks,
             ),
             expand(
-                "results/fp-fn/vcf/{benchmark}/{callset}.unique_{classification}.vcf.gz",
+                "results/fp-fn/vcf/{benchmark}/{callset}.unique_{classification}.sorted.vcf.gz",
                 benchmark=used_benchmarks,
                 callset=used_callsets,
                 classification=["fp", "fn"],
