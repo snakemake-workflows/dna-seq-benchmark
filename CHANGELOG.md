@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.14.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.13.0...v1.14.0) (2025-10-01)
+
+
+### Features
+
+* add conda to dependabot ([#144](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/144)) ([3ad3652](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/3ad36524e9d8a26db2a67eb20257ad54ea2c6d9a))
+* add fp-fn-filtering and write to vcf ([#137](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/137)) ([95642c1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/95642c149754e9676bc63d5dcb8207a1a3f5715c))
+* add vaf column to fp/fn tables ([#142](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/142)) ([b0a9dd4](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b0a9dd4b93aa264063e9617c1a791684c1091a15))
+* sort vcfs with shared and unique fp and fn ([#143](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/143)) ([c2aaad2](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/c2aaad20c6c6cec322da4d69766fea30fa9dce96))
+
+
+### Performance Improvements
+
+* update tools in conda environments and snakemake wrappers to 7.2.0 ([#141](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/141)) ([b645cb6](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b645cb602475d1f523d8dd766254422c73fe341e))
+
 ## [1.13.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.2...v1.13.0) (2025-08-01)
 
 
