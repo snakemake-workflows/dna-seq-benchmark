@@ -81,7 +81,7 @@ rule report_precision_recall:
         genome=get_genome_name,
         version=get_genome_version,
     wrapper:
-        "v7.0.0/utils/datavzrd"
+        "v7.6.1/utils/datavzrd"
 
 
 rule extract_fp_fn:
@@ -263,7 +263,7 @@ rule report_fp_fn:
         labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
         version=get_genome_version,
     wrapper:
-        "v7.0.0/utils/datavzrd"
+        "v7.6.1/utils/datavzrd"
 
 
 rule report_fp_fn_callset:
@@ -293,7 +293,7 @@ rule report_fp_fn_callset:
         somatic=get_somatic_status,
         high_coverage=get_high_coverage_status,
     wrapper:
-        "v7.0.0/utils/datavzrd"
+        "v7.6.1/utils/datavzrd"
 
 
 # TODO: Add rules to include unique and shared fp / fn variants in the report

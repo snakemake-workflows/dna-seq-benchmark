@@ -91,7 +91,7 @@ rule normalize_truth:
     log:
         "logs/normalize-truth/{genome}.log",
     wrapper:
-        "v7.2.0/bio/bcftools/norm"
+        "v7.6.1/bio/bcftools/norm"
 
 
 rule get_confidence_bed:
@@ -166,7 +166,7 @@ rule get_reference:
         "logs/get-genome.log",
     cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
-        "v7.2.0/bio/reference/ensembl-sequence"
+        "v7.6.1/bio/reference/ensembl-sequence"
 
 
 rule get_liftover_chain:
@@ -188,7 +188,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "v7.2.0/bio/samtools/faidx"
+        "v7.6.1/bio/samtools/faidx"
 
 
 rule bwa_index:
@@ -201,7 +201,7 @@ rule bwa_index:
     log:
         "logs/bwa_index/genome.log",
     wrapper:
-        "v7.2.0/bio/bwa/index"
+        "v7.6.1/bio/bwa/index"
 
 
 rule bwa_mem:
@@ -218,7 +218,7 @@ rule bwa_mem:
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v7.2.0/bio/bwa/mem"
+        "v7.6.1/bio/bwa/mem"
 
 
 rule mark_duplicates:
@@ -234,7 +234,7 @@ rule mark_duplicates:
     resources:
         mem_mb=1024,
     wrapper:
-        "v7.2.0/bio/picard/markduplicates"
+        "v7.6.1/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -246,7 +246,7 @@ rule samtools_index:
         "logs/samtools-index/{benchmark}.log",
     threads: 4  # This value - 1 will be sent to -@
     wrapper:
-        "v7.2.0/bio/samtools/index"
+        "v7.6.1/bio/samtools/index"
 
 
 rule mosdepth:
@@ -254,18 +254,18 @@ rule mosdepth:
         bam=get_mosdepth_input(),
         bai=get_mosdepth_input(bai=True),
     output:
-        "results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
-        "results/coverage/{benchmark}/coverage.quantized.bed.gz",
+        dist="results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
+        quant="results/coverage/{benchmark}/coverage.quantized.bed.gz",
         summary="results/coverage/{benchmark}/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
     log:
         "logs/mosdepth/{benchmark}.log",
     params:
-        extra="--no-per-base --mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
+        extra="--mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize,
     # additional decompression threads through `--threads`
     threads: 4  # This value - 1 will be sent to `--threads`
     wrapper:
-        "v7.2.0/bio/mosdepth"
+        "v7.6.1/bio/mosdepth"
 
 
 rule stratify_regions:
