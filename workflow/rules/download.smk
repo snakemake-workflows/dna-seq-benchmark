@@ -260,7 +260,7 @@ rule mosdepth:
     log:
         "logs/mosdepth/{benchmark}.log",
     params:
-        extra="--no-per-base --mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
+        extra="--mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize,
     # additional decompression threads through `--threads`
     threads: 4  # This value - 1 will be sent to `--threads`
