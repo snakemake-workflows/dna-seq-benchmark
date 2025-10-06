@@ -254,8 +254,8 @@ rule mosdepth:
         bam=get_mosdepth_input(),
         bai=get_mosdepth_input(bai=True),
     output:
-        "results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
-        "results/coverage/{benchmark}/coverage.quantized.bed.gz",
+        dist="results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
+        quant="results/coverage/{benchmark}/coverage.quantized.bed.gz",
         summary="results/coverage/{benchmark}/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
     log:
         "logs/mosdepth/{benchmark}.log",
