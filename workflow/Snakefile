@@ -34,8 +34,8 @@ if "variant-calls" in config:
                 benchmark=used_benchmarks,
             ),
             expand(
-                "results/fp-fn/vcf/{benchmark}/{benchmark}.unique_{classification}.sorted.vcf.gz",
-                benchmark=used_benchmarks,
+                "results/fp-fn/vcf/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.sorted.vcf.gz",
+                benchmark_callset=used_benchmarks_callsets,
                 classification=["fp", "fn"],
             ),
 
