@@ -23,6 +23,13 @@ used_callsets = {callset for callset in callsets.keys()}
 
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
+used_benchmarks_callsets = [
+    (benchmark, callset)
+    for callset, entries in config["variant-calls"].items()
+    for benchmark in used_benchmarks
+    if entries["benchmark"] == benchmark
+]
+
 
 wildcard_constraints:
     benchmark="|".join(benchmarks),
