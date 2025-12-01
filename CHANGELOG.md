@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.14.1](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.14.0...v1.14.1) (2025-11-14)
+
+
+### Bug Fixes
+
+* avoid creation of vcfs for all callsets for each benchmark ([#149](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/149)) ([2de769e](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/2de769e5ee6af56f9aea36fee781808d8a5acf5f))
+
+
+### Performance Improvements
+
+* bump snakemake wrappers to v7.6.1 ([#145](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/145)) ([8768c74](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/8768c749b39501cc9ba8b7417bba5b3495150fae))
+* bump snakemake wrappers to v7.8.1 ([#147](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/147)) ([7181d47](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/7181d47166819ebcb325949056a4c1f32ec9cbb0))
+
 ## [1.14.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.13.0...v1.14.0) (2025-10-01)
 
 
