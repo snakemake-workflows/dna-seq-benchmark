@@ -7,7 +7,7 @@ on:
 # cancel any in-progress runs if a new commit is pushed
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
 concurrency:
-  group: 'autobump'
+  group: 'autobump-wrappers'
   cancel-in-progress: true
 
 permissions:
@@ -29,7 +29,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: perf/autobump
+          branch: perf/autobump-wrappers
           title: "perf: autobump snakemake wrappers"
           token: ${{ secrets.AUTOBUMP_PAT }}
           commit-message: "perf: autobump snakemake wrappers"
