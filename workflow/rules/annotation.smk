@@ -1,0 +1,125 @@
+rule get_vep_cache:
+    output:
+        directory("resources/vep/cache"),
+    params:
+        species="homo_sapiens",
+        build=get_reference_genome_build(),
+        release="111",
+    log:
+        "logs/vep/cache.log",
+    cache: "omit-software"
+    wrapper:
+        "v8.0.2/bio/vep/cache"
+
+
+rule get_vep_plugins:
+    output:
+        directory("resources/vep/plugins"),
+    params:
+        release="111",
+    log:
+        "logs/vep/plugins.log",
+    wrapper:
+        "v8.0.2/bio/vep/plugins"
+
+
+rule download_revel:
+    output:
+        temp("resources/revel_scores.zip"),
+    log:
+        "logs/vep_plugins/download_revel.log",
+    conda:
+        "../envs/curl.yaml"
+    shell:
+        "curl https://zenodo.org/records/7072866/files/revel-v1.3_all_chromosomes.zip -o {output} &> {log}"
+
+
+rule process_revel_scores:
+    input:
+        "resources/revel_scores.zip",
+    output:
+        "resources/revel_scores.tsv.gz",
+    params:
+        build=get_reference_genome_build(),
+    log:
+        "logs/vep_plugins/process_revel_scores.log",
+    conda:
+        "../envs/htslib.yaml"
+    shell:
+        """
+        tmpfile=$(mktemp {resources.tmpdir}/revel_scores.XXXXXX)
+        unzip -p {input} | tr "," "\t" | sed '1s/.*/#&/' | bgzip -c > $tmpfile
+        if [ "{params.build}" == "GRCh38" ] ; then
+            zgrep -h -v ^#chr $tmpfile | awk '$3 != "." ' | sort -k1,1 -k3,3n - | cat <(zcat $tmpfile | head -n1) - | bgzip -c > {output}
+        elif [ "{params.build}" == "GRCh37" ] ; then
+            cat $tmpfile > {output}
+        else
+            echo "Annotation of REVEL scores only supported for GRCh37 or GRCh38" > {log}
+            exit 125
+        fi
+        """
+
+
+rule tabix_revel_scores:
+    input:
+        "resources/revel_scores.tsv.gz",
+    output:
+        "resources/revel_scores.tsv.gz.tbi",
+    params:
+        get_tabix_revel_params(),
+    log:
+        "logs/tabix/revel.log",
+    wrapper:
+        "v8.0.2/bio/tabix/index"
+
+
+rule annotate_shared_fn:
+    input:
+        calls="results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.sorted.vcf.gz",
+        cache=access.random("resources/vep/cache"),
+        plugins=access.random("resources/vep/plugins"),
+        revel=lambda wc: get_plugin_aux("REVEL"),
+        revel_tbi=lambda wc: get_plugin_aux("REVEL", True),
+        fasta=access.random("resources/reference/genome.fasta"),
+        fai="resources/reference/genome.fasta.fai",
+    output:
+        calls="results/fp-fn/annotated_vcf/{benchmark}/{benchmark}.shared_fn.annotated.vcf.gz",
+        stats="results/fp-fn/annotated_vcf/{benchmark}/{benchmark}.shared_fn.stats.html",
+    params:
+        # Pass a list of plugins to use, see https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
+        # Plugin args can be added as well, e.g. via an entry "MyPlugin,1,FOO", see docs.
+        plugins=["REVEL"],
+        extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
+    log:
+        "logs/vep/fp-fn/{benchmark}/{benchmark}.shared_fn.annotate.log",
+    threads: 4
+    group:
+        "annotation"
+    wrapper:
+        "v8.0.2/bio/vep/annotate"
+
+
+rule annotate_unique_fp_fn:
+    input:
+        calls="results/fp-fn/vcf/{benchmark}/{callset}.unique_{classification}.sorted.vcf.gz",
+        cache=access.random("resources/vep/cache"),
+        plugins=access.random("resources/vep/plugins"),
+        revel=lambda wc: get_plugin_aux("REVEL"),
+        revel_tbi=lambda wc: get_plugin_aux("REVEL", True),
+        fasta=access.random("resources/reference/genome.fasta"),
+        fai="resources/reference/genome.fasta.fai",
+    output:
+        calls="results/fp-fn/annotated_vcf/{benchmark}/{callset}.unique_{classification}.annotated.vcf.gz",
+        stats="results/fp-fn/annotated_vcf/{benchmark}/{callset}.unique_{classification}.stats.html",
+    params:
+        # Pass a list of plugins to use, see https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
+        # Plugin args can be added as well, e.g. via an entry "MyPlugin,1,FOO", see docs.
+        plugins=["REVEL"],
+        extra="--everything --check_existing --vcf_info_field ANN --hgvsg",
+    log:
+        "logs/vep/fp-fn/{benchmark}/{callset}.unique_{classification}.annotate.log",
+    threads: 4
+    group:
+        "annotation"
+    wrapper:
+        "v8.0.2/bio/vep/annotate"

@@ -733,3 +733,16 @@ if "variant-calls" in config:
         classification="fp|fn",
         comparison="genotype|existence",
         vartype="snvs|indels",
+
+
+def get_tabix_revel_params():
+    # Indexing of REVEL-score file where the column depends on the reference
+    column = 2 if config["reference-genome"] == "grch37" else 3
+    return f"-f -s 1 -b {column} -e {column}"
+
+
+def get_plugin_aux(plugin, index=False):
+    if plugin == "REVEL":
+        suffix = ".tbi" if index else ""
+        return "resources/revel_scores.tsv.gz{suffix}".format(suffix=suffix)
+    return []
