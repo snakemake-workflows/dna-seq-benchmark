@@ -115,7 +115,7 @@ rule annotate_unique_fp_fn:
         # Pass a list of plugins to use, see https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
         # Plugin args can be added as well, e.g. via an entry "MyPlugin,1,FOO", see docs.
         plugins=["REVEL"],
-        extra="--everything --check_existing --vcf_info_field ANN --hgvsg",
+        extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
     log:
         "logs/vep/fp-fn/{benchmark}/{callset}.unique_{classification}.annotate.log",
     threads: 4
