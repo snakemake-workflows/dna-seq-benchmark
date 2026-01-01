@@ -18,7 +18,7 @@ jobs:
   autobump:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Update wrappers and meta-wrappers
         uses: snakemake/snakedeploy-github-action@v1
@@ -27,7 +27,7 @@ jobs:
           args: workflow/Snakefile workflow/rules/*.smk
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: perf/autobump-wrappers
           title: "perf: autobump snakemake wrappers"
