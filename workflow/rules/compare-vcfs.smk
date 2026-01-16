@@ -112,7 +112,7 @@ rule remove_non_pass:
     params:
         extra="-f 'PASS,.'",
     wrapper:
-        "v8.0.2/bio/bcftools/view"
+        "v8.1.1/bio/bcftools/view"
 
 
 rule intersect_calls_with_target_regions:
@@ -208,7 +208,7 @@ rule index_stratified_truth:
     log:
         "logs/bcftools-index/{benchmark}.truth.{cov}.log",
     wrapper:
-        "v8.0.2/bio/bcftools/index"
+        "v8.1.1/bio/bcftools/index"
 
 
 checkpoint stat_truth:
