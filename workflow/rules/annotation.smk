@@ -70,7 +70,7 @@ rule tabix_revel_scores:
     log:
         "logs/tabix/revel.log",
     wrapper:
-        "v8.0.2/bio/tabix/index"
+        "v8.1.1/bio/tabix/index"
 
 
 rule annotate_shared_fn:
