@@ -122,4 +122,4 @@ rule annotate_unique_fp_fn:
     group:
         "annotation"
     wrapper:
-        "v8.0.2/bio/vep/annotate"
+        "v8.1.1/bio/vep/annotate"
