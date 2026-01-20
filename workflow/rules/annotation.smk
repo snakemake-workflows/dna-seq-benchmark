@@ -29,7 +29,7 @@ rule download_revel:
     log:
         "logs/vep_plugins/download_revel.log",
     conda:
-        "../envs/curl.yaml"
+        "../envs/tools.yaml"
     shell:
         "curl https://zenodo.org/records/7072866/files/revel-v1.3_all_chromosomes.zip -o {output} &> {log}"
 
