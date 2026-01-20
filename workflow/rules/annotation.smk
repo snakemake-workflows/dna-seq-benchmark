@@ -9,7 +9,7 @@ rule get_vep_cache:
         "logs/vep/cache.log",
     cache: "omit-software"
     wrapper:
-        "v8.0.2/bio/vep/cache"
+        "v8.1.1/bio/vep/cache"
 
 
 rule get_vep_plugins:
