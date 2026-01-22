@@ -1,3 +1,14 @@
+rule get_downsampled_vep_cache:
+    output:
+        directory("resources/vep/cache_downsampled"),
+    log:
+        "logs/vep/cache.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "(mkdir -p {output}; curl -L https://github.com/nf-core/test-datasets/raw/refs/heads/variantprioritization/reference/vep_cache_113_GRCh38_chr22.tar.gz | tar -x -C {output} --strip-components 1) 2> {log}"
+
+
 rule get_vep_cache:
     output:
         directory("resources/vep/cache"),
@@ -76,7 +87,7 @@ rule tabix_revel_scores:
 rule annotate_shared_fn:
     input:
         calls="results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.sorted.vcf.gz",
-        cache=access.random("resources/vep/cache"),
+        cache=get_vep_cache_dir(),
         plugins=access.random("resources/vep/plugins"),
         revel=lambda wc: get_plugin_aux("REVEL"),
         revel_tbi=lambda wc: get_plugin_aux("REVEL", True),

@@ -746,3 +746,9 @@ def get_plugin_aux(plugin, index=False):
         suffix = ".tbi" if index else ""
         return "resources/revel_scores.tsv.gz{suffix}".format(suffix=suffix)
     return []
+
+
+def get_vep_cache_dir():
+    if config.get("limit-reads"):
+        return access.random("resources/vep/cache_downsampled")
+    return (access.random("resources/vep/cache"),)
