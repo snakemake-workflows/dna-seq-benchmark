@@ -45,6 +45,7 @@ else:
             col: []
             for col in [
                 "coverage",
+                "vaf",
                 "precision",
                 "tp_query",
                 "fp",

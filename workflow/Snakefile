@@ -13,9 +13,10 @@ include: "rules/download.smk"
 
 if "variant-calls" in config:
 
-    include: "rules/eval.smk"
+    include: "rules/compare-vcfs.smk"
+    include: "rules/eval-results.smk"
 
-    rule eval:
+    rule all:
         input:
             expand(
                 "results/report/precision-recall/{benchmark}/{vartype}",
@@ -25,6 +26,35 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
+                classification=["fp", "fn"],
+            ),
+            get_fp_fn_reports,
+            expand(
+                "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.sorted.vcf.gz",
+                benchmark=used_benchmarks,
+            ),
+            expand(
+                "results/fp-fn/vcf/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.sorted.vcf.gz",
+                benchmark_callset=used_benchmarks_callsets,
+                classification=["fp", "fn"],
+            ),
+
+    rule eval:
+        # TODO: after integrating unqique/shared fp/fn into report add them here
+        input:
+            expand(
+                "results/report/precision-recall/{benchmark}/{vartype}",
+                benchmark=used_benchmarks,
+                vartype=["snvs", "indels"],
+            ),
+            expand(
+                "results/report/fp-fn/callsets/{callset}/{classification}",
+                callset=used_callsets,
+                classification=["fp", "fn"],
+            ),
+            expand(
+                "results/fp-fn/{benchmark}.{classification}.tsv",
+                benchmark=used_benchmarks,
                 classification=["fp", "fn"],
             ),
             get_fp_fn_reports,

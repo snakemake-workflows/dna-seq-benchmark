@@ -1,5 +1,67 @@
 # Changelog
 
+## [1.14.1](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.14.0...v1.14.1) (2025-11-14)
+
+
+### Bug Fixes
+
+* avoid creation of vcfs for all callsets for each benchmark ([#149](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/149)) ([2de769e](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/2de769e5ee6af56f9aea36fee781808d8a5acf5f))
+
+
+### Performance Improvements
+
+* bump snakemake wrappers to v7.6.1 ([#145](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/145)) ([8768c74](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/8768c749b39501cc9ba8b7417bba5b3495150fae))
+* bump snakemake wrappers to v7.8.1 ([#147](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/147)) ([7181d47](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/7181d47166819ebcb325949056a4c1f32ec9cbb0))
+
+## [1.14.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.13.0...v1.14.0) (2025-10-01)
+
+
+### Features
+
+* add conda to dependabot ([#144](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/144)) ([3ad3652](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/3ad36524e9d8a26db2a67eb20257ad54ea2c6d9a))
+* add fp-fn-filtering and write to vcf ([#137](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/137)) ([95642c1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/95642c149754e9676bc63d5dcb8207a1a3f5715c))
+* add vaf column to fp/fn tables ([#142](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/142)) ([b0a9dd4](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b0a9dd4b93aa264063e9617c1a791684c1091a15))
+* sort vcfs with shared and unique fp and fn ([#143](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/143)) ([c2aaad2](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/c2aaad20c6c6cec322da4d69766fea30fa9dce96))
+
+
+### Performance Improvements
+
+* update tools in conda environments and snakemake wrappers to 7.2.0 ([#141](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/141)) ([b645cb6](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b645cb602475d1f523d8dd766254422c73fe341e))
+
+## [1.13.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.2...v1.13.0) (2025-08-01)
+
+
+### Features
+
+* add number of expected variants to report and improve the views ([#130](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/130)) ([4ada0c1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/4ada0c1f16d9e4ebdee104b112e066574aa31c5a))
+
+
+### Bug Fixes
+
+* link to snakemake workflow catalog ([#129](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/129)) ([1c49f2f](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/1c49f2f5b9777d8b46d691efcd97d063e6afc911))
+* use buffered and script based get-reads implementation ([#126](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/126)) ([b9d4360](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b9d43605e736a3e919a74d811dadf93fad8c5cef))
+
+
+### Performance Improvements
+
+* add bot to automatically update github actions monthly ([#134](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/134)) ([e1ac2d5](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/e1ac2d5b0c67444adeff8af667f97249ef9073eb))
+* update tools in conda environments ([#132](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/132)) ([6d2dbc1](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/6d2dbc1fa4ce97cfc3754e9050a266a9b499e3e5))
+* update snakemake wrappers to 7.0.0 ([#131](https://github.com/snakemake-workflows/dna-seq-benchmark/pull/131)) ([d7d9f0e](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/d7d9f0ebbd3ef33ef4a1165d3f96656c9b366ba8))
+
+### [1.12.2](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.1...v1.12.2) (2025-04-15)
+
+
+### Bug Fixes
+
+* add dirs with results to rule all ([#120](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/120)) ([4dfdf6d](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/4dfdf6dd33c1e84d82f9647b24b8872e5d688f41))
+
+### [1.12.1](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.12.0...v1.12.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* add .get() for optional values in config instead of dict access ([#118](https://www.github.com/snakemake-workflows/dna-seq-benchmark/issues/118)) ([94d9294](https://www.github.com/snakemake-workflows/dna-seq-benchmark/commit/94d92945732fd6b30aa08ff8e267f8929098ce22))
+
 ## [1.12.0](https://www.github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.11.7...v1.12.0) (2025-04-03)
 
 

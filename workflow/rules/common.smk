@@ -23,6 +23,13 @@ used_callsets = {callset for callset in callsets.keys()}
 
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
+used_benchmarks_callsets = [
+    (benchmark, callset)
+    for callset, entries in config["variant-calls"].items()
+    for benchmark in used_benchmarks
+    if entries["benchmark"] == benchmark
+]
+
 
 wildcard_constraints:
     benchmark="|".join(benchmarks),
@@ -208,9 +215,9 @@ def get_callset(wildcards):
     vcf = callset["path"]
     if get_somatic_status(wildcards):
         return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif callset.get("rename-contigs", False) != False:
+    elif callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif callset["genome-build"] == "grch37":
+    elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     elif isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
@@ -221,9 +228,9 @@ def get_callset(wildcards):
 def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
-    if "rename-contigs" in callset:
+    if callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif callset["genome-build"] == "grch37":
+    elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
     elif isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
@@ -234,9 +241,9 @@ def get_callset_correct_contigs(wildcards):
 def get_callset_correct_contigs_liftover(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
-    if callset["genome-build"] == "grch37":
+    if callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
-    elif callset.get("rename-contigs", False) != False:
+    elif callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
@@ -334,13 +341,6 @@ def get_liftover_statement(wildcards, input, output):
         return f"> {output}"
 
 
-def get_read_limit_param(wildcards, input):
-    if config.get("limit-reads"):
-        return "| head -n 110000"  # a bit more than 100000 reads because we also have the header
-    else:
-        return ""
-
-
 def get_benchmark(benchmark):
     try:
         return benchmarks[benchmark]
@@ -362,11 +362,35 @@ def get_genome_truth(wildcards):
 
 
 def get_benchmark_truth(wildcards):
-    genome = get_benchmark(wildcards.benchmark)["genome"]
-    if get_somatic_status(wildcards):
-        return f"resources/variants/{genome}/all.truth.format-added.vcf.gz"
+    if hasattr(wildcards, "benchmark"):
+        genome = get_benchmark(wildcards.benchmark)["genome"]
+        if get_somatic_status(wildcards):
+            return f"resources/variants/{genome}/all.truth.format-added.vcf.gz"
+        else:
+            return f"resources/variants/{genome}/all.truth.norm.bcf"
     else:
-        return f"resources/variants/{genome}/all.truth.norm.bcf"
+        return f"resources/variants/{wildcards.genome}/all.truth.norm.bcf"
+
+
+def get_benchmark_truth_index(wildcards):
+    if hasattr(wildcards, "benchmark"):
+        genome = get_benchmark(wildcards.benchmark)["genome"]
+        if get_somatic_status(wildcards):
+            return f"resources/variants/{genome}/all.truth.format-added.vcf.gz.tbi"
+        else:
+            return f"resources/variants/{genome}/all.truth.norm.bcf.csi"
+    else:
+        return f"resources/variants/{wildcards.genome}/all.truth.norm.bcf.csi"
+
+
+def get_benchmark_renamed_truth(wildcards):
+    genome = get_benchmark(wildcards.benchmark)["genome"]
+    return f"resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz"
+
+
+def get_benchmark_renamed_truth_index(wildcards):
+    genome = get_benchmark(wildcards.benchmark)["genome"]
+    return f"resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz.tbi"
 
 
 def get_stratified_truth(suffix=""):
@@ -388,22 +412,32 @@ def get_test_regions(wildcards):
 
 
 def get_rename_contig_file(wildcards):
-    if config["variant-calls"][wildcards.callset][
-        "genome-build"
-    ] == "grch37" and config["variant-calls"][wildcards.callset].get(
-        "rename-contigs", False
-    ):
-        return workflow.source_path(
-            "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
-        )
-    if config["variant-calls"][wildcards.callset][
-        "genome-build"
-    ] == "grch38" and config["variant-calls"][wildcards.callset].get(
-        "rename-contigs", False
-    ):
-        return workflow.source_path(
-            "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
-        )
+    if hasattr(wildcards, "callset"):
+        if config["variant-calls"][wildcards.callset].get(
+            "genome-build", "grch38"
+        ) == "grch37" and config["variant-calls"][wildcards.callset].get(
+            "rename-contigs", False
+        ):
+            return workflow.source_path(
+                "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
+            )
+        if config["variant-calls"][wildcards.callset].get(
+            "genome-build", "grch38"
+        ) == "grch38" and config["variant-calls"][wildcards.callset].get(
+            "rename-contigs", False
+        ):
+            return workflow.source_path(
+                "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
+            )
+    if hasattr(wildcards, "genome"):
+        if config["reference-genome"] == "grch37":
+            return workflow.source_path(
+                "../resources/rename-contigs/grch37_ucsc2ensembl.txt"
+            )
+        elif config["reference-genome"] == "grch38":
+            return workflow.source_path(
+                "../resources/rename-contigs/grch38_ucsc2ensembl.txt"
+            )
     else:
         return config["variant-calls"][wildcards.callset].get("rename-contigs", False)
 
@@ -517,13 +551,18 @@ def get_vaf_fields(wildcards):
 
 
 def get_vaf_status(wildcards):
-    vaf_benchmark = benchmarks[wildcards.benchmark].get("vaf-field")
+    if hasattr(wildcards, "benchmark"):
+        benchmark = wildcards.benchmark
+    else:
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+
+    vaf_benchmark = benchmarks[benchmark].get("vaf-field")
     if vaf_benchmark is None:
         return False
     if vaf_benchmark == "tbc":
         return True
     else:
-        callsets = get_benchmark_callsets(wildcards.benchmark)
+        callsets = get_benchmark_callsets(benchmark)
         vaf_callsets = [
             config["variant-calls"][callset].get("vaf-field") for callset in callsets
         ]
@@ -546,7 +585,7 @@ def get_collect_stratifications_input(wildcards):
     import json
 
     return expand(
-        "results/precision-recall/callsets/{{callset}}/{cov}.{{vartype}}.tsv",
+        "results/precision-recall/callsets/{{callset}}/{cov}.{{vartype}}.{{mode}}.tsv",
         cov=get_nonempty_coverages(wildcards),
     )
 
@@ -592,8 +631,18 @@ def get_benchmark_callsets(benchmark):
 def get_collect_precision_recall_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
     return expand(
-        "results/precision-recall/callsets/{callset}.{{vartype}}.tsv", callset=callsets
+        "results/precision-recall/callsets/{callset}.{{vartype}}.{{mode}}.tsv",
+        callset=callsets,
     )
+
+
+def get_report_precision_recall_input(wildcards):
+    table = "results/precision-recall/benchmarks/{benchmark}.{vartype}.base.tsv"
+    if get_vaf_status(wildcards):
+        stratified_table = "results/precision-recall/benchmarks/{benchmark}.{vartype}.vaf-stratified.tsv"
+        return [table, stratified_table]
+    else:
+        return [table]
 
 
 def get_collect_fp_fn_benchmark_input(wildcards):

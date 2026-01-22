@@ -3,22 +3,19 @@ rule get_reads:
         r1="resources/reads/{benchmark}.1.fq",
         r2="resources/reads/{benchmark}.2.fq",
     params:
-        limit=get_read_limit_param,
+        limit=branch(
+            lookup("limit-reads", within=config, default=False),
+            then=100000,
+            otherwise=None,
+        ),
         bam_url=get_benchmark_bam_url,
     log:
         "logs/download-reads/{benchmark}.log",
     conda:
-        "../envs/tools.yaml"
-    resources:
-        sort_threads=lambda _, threads: max(threads - 2, 1),
-    threads: 32
+        "../envs/pysam.yaml"
     retries: 3
-    shell:
-        "(set +o pipefail; samtools view -f3 -h"
-        " {params.bam_url}"
-        " {params.limit} |"
-        " samtools sort -n -O BAM --threads {resources.sort_threads} | "
-        " samtools fastq -1 {output.r1} -2 {output.r2} -s /dev/null -0 /dev/null -) 2> {log}"
+    script:
+        "../scripts/get-reads.py"
 
 
 rule get_archive:
@@ -53,6 +50,21 @@ rule get_truth:
         ") 2> {log}"
 
 
+rule rename_truth_contigs:
+    input:
+        calls=get_benchmark_truth,
+        repl_file=get_rename_contig_file,
+    output:
+        "resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz",
+    log:
+        "logs/rename-truth-contigs/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        "bcftools annotate {input.calls} --rename-chrs {input.repl_file} "
+        "-Oz -o {output} 2> {log}"
+
+
 rule merge_truthsets:
     input:
         bcf=get_truthsets(),
@@ -79,7 +91,7 @@ rule normalize_truth:
     log:
         "logs/normalize-truth/{genome}.log",
     wrapper:
-        "v1.9.0/bio/bcftools/norm"
+        "v8.0.2/bio/bcftools/norm"
 
 
 rule get_confidence_bed:
@@ -152,8 +164,9 @@ rule get_reference:
         chromosome="1" if config.get("limit-reads") else None,
     log:
         "logs/get-genome.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
-        "v1.7.2/bio/reference/ensembl-sequence"
+        "v8.0.2/bio/reference/ensembl-sequence"
 
 
 rule get_liftover_chain:
@@ -175,7 +188,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "v1.7.2/bio/samtools/faidx"
+        "v8.0.2/bio/samtools/faidx"
 
 
 rule bwa_index:
@@ -186,9 +199,9 @@ rule bwa_index:
             "resources/reference/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
         ),
     log:
-        "logs/bwa-index.log",
+        "logs/bwa_index/genome.log",
     wrapper:
-        "v1.8.0/bio/bwa/index"
+        "v8.0.2/bio/bwa/index"
 
 
 rule bwa_mem:
@@ -200,11 +213,12 @@ rule bwa_mem:
     log:
         "logs/bwa-mem/{benchmark}.log",
     params:
+        extra=r"-R '@RG\tID:{benchmark}\tSM:{benchmark}'",
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v1.8.0/bio/bwa/mem"
+        "v8.0.2/bio/bwa/mem"
 
 
 rule mark_duplicates:
@@ -220,7 +234,7 @@ rule mark_duplicates:
     resources:
         mem_mb=1024,
     wrapper:
-        "v1.7.2/bio/picard/markduplicates"
+        "v8.0.2/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -230,8 +244,9 @@ rule samtools_index:
         "results/read-alignments/{benchmark}.dedup.bam.bai",
     log:
         "logs/samtools-index/{benchmark}.log",
+    threads: 4  # This value - 1 will be sent to -@
     wrapper:
-        "v1.7.2/bio/samtools/index"
+        "v8.0.2/bio/samtools/index"
 
 
 rule mosdepth:
@@ -239,16 +254,18 @@ rule mosdepth:
         bam=get_mosdepth_input(),
         bai=get_mosdepth_input(bai=True),
     output:
-        "results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
-        "results/coverage/{benchmark}/coverage.quantized.bed.gz",
+        dist="results/coverage/{benchmark}/coverage.mosdepth.global.dist.txt",
+        quant="results/coverage/{benchmark}/coverage.quantized.bed.gz",
         summary="results/coverage/{benchmark}/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
     log:
         "logs/mosdepth/{benchmark}.log",
     params:
-        extra="--no-per-base --mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
+        extra="--mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize,
+    # additional decompression threads through `--threads`
+    threads: 4  # This value - 1 will be sent to `--threads`
     wrapper:
-        "v1.7.2/bio/mosdepth"
+        "v8.0.2/bio/mosdepth"
 
 
 rule stratify_regions:
