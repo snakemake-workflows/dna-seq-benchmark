@@ -6,7 +6,7 @@ rule get_downsampled_vep_cache:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(mkdir -p {output}; curl -L https://github.com/nf-core/test-datasets/raw/refs/heads/variantprioritization/reference/vep_cache_113_GRCh38_chr22.tar.gz | tar -x -C {output} --strip-components 1) 2> {log}"
+        "(mkdir -p {output}; curl -L https://github.com/nf-core/test-datasets/raw/refs/heads/variantprioritization/reference/vep_cache_113_GRCh38_chr22.tar.gz | tar -xz -C {output} --strip-components 1) 2> {log}"
 
 
 rule get_vep_cache:
