@@ -70,6 +70,7 @@ rule process_revel_scores:
         fi
         """
 
+
 rule tabix_revel_scores:
     input:
         get_revel_tsv(),

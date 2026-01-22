@@ -756,8 +756,6 @@ def get_vep_cache_dir():
 
 def get_revel_tsv():
     if config.get("limit-reads"):
-        workflow.source_path(
-                "../resources/new_tabbed_revel_grch38.1pct.tsv.gz"
-            )
+        workflow.source_path("../resources/new_tabbed_revel_grch38.1pct.tsv.gz")
     else:
         return "resources/revel_scores.tsv.gz"
