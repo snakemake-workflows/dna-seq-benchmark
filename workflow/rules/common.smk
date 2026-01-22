@@ -754,10 +754,10 @@ def get_vep_cache_dir():
     return access.random("resources/vep/cache")
 
 
-def get_revel_url():
+def get_revel_tsv():
     if config.get("limit-reads"):
-        return (
-            "https://zenodo.org/records/7072866/files/revel-v1.3_segments_chrom_22.zip"
-        )
+        workflow.source_path(
+                "../resources/new_tabbed_revel_grch38.1pct.tsv.gz"
+            )
     else:
-        return "https://zenodo.org/records/7072866/files/revel-v1.3_all_chromosomes.zip"
+        return "resources/revel_scores.tsv.gz"

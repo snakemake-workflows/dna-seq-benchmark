@@ -37,14 +37,12 @@ rule get_vep_plugins:
 rule download_revel:
     output:
         temp("resources/revel_scores.zip"),
-    params:
-        url=get_revel_url(),
     log:
         "logs/vep_plugins/download_revel.log",
     conda:
         "../envs/tools.yaml"
     shell:
-        "curl {params.url} -o {output} &> {log}"
+        "curl https://zenodo.org/records/7072866/files/revel-v1.3_all_chromosomes.zip -o {output} &> {log}"
 
 
 rule process_revel_scores:
@@ -72,10 +70,9 @@ rule process_revel_scores:
         fi
         """
 
-
 rule tabix_revel_scores:
     input:
-        "resources/revel_scores.tsv.gz",
+        get_revel_tsv(),
     output:
         "resources/revel_scores.tsv.gz.tbi",
     params:
