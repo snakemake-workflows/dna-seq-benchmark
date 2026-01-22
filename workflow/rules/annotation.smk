@@ -113,7 +113,7 @@ rule annotate_shared_fn:
 rule annotate_unique_fp_fn:
     input:
         calls="results/fp-fn/vcf/{benchmark}/{callset}.unique_{classification}.sorted.vcf.gz",
-        cache=access.random("resources/vep/cache"),
+        cache=get_vep_cache_dir(),
         plugins=access.random("resources/vep/plugins"),
         revel=lambda wc: get_plugin_aux("REVEL"),
         revel_tbi=lambda wc: get_plugin_aux("REVEL", True),
