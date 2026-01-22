@@ -38,7 +38,7 @@ rule download_revel:
     output:
         temp("resources/revel_scores.zip"),
     params:
-        url=get_revel_url()
+        url=get_revel_url(),
     log:
         "logs/vep_plugins/download_revel.log",
     conda:

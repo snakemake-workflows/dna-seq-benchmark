@@ -751,10 +751,13 @@ def get_plugin_aux(plugin, index=False):
 def get_vep_cache_dir():
     if config.get("limit-reads"):
         return access.random("resources/vep/cache_downsampled")
-    return (access.random("resources/vep/cache"),)
+    return access.random("resources/vep/cache")
+
 
 def get_revel_url():
     if config.get("limit-reads"):
-        return "https://zenodo.org/records/7072866/files/revel-v1.3_segments_chrom_22.zip"
+        return (
+            "https://zenodo.org/records/7072866/files/revel-v1.3_segments_chrom_22.zip"
+        )
     else:
         return "https://zenodo.org/records/7072866/files/revel-v1.3_all_chromosomes.zip"
