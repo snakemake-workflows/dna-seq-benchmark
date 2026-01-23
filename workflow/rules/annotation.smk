@@ -10,7 +10,7 @@ rule get_downsampled_vep_cache:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(mkdir -p {output}; tar -xz {input}  -C {output} --strip-components 1) 2> {log}"
+        "(mkdir -p {output}; tar -xzf {input}  -C {output} --strip-components 1) 2> {log}"
 
 
 rule get_vep_cache:
