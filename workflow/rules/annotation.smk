@@ -1,6 +1,6 @@
 rule get_downsampled_vep_cache:
     input:
-        workflow.basedir + "../.test/resources/vep_cache_113_GRCh38_chr22.tar.gz",
+        workflow.source_path("../../.test/resources/vep_cache_113_GRCh38_chr22.tar.gz"),
     output:
         directory("resources/vep/cache_downsampled"),
     log:

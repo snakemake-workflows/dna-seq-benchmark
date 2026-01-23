@@ -745,9 +745,8 @@ def get_plugin_aux(plugin, index=False):
     if plugin == "REVEL":
         suffix = ".tbi" if index else ""
         if config.get("limit-reads"):
-            return (
-                workflow.basedir
-                + "../.test/resources/new_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(
+            return workflow.source_path(
+                "../../.test/resources/downsampled_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(
                     suffix=suffix
                 )
             )
