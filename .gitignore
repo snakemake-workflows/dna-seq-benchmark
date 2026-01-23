@@ -2,7 +2,7 @@ results/**
 resources/**
 .snakemake
 .snakemake/**
-.test/**
+.test/config/**
 logs
 logs/**
 data/**
