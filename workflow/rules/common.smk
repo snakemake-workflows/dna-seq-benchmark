@@ -752,7 +752,7 @@ def get_plugin_aux(plugin, index=False):
                     "The downsampled REVEL table is only available for GRCh38"
                 )
             return workflow.source_path(
-                "../resources/ci-test-references/downsampled_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(
+                "../resources/ci-test-references/new_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(
                     suffix=suffix
                 )
             )
