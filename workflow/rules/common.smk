@@ -735,6 +735,12 @@ if "variant-calls" in config:
         vartype="snvs|indels",
 
 
+def get_downsampled_vep_cache_input():
+    return workflow.source_path(
+        "../resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz",
+    )
+
+
 def get_tabix_revel_params():
     # Indexing of REVEL-score file where the column depends on the reference
     build = get_reference_genome_build()

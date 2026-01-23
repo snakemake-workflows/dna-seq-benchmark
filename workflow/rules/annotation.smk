@@ -1,6 +1,6 @@
 rule get_downsampled_vep_cache:
     input:
-        "resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz",
+        get_downsampled_vep_cache_input(),
     output:
         directory("resources/vep/cache_downsampled"),
     log:
