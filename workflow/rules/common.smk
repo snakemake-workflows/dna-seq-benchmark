@@ -744,6 +744,8 @@ def get_tabix_revel_params():
 def get_plugin_aux(plugin, index=False):
     if plugin == "REVEL":
         suffix = ".tbi" if index else ""
+        if config.get("limit-reads"):
+            return workflow.source_path("../resources/new_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(suffix=suffix))
         return "resources/revel_scores.tsv.gz{suffix}".format(suffix=suffix)
     return []
 
@@ -752,10 +754,3 @@ def get_vep_cache_dir():
     if config.get("limit-reads"):
         return access.random("resources/vep/cache_downsampled")
     return access.random("resources/vep/cache")
-
-
-def get_revel_tsv():
-    if config.get("limit-reads"):
-        return workflow.source_path("../resources/new_tabbed_revel_grch38.1pct.tsv.gz")
-    else:
-        return "resources/revel_scores.tsv.gz"

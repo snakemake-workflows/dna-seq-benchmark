@@ -73,7 +73,7 @@ rule process_revel_scores:
 
 rule tabix_revel_scores:
     input:
-        get_revel_tsv(),
+        "resources/revel_scores.tsv.gz",
     output:
         "resources/revel_scores.tsv.gz.tbi",
     params:
