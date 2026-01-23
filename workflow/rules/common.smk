@@ -737,16 +737,22 @@ if "variant-calls" in config:
 
 def get_tabix_revel_params():
     # Indexing of REVEL-score file where the column depends on the reference
-    column = 2 if config["reference-genome"] == "grch37" else 3
+    build = get_reference_genome_build()
+    column = 2 if build == "GRCh37" else 3
     return f"-f -s 1 -b {column} -e {column}"
 
 
 def get_plugin_aux(plugin, index=False):
+    build = get_reference_genome_build()
     if plugin == "REVEL":
         suffix = ".tbi" if index else ""
         if config.get("limit-reads"):
+            if build == "GRCh37":
+                raise ValueError(
+                    "The downsampled REVEL table is only available for GRCh38"
+                )
             return workflow.source_path(
-                "../../.test/resources/downsampled_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(
+                "../resources/ci-test-references/downsampled_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(
                     suffix=suffix
                 )
             )

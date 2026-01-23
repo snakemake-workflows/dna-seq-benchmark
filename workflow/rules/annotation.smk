@@ -1,6 +1,8 @@
 rule get_downsampled_vep_cache:
     input:
-        workflow.source_path("../../.test/resources/vep_cache_113_GRCh38_chr22.tar.gz"),
+        workflow.source_path(
+            "../resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz"
+        ),
     output:
         directory("resources/vep/cache_downsampled"),
     log:
@@ -56,11 +58,14 @@ rule process_revel_scores:
         build=get_reference_genome_build(),
     log:
         "logs/vep_plugins/process_revel_scores.log",
+    resources:
+        tmpdir=temp("tmpdir"),
     conda:
         "../envs/tools.yaml"
     shell:
         """
-        tmpfile=$(mktemp {resources.tmpdir}/revel_scores.XXXXXX)
+        tmpfile=$(mktemp "${{TMPDIR:-/tmp}}"/revel_scores.XXXXXX)
+        trap "rm -f $tmpfile" EXIT
         unzip -p {input} | tr "," "\t" | sed '1s/.*/#&/' | bgzip -c > $tmpfile
         if [ "{params.build}" == "GRCh38" ] ; then
             zgrep -h -v ^#chr $tmpfile | awk '$3 != "." ' | sort -k1,1 -k3,3n - | cat <(zcat $tmpfile | head -n1) - | bgzip -c > {output}
