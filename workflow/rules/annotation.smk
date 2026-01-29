@@ -1,4 +1,8 @@
 rule get_downsampled_vep_cache:
+    input:
+        workflow.source_path(
+            "../resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz",
+        ),
     output:
         directory("resources/vep/cache_downsampled"),
     log:
@@ -6,7 +10,7 @@ rule get_downsampled_vep_cache:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(mkdir -p {output}; curl -L https://github.com/snakemake-workflows/dna-seq-benchmark/raw/0181ccf16c5483c0d7d1ad1b8f9dfa87376b5b1f/workflow/resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz | tar -xz -C {output} --strip-components 1) 2> {log}"
+        "(mkdir -p {output}; tar -xzf {input} -C {output} --strip-components 1) 2> {log}"
 
 
 rule get_vep_cache:
