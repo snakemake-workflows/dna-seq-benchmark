@@ -31,11 +31,11 @@ if "variant-calls" in config:
             ),
             get_fp_fn_reports,
             expand(
-                "results/fp-fn/annotated_vcf/{benchmark}/{benchmark}.shared_fn.annotated.vcf.gz",
+                "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
                 benchmark=used_benchmarks,
             ),
             expand(
-                "results/fp-fn/annotated_vcf/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.annotated.vcf.gz",
+                "results/annotated/tsv/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.annotated.tsv",
                 benchmark_callset=used_benchmarks_callsets,
                 classification=["fp", "fn"],
             ),

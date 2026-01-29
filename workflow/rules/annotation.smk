@@ -101,8 +101,8 @@ rule annotate_shared_fn:
         fasta=access.random("resources/reference/genome.fasta"),
         fai="resources/reference/genome.fasta.fai",
     output:
-        calls="results/fp-fn/annotated_vcf/{benchmark}/{benchmark}.shared_fn.annotated.vcf.gz",
-        stats="results/fp-fn/annotated_vcf/{benchmark}/{benchmark}.shared_fn.stats.html",
+        calls="results/annotated/vcf/{benchmark}/{benchmark}.shared_fn.annotated.vcf.gz",
+        stats="results/annotated/stats/{benchmark}/{benchmark}.shared_fn.stats.html",
     params:
         # Pass a list of plugins to use, see https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
         # Plugin args can be added as well, e.g. via an entry "MyPlugin,1,FOO", see docs.
@@ -127,8 +127,8 @@ rule annotate_unique_fp_fn:
         fasta=access.random("resources/reference/genome.fasta"),
         fai="resources/reference/genome.fasta.fai",
     output:
-        calls="results/fp-fn/annotated_vcf/{benchmark}/{callset}.unique_{classification}.annotated.vcf.gz",
-        stats="results/fp-fn/annotated_vcf/{benchmark}/{callset}.unique_{classification}.stats.html",
+        calls="results/annotated/vcf/{benchmark}/{callset}.unique_{classification}.annotated.vcf.gz",
+        stats="results/annotated/stats/{benchmark}/{callset}.unique_{classification}.stats.html",
     params:
         # Pass a list of plugins to use, see https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
         # Plugin args can be added as well, e.g. via an entry "MyPlugin,1,FOO", see docs.
@@ -141,3 +141,31 @@ rule annotate_unique_fp_fn:
         "annotation"
     wrapper:
         "v8.1.1/bio/vep/annotate"
+
+
+rule vembrane_table_shared_fn:
+    input:
+        "results/annotated/vcf/{benchmark}/{benchmark}.shared_fn.annotated.vcf.gz",
+    output:
+        "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
+    params:
+        expression="ALL",
+        extra="--naming-convention underscore",
+    log:
+        "logs/vembrane/{benchmark}/{benchmark}.shared_fn.annotate.log",
+    wrapper:
+        "v7.6.1/bio/vembrane/table"
+
+
+rule vembrane_table_unique_fp_fn:
+    input:
+        "results/annotated/vcf/{benchmark}/{callset}.unique_{classification}.annotated.vcf.gz",
+    output:
+        "results/annotated/tsv/{benchmark}/{callset}.unique_{classification}.annotated.tsv",
+    params:
+        expression="ALL",
+        extra="--naming-convention underscore",
+    log:
+        "logs/vembrane/{benchmark}/{callset}.unique_{classification}.annotate.log",
+    wrapper:
+        "v7.6.1/bio/vembrane/table"
