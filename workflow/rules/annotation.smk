@@ -143,14 +143,27 @@ rule annotate_unique_fp_fn:
         "v8.1.1/bio/vep/annotate"
 
 
+rule norm_vcf:
+    input:
+        "{prefix}.vcf.gz",
+    output:
+        "{prefix}.norm.vcf",
+    log:
+        "logs/norm/{prefix}.norm.log",
+    params:
+        extra="--rm-dup none -m-any",
+    wrapper:
+        "v8.1.1/bio/bcftools/norm"
+
+
 rule vembrane_table_shared_fn:
     input:
-        "results/annotated/vcf/{benchmark}/{benchmark}.shared_fn.annotated.vcf.gz",
+        "results/annotated/vcf/{benchmark}/{benchmark}.shared_fn.annotated.norm.vcf",
     output:
         "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
     params:
-        expression="ALL",
-        extra="--naming-convention underscore",
+        expression='CHROM, POS, REF, ALT, ANN["IMPACT"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
+        extra="--header 'CHROM,POS,REF,ALT,IMPACT,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     log:
         "logs/vembrane/{benchmark}/{benchmark}.shared_fn.annotate.log",
     wrapper:
@@ -159,12 +172,12 @@ rule vembrane_table_shared_fn:
 
 rule vembrane_table_unique_fp_fn:
     input:
-        "results/annotated/vcf/{benchmark}/{callset}.unique_{classification}.annotated.vcf.gz",
+        "results/annotated/vcf/{benchmark}/{callset}.unique_{classification}.annotated.norm.vcf",
     output:
         "results/annotated/tsv/{benchmark}/{callset}.unique_{classification}.annotated.tsv",
     params:
-        expression="ALL",
-        extra="--naming-convention underscore",
+        expression='CHROM, POS, REF, ALT, ANN["IMPACT"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
+        extra="--header 'CHROM,POS,REF,ALT,IMPACT,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     log:
         "logs/vembrane/{benchmark}/{callset}.unique_{classification}.annotate.log",
     wrapper:
