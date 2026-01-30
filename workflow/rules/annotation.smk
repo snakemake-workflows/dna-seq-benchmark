@@ -24,7 +24,7 @@ rule get_vep_cache:
         "logs/vep/cache.log",
     cache: "omit-software"
     wrapper:
-        "v8.1.1/bio/vep/cache"
+        "v7.6.0/bio/vep/cache"
 
 
 rule get_vep_plugins:
@@ -114,7 +114,7 @@ rule annotate_shared_fn:
     group:
         "annotation"
     wrapper:
-        "v8.1.1/bio/vep/annotate"
+        "v8.0.0/bio/vep/annotate"
 
 
 rule annotate_unique_fp_fn:
@@ -140,7 +140,7 @@ rule annotate_unique_fp_fn:
     group:
         "annotation"
     wrapper:
-        "v8.1.1/bio/vep/annotate"
+        "v8.0.0/bio/vep/annotate"
 
 
 rule norm_vcf:
