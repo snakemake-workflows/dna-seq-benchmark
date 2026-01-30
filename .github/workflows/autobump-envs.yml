@@ -1,15 +1,15 @@
-name: Autobump Conda Envs 
+name: Autobump Conda Envs
 
 # run every month
 on:
   schedule:
-    - cron: '0 0 1 * *'
+    - cron: "0 0 1 * *"
   workflow_dispatch:
 
 # cancel any in-progress runs if a new commit is pushed
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
 concurrency:
-  group: 'autobump-envs'
+  group: "autobump-envs"
   cancel-in-progress: true
 
 permissions:
@@ -22,11 +22,19 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Collect conda envs (excluding vatools)
+        id: envs
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=$(find workflow/envs -maxdepth 1 -type f -name '*.yaml' ! -name 'vatools.yaml' -print | sort | tr '\n' ' ')
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+
       - name: Update conda envs and also create pinnings
         uses: snakemake/snakedeploy-github-action@v1
         with:
           subcommand: update-conda-envs
-          args: workflow/envs/*.yaml --pin-envs
+          args: ${{ steps.envs.outputs.files }} --pin-envs
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
