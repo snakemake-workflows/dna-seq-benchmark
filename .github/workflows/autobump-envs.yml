@@ -1,3 +1,5 @@
+name: Autobump Conda Envs 
+
 # run every month
 on:
   schedule:
