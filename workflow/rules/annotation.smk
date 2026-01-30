@@ -162,8 +162,8 @@ rule vembrane_table_shared_fn:
     output:
         "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
     params:
-        expression='CHROM, POS, REF, ALT, ANN["IMPACT"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
-        extra="--header 'CHROM,POS,REF,ALT,IMPACT,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
+        expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
+        extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     log:
         "logs/vembrane/{benchmark}/{benchmark}.shared_fn.annotate.log",
     wrapper:
@@ -176,8 +176,8 @@ rule vembrane_table_unique_fp_fn:
     output:
         "results/annotated/tsv/{benchmark}/{callset}.unique_{classification}.annotated.tsv",
     params:
-        expression='CHROM, POS, REF, ALT, ANN["IMPACT"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
-        extra="--header 'CHROM,POS,REF,ALT,IMPACT,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
+        expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
+        extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     log:
         "logs/vembrane/{benchmark}/{callset}.unique_{classification}.annotate.log",
     wrapper:
