@@ -733,3 +733,40 @@ if "variant-calls" in config:
         classification="fp|fn",
         comparison="genotype|existence",
         vartype="snvs|indels",
+
+
+def get_downsampled_vep_cache_input():
+    return workflow.source_path(
+        "../resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz",
+    )
+
+
+def get_tabix_revel_params():
+    # Indexing of REVEL-score file where the column depends on the reference
+    build = get_reference_genome_build()
+    column = 2 if build == "GRCh37" else 3
+    return f"-f -s 1 -b {column} -e {column}"
+
+
+def get_plugin_aux(plugin, index=False):
+    build = get_reference_genome_build()
+    if plugin == "REVEL":
+        suffix = ".tbi" if index else ""
+        if config.get("limit-reads"):
+            if build == "GRCh37":
+                raise ValueError(
+                    "The downsampled REVEL table is only available for GRCh38"
+                )
+            return workflow.source_path(
+                "../resources/ci-test-references/new_tabbed_revel_grch38.1pct.tsv.gz{suffix}".format(
+                    suffix=suffix
+                )
+            )
+        return "resources/revel_scores.tsv.gz{suffix}".format(suffix=suffix)
+    return []
+
+
+def get_vep_cache_dir():
+    if config.get("limit-reads"):
+        return access.random("resources/vep/cache_downsampled")
+    return access.random("resources/vep/cache")

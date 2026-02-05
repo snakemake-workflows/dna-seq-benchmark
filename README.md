@@ -10,3 +10,7 @@ A Snakemake workflow for benchmarking variant calling approaches with Genome in 
 The usage of this workflow is described in the [Snakemake Workflow Catalog](https://snakemake.github.io/snakemake-workflow-catalog/docs/workflows/snakemake-workflows/dna-seq-benchmark.html).
 
 If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) benchmark-giabsitory and its DOI (see above).
+
+## Output
+
+The folder `results/annotated/*` contains the final results of the false positive and false negative calls of the workflow.
