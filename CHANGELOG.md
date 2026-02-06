@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.15.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.14.1...v1.15.0) (2026-02-05)
+
+
+### Features
+
+* VEP annotation with REVEL, Sift and PolyPhen Scores to fp/fn vcfs ([#154](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/154)) ([d2512d0](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/d2512d0afb43d7db0a6a49caf793f124bde2f979))
+
+
+### Bug Fixes
+
+* change SEQC2 SNV truth to enable VAF comparison for WGS ([#157](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/157)) ([925a157](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/925a157158b2b7c216c231140ab4df2f39c303a9))
+
+
+### Performance Improvements
+
+* autobump snakemake wrappers ([#155](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/155)) ([bfa37e2](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/bfa37e2262253447f7e6b1fb5f914f56718bd78d))
+* bump snakemake wrappers to v8.0.2 ([#150](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/150)) ([0647f12](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/0647f12b9c5b32270c9b74ba14f6e98ffd1efab9))
+
 ## [1.14.1](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.14.0...v1.14.1) (2025-11-14)
 
 
