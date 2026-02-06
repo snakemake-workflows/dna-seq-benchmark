@@ -1,3 +1,5 @@
+name: Autobump Snakemake Wrappers
+
 # run every month
 on:
   schedule:
