@@ -35,7 +35,7 @@ rule get_vep_plugins:
     log:
         "logs/vep/plugins.log",
     wrapper:
-        "v8.1.1/bio/vep/plugins"
+        "v9.0.1/bio/vep/plugins"
 
 
 rule download_revel:
