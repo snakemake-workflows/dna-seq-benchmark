@@ -213,9 +213,7 @@ def get_cov_interval(name, coverages):
 def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
-    if get_somatic_status(wildcards):
-        return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif callset.get("rename-contigs", False):
+    if callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
@@ -528,12 +526,8 @@ def get_somatic_sample_name(wildcards):
 
 def get_somatic_flag(wildcards):
     if get_somatic_status(wildcards):
-        sample_name_baseline = "truth"
-        sample_name_callset = config["variant-calls"][wildcards.callset][
-            "tumor_sample_name"
-        ]  # get name tumor via config -> from dict
         somatic_flag = (
-            f"--squash-ploidy --sample {sample_name_baseline},{sample_name_callset}"
+            f"--squash-ploidy --sample truth,ALT"
         )
     else:
         somatic_flag = ""

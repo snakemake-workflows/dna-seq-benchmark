@@ -66,23 +66,6 @@ rule rename_contigs:
         "-Oz -o {output} 2> {log}"
 
 
-rule add_genotype_field:
-    input:
-        get_callset_correct_contigs_liftover,
-    output:
-        "results/normalized-variants/{callset}.gt-added.vcf.gz",
-    log:
-        "logs/add_genotype_field/{callset}.log",
-    params:
-        get_somatic_sample_name,
-    conda:
-        "../envs/vatools.yaml"
-    shell:
-        # part after || gets executed if vcf-genotype-annotater fails because GT field is already present
-        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
-        "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || bcftools view {input} -Oz > {output}"
-
-
 rule add_format_field:
     input:
         bcf="resources/variants/{genome}/all.truth.norm.bcf",
@@ -91,15 +74,9 @@ rule add_format_field:
     log:
         "logs/add_format_field/{genome}.log",
     conda:
-        "../envs/vatools.yaml"
+        "../envs/tools.yaml"
     shell:
-        """
-        if bcftools view -h {input.bcf} | grep -q FORMAT; then
-            bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output}
-        else
-            vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}
-        fi
-        """
+        "bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output} 2> {log}"
 
 
 rule remove_non_pass:
