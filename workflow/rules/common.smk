@@ -526,9 +526,7 @@ def get_somatic_sample_name(wildcards):
 
 def get_somatic_flag(wildcards):
     if get_somatic_status(wildcards):
-        somatic_flag = (
-            f"--squash-ploidy --sample truth,ALT"
-        )
+        somatic_flag = f"--squash-ploidy --sample truth,ALT"
     else:
         somatic_flag = ""
     return somatic_flag
