@@ -8,7 +8,7 @@ rule calc_precision_recall:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
-        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
+        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.germline.tsv",
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
     params:
