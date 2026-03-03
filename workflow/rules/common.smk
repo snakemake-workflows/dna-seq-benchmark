@@ -539,10 +539,10 @@ def get_vcfeval_output_mode(wildcards):
         return "ga4gh"
 
 
-def get_fp_fn_expression(wildcards, vaf_from_callset):
+def get_fp_fn_expression(wildcards):
     if get_vaf_status(wildcards):
         vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
-        if vaf_from_callset:
+        if wildcards.get("classification") == "fn" or wildcards.get("classification") == "tp_baseline":
             return "CHROM, POS, ALT, REF, " + vaf_callset
         else:
             return "CHROM, POS, ALT, REF, " + vaf_benchmark
@@ -743,7 +743,6 @@ if "variant-calls" in config:
         classification="fp|fn|tp|tp_baseline",
         comparison="genotype|existence",
         vartype="snvs|indels",
-        classtype="fn|tp|tp_baseline",
 
 
 def get_downsampled_vep_cache_input():

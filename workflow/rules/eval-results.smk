@@ -124,32 +124,17 @@ rule extract_fp_fn:
         "../scripts/extract-fp-fn.py"
 
 
-## Somatic FP
-rule extract_fp:
+##  SOMATIC FP, FN and TP
+rule extract_fp_fn_tp:
     input:
-        fp="results/vcfeval/{callset}/{cov}/fp.vcf",
+        tp="results/vcfeval/{callset}/{cov}/{classification}.vcf",
     output:
-        vcf="results/vembrane/callsets/{callset}/{cov}.fp.tsv",
+        vcf="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
     params:
-        expression=get_fp_fn_expression(vaf_from_callset=True),
+        expression=get_fp_fn_expression,
         extra="",
     log:
-        "logs/extract-fp-fn/{callset}/{cov}.fp.log",
-    wrapper:
-        "v7.6.1/bio/vembrane/table"
-
-
-##  SOMATIC FN and TP
-rule extract_fn_tp:
-    input:
-        tp="results/vcfeval/{callset}/{cov}/{classtype}.vcf",
-    output:
-        vcf="results/vembrane/callsets/{callset}/{cov}.{classtype}.tsv",
-    params:
-        expression=get_fp_fn_expression(vaf_from_callset=False),
-        extra="",
-    log:
-        "logs/extract-fp-fn/{callset}/{cov}.{classtype}.log",
+        "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
     wrapper:
         "v7.6.1/bio/vembrane/table"
 
