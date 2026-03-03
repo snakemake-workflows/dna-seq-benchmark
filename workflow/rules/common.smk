@@ -743,7 +743,7 @@ if "variant-calls" in config:
         classification="fp|fn",
         comparison="genotype|existence",
         vartype="snvs|indels",
-        classtype="fn|tp|tp_baseline"
+        classtype="fn|tp|tp_baseline",
 
 
 def get_downsampled_vep_cache_input():

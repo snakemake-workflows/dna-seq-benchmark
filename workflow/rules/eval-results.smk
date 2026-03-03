@@ -123,17 +123,18 @@ rule extract_fp_fn:
     script:
         "../scripts/extract-fp-fn.py"
 
+
 ## Somatic FP
 rule extract_fp:
     input:
         fp="results/vcfeval/{callset}/{cov}/fp.vcf",
     output:
-        vcf="results/vembrane/callsets/{callset}/{cov}.fp.tsv"
+        vcf="results/vembrane/callsets/{callset}/{cov}.fp.tsv",
     params:
         expression=get_fp_fn_expression(vaf_from_callset=True),
-        extra=""
+        extra="",
     log:
-        "logs/extract-fp-fn/{callset}/{cov}.fp.log"
+        "logs/extract-fp-fn/{callset}/{cov}.fp.log",
     wrapper:
         "v7.6.1/bio/vembrane/table"
 
@@ -143,19 +144,19 @@ rule extract_fn_tp:
     input:
         tp="results/vcfeval/{callset}/{cov}/{classtype}.vcf",
     output:
-        vcf="results/vembrane/callsets/{callset}/{cov}.{classtype}.tsv"
+        vcf="results/vembrane/callsets/{callset}/{cov}.{classtype}.tsv",
     params:
         expression=get_fp_fn_expression(vaf_from_callset=False),
-        extra=""
+        extra="",
     log:
-        "logs/extract-fp-fn/{callset}/{cov}.{classtype}.log"
+        "logs/extract-fp-fn/{callset}/{cov}.{classtype}.log",
     wrapper:
         "v7.6.1/bio/vembrane/table"
 
 
 ## Make Germline and Somatic Tables comparable
 rule rename_table_headers:
-    input: 
+    input:
         table="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
     output:
         renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
@@ -173,6 +174,7 @@ rule rename_table_headers:
         "../envs/stats.yaml"
     run:
         import pandas as pd
+
         df = pd.read_csv(snakemake.input.table, sep="\t")
         df_renamed = df.rename(columns=snakemake.params.expression)
         df_renamed.to_csv(snakemake.output.renamed_table, sep="\t", index=False)

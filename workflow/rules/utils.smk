@@ -30,6 +30,7 @@ rule sort_vcf:
     wrapper:
         "v8.1.1/bio/bcftools/sort"
 
+
 rule unzip_vcf:
     input:
         "{prefix}.vcf.gz",
