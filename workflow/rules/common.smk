@@ -542,7 +542,10 @@ def get_vcfeval_output_mode(wildcards):
 def get_fp_fn_expression(wildcards):
     if get_vaf_status(wildcards):
         vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
-        if wildcards.get("classification") == "fn" or wildcards.get("classification") == "tp_baseline":
+        if (
+            wildcards.get("classification") == "fn"
+            or wildcards.get("classification") == "tp_baseline"
+        ):
             return "CHROM, POS, ALT, REF, " + vaf_callset
         else:
             return "CHROM, POS, ALT, REF, " + vaf_benchmark
