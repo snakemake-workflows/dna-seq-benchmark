@@ -23,38 +23,18 @@ class Classifications:
         self.fn = fn
 
     def precision(self):
-        if self.stratify_by_vaf:
-            p_vaf = self.tp_query_vaf.astype(np.float32) + self.fp_vaf
-            for (i, x) in enumerate(p_vaf):
-                if x == 0:
-                    p_vaf[i] = 1.0
-                else:
-                    p_vaf[i] = self.tp_query_vaf[i] / p_vaf[i]
-        else:
-            p_vaf = None
-
         p = self.tp_query + self.fp
         if p == 0:
-            return (1.0, p_vaf)
+            return 1.0
         p = float(self.tp_query) / float(p)
-        return (p, p_vaf)
+        return p
 
     def recall(self):
-        if self.stratify_by_vaf:
-            t_vaf = self.tp_truth_vaf.astype(np.float32) + self.fn_vaf
-            for (i, x) in enumerate(t_vaf):
-                if x == 0:
-                    t_vaf[i] = 1.0
-                else:
-                    t_vaf[i] = self.tp_truth_vaf[i] / t_vaf[i]
-        else:
-            t_vaf = None
-
         t = self.tp_truth + self.fn
         if t == 0:
-            return (1.0, t_vaf)
+            return 1.0
         t = float(self.tp_truth) / float(t)
-        return (t, t_vaf)
+        return t
 
 
     def fstar(self):
@@ -67,34 +47,24 @@ class Classifications:
         prediction and truth is correctly predicted.
         It is a monotonic transformation of the F-measure.
         """
-        if self.stratify_by_vaf:
-            a_vaf = self.tp_query_vaf.astype(np.float32) + self.fn_vaf + self.fp_vaf
-            for (i, x) in enumerate(a_vaf):
-                if a_vaf[i] == 0:
-                    a_vaf[i] = 1.0
-                else:
-                    a_vaf[i] = self.tp_query_vaf[i] / a_vaf[i]
-        else:
-            a_vaf = None
-
         a = self.tp_query + self.fn + self.fp
         if a == 0:
-            return (1.0, a_vaf)
+            return 1.0
         a = float(self.tp_query) / float(a)
-        return (a, a_vaf)
+        return a
 
 def collect_results():
     classifications_existence = Classifications()
 
     d = pd.DataFrame(
         {   "#variants_truth": [classifications_existence.tp_truth + classifications_existence.fn],
-            "precision": [classifications_existence.precision()[0]],
+            "precision": [classifications_existence.precision()],
             "tp_query": [classifications_existence.tp_query],
             "fp": [classifications_existence.fp],
-            "recall": [classifications_existence.recall()[0]],
+            "recall": [classifications_existence.recall()],
             "tp_truth": [classifications_existence.tp_truth],
             "fn": [classifications_existence.fn],
-            "F*": [classifications_existence.fstar()[0]],
+            "F*": [classifications_existence.fstar()],
         }
     )
 
