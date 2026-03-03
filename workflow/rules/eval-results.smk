@@ -20,6 +20,23 @@ rule calc_precision_recall:
         "../scripts/calc-precision-recall.py"
 
 
+### Simpler than germline calculation as we do not worry about the genotype
+rule calc_precision_recall_somatic:
+    input:
+        fp="results/vcfeval/{callset}/{cov}/fp.tsv",
+        fn="results/vcfeval/{callset}/{cov}/fn.tsv",
+        tp="results/vcfeval/{callset}/{cov}/tp.tsv",
+        tp_baseline="results/vcfeval/{callset}/{cov}/tp-baseline.tsv",
+    output:
+        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
+    log:
+        "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
+    conda:
+        "../envs/pysam.yaml"
+    script:
+        "../scripts/calc-precision-recall-somatic.py"
+
+
 rule collect_stratifications:
     input:
         get_collect_stratifications_input,
@@ -113,26 +130,28 @@ rule extract_fp:
     output:
         vcf="results/vembrane/callsets/{callset}/{cov}.fp.tsv"
     params:
-        expression=get_fp_fn_expression(fp=True),
+        expression=get_fp_fn_expression(vaf_from_callset=True),
         extra=""
     log:
         "logs/extract-fp-fn/{callset}/{cov}.fp.log"
     wrapper:
         "v7.6.1/bio/vembrane/table"
 
-## SOMATIC FN
-rule extract_fn:
+
+##  SOMATIC FN and TP
+rule extract_fn_tp:
     input:
-        fn="results/vcfeval/{callset}/{cov}/fn.vcf",
+        tp="results/vcfeval/{callset}/{cov}/{classtype}.vcf",
     output:
-        vcf="results/vembrane/callsets/{callset}/{cov}.fn.tsv"
+        vcf="results/vembrane/callsets/{callset}/{cov}.{classtype}.tsv"
     params:
-        expression=get_fp_fn_expression(fp=False),
+        expression=get_fp_fn_expression(vaf_from_callset=False),
         extra=""
     log:
-        "logs/extract-fp-fn/{callset}/{cov}.fn.log"
+        "logs/extract-fp-fn/{callset}/{cov}.{classtype}.log"
     wrapper:
         "v7.6.1/bio/vembrane/table"
+
 
 ## Make Germline and Somatic Tables comparable
 rule rename_table_headers:
