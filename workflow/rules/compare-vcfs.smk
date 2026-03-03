@@ -240,5 +240,5 @@ rule benchmark_variants:
     threads: 32
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
-        "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
+        "--output-mode combine --baseline {input.truth} --calls {input.query} "
         "--output {params.output} --template {input.genome} {params.somatic} &> {log}"
