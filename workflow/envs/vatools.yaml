@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python =3.8
+  - pip =24.0
+  - bcftools
+  - pip:
+    - vatools

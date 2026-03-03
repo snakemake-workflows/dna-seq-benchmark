@@ -74,9 +74,15 @@ rule add_format_field:
     log:
         "logs/add_format_field/{genome}.log",
     conda:
-        "../envs/tools.yaml"
+        "../envs/vatools.yaml"
     shell:
-        "( bcftools view {input.bcf} | bcftools reheader -s <(echo 'truth') | bcftools view -Oz > {output}) 2> {log}"
+        """
+        if bcftools view -h {input.bcf} | grep -q FORMAT; then
+            bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output}
+        else
+            vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}
+        fi
+        """
 
 
 rule remove_non_pass:
