@@ -112,7 +112,7 @@ rule extract_fp_fn:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
-        "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
+        "results/fp-fn/callsets/{callset}/{cov}.{classification}.germline.tsv",
     log:
         "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
     params:
