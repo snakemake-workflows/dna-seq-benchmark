@@ -76,7 +76,7 @@ rule add_format_field:
     conda:
         "../envs/tools.yaml"
     shell:
-        "(bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output}) 2> {log}"
+        "( bcftools view {input.bcf} | bcftools reheader -s <(echo 'truth') | bcftools view -Oz > {output}) 2> {log}"
 
 
 rule remove_non_pass:
