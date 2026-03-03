@@ -29,3 +29,13 @@ rule sort_vcf:
         "logs/bcftools-sort-vcf/{prefix}.log",
     wrapper:
         "v8.1.1/bio/bcftools/sort"
+
+rule unzip_vcf:
+    input:
+        "{prefix}.vcf.gz",
+    output:
+        "{prefix}.vcf",
+    log:
+        "logs/unzip/{prefix}.log",
+    shell:
+        "gunzip -keep {input} 2> {log}"

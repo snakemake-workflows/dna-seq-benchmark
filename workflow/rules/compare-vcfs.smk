@@ -229,16 +229,21 @@ rule benchmark_variants:
         query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
         genome="resources/reference/genome-sdf",
     output:
-        "results/vcfeval/{callset}/{cov}/output.vcf.gz",
+        output="results/vcfeval/{callset}/{cov}/output.vcf.gz",
+        fp="results/vcfeval/{callset}/{cov}/fp.vcf.gz",
+        fn="results/vcfeval/{callset}/{cov}/fn.vcf.gz",
+        tp="results/vcfeval/{callset}/{cov}/tp.vcf.gz",
+        tp_baseline="results/vcfeval/{callset}/{cov}/tp-baseline.vcf.gz",
     log:
         "logs/vcfeval/{callset}/{cov}.log",
     params:
         output=lambda w, output: os.path.dirname(output[0]),
         somatic=get_somatic_flag,
+        output_mode=get_vcfeval_output_mode,
     conda:
         "../envs/rtg-tools.yaml"
     threads: 32
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
-        "--output-mode combine --baseline {input.truth} --calls {input.query} "
+        "--output-mode {params.output_mode} --baseline {input.truth} --calls {input.query} "
         "--output {params.output} --template {input.genome} {params.somatic} &> {log}"

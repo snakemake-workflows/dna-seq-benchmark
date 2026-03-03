@@ -84,6 +84,7 @@ rule report_precision_recall:
         "v8.0.3/utils/datavzrd"
 
 
+## Germline FP / FN extraction
 rule extract_fp_fn:
     input:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
@@ -104,6 +105,58 @@ rule extract_fp_fn:
         "../envs/vembrane.yaml"
     script:
         "../scripts/extract-fp-fn.py"
+
+## Somatic FP
+rule extract_fp:
+    input:
+        fp="results/vcfeval/{callset}/{cov}/fp.vcf",
+    output:
+        vcf="results/vembrane/callsets/{callset}/{cov}.fp.tsv"
+    params:
+        expression=get_fp_fn_expression(fp=True),
+        extra=""
+    log:
+        "logs/extract-fp-fn/{callset}/{cov}.fp.log"
+    wrapper:
+        "v7.6.1/bio/vembrane/table"
+
+## SOMATIC FN
+rule extract_fn:
+    input:
+        fn="results/vcfeval/{callset}/{cov}/fn.vcf",
+    output:
+        vcf="results/vembrane/callsets/{callset}/{cov}.fn.tsv"
+    params:
+        expression=get_fp_fn_expression(fp=False),
+        extra=""
+    log:
+        "logs/extract-fp-fn/{callset}/{cov}.fn.log"
+    wrapper:
+        "v7.6.1/bio/vembrane/table"
+
+## Make Germline and Somatic Tables comparable
+rule rename_table_headers:
+    input: 
+        table="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
+    output:
+        renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
+    params:
+        expression={
+            "CHROM": "chromosome",
+            "POS": "position",
+            "REF": "ref_allele",
+            "ALT": "alt_allele",
+            "VAF": "vaf",
+        },
+    log:
+        "logs/rename-table-headers/{callset}/{cov}/{classification}.log",
+    conda:
+        "../envs/stats.yaml"
+    run:
+        import pandas as pd
+        df = pd.read_csv(snakemake.input.table, sep="\t")
+        df_renamed = df.rename(columns=snakemake.params.expression)
+        df_renamed.to_csv(snakemake.output.renamed_table, sep="\t", index=False)
 
 
 # TODO: if one of the input callsets has all sites as FN, the resulting merged table
