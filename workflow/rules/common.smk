@@ -740,7 +740,7 @@ if "variant-calls" in config:
 
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
-        classification="fp|fn",
+        classification="fp|fn|tp|tp_baseline",
         comparison="genotype|existence",
         vartype="snvs|indels",
         classtype="fn|tp|tp_baseline",
