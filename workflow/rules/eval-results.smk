@@ -57,9 +57,9 @@ rule rename_table_headers:
     run:
         import pandas as pd
 
-        df = pd.read_csv(snakemake.input.table, sep="\t")
-        df_renamed = df.rename(columns=snakemake.params.expression)
-        df_renamed.to_csv(snakemake.output.renamed_table, sep="\t", index=False)
+        df = pd.read_csv(input.table, sep="\t")
+        df_renamed = df.rename(columns=params.expression)
+        df_renamed.to_csv(output.renamed_table, sep="\t", index=False)
 
 
 rule calc_precision_recall:
