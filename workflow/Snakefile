@@ -17,8 +17,6 @@ if "variant-calls" in config:
     include: "rules/eval-results.smk"
     include: "rules/annotation.smk"
 
-    ruleorder: intersect_calls_with_target_regions > unzip_vcf
-
     rule all:
         input:
             expand(
