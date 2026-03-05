@@ -570,7 +570,7 @@ def get_fp_fn_expression(wildcards):
         vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
         if (
             wildcards.get("classification") == "fn"
-            or wildcards.get("classification") == "tp_baseline"
+            or wildcards.get("classification") == "tp-baseline"
         ):
             return "CHROM, POS, ALT, REF, " + vaf_callset
         else:
@@ -739,7 +739,7 @@ if "variant-calls" in config:
 
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
-        classification="fp|fn|tp|tp_baseline",
+        classification="fp|fn|tp|tp-baseline",
         comparison="genotype|existence",
         vartype="snvs|indels",
 
