@@ -46,7 +46,7 @@ rule reformat_fp_fn_tp_tables:
         expression=get_rename_expression,
         tumor_sample_name=get_somatic_sample_name,
     log:
-        "logs/rename-table-headers/{callset}/{cov}/{classification}.log",
+        "logs/reformat-fp-fn-tp-tables/{callset}/{cov}/{classification}.log",
     conda:
         "../envs/stats.yaml"
     script:
