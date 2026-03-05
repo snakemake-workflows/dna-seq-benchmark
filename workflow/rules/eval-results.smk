@@ -87,10 +87,10 @@ rule calc_precision_recall:
 ### Simpler than germline calculation as we do not worry about the genotype
 rule calc_precision_recall_somatic:
     input:
-        fp="results/vcfeval/{callset}/{cov}/fp.tsv",
-        fn="results/vcfeval/{callset}/{cov}/fn.tsv",
-        tp="results/vcfeval/{callset}/{cov}/tp.tsv",
-        tp_baseline="results/vcfeval/{callset}/{cov}/tp-baseline.tsv",
+        fp="results/fp-fn/callsets/{callset}/{cov}.fp.tsv",
+        fn="results/fp-fn/callsets/{callset}/{cov}.fn.tsv",
+        tp="results/fp-fn/callsets/{callset}/{cov}.tp.tsv",
+        tp_baseline="results/fp-fn/callsets/{callset}/{cov}.tp-baseline.tsv",
     output:
         "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
     log:

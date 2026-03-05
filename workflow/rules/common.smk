@@ -535,20 +535,6 @@ def get_somatic_flag(wildcards):
     return somatic_flag
 
 
-def get_fp_fn_expression(wildcards):
-    if get_vaf_status(wildcards):
-        vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
-        if (
-            wildcards.get("classification") == "fn"
-            or wildcards.get("classification") == "tp_baseline"
-        ):
-            return "CHROM, POS, ALT, REF, " + vaf_callset
-        else:
-            return "CHROM, POS, ALT, REF, " + vaf_benchmark
-    else:
-        return "CHROM, POS, ALT, REF"
-
-
 def get_vaf_fields(wildcards):
     vaf_callset = config["variant-calls"][wildcards.callset].get("vaf-field")
 
@@ -577,6 +563,20 @@ def get_vaf_status(wildcards):
             return True
         else:
             return False
+
+
+def get_fp_fn_expression(wildcards):
+    if get_vaf_status(wildcards):
+        vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
+        if (
+            wildcards.get("classification") == "fn"
+            or wildcards.get("classification") == "tp_baseline"
+        ):
+            return "CHROM, POS, ALT, REF, " + vaf_callset
+        else:
+            return "CHROM, POS, ALT, REF, " + vaf_benchmark
+    else:
+        return "CHROM, POS, ALT, REF"
 
 
 def get_high_coverage_status(wildcards):
