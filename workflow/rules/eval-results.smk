@@ -37,23 +37,20 @@ rule extract_fp_fn_tp:
 
 
 ## Make Germline and Somatic Tables comparable
-rule rename_table_headers:
+rule reformat_fp_fn_tp_tables:
     input:
         table="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
     output:
         renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     params:
         expression=get_rename_expression,
+        tumor_sample_name=get_somatic_sample_name,
     log:
         "logs/rename-table-headers/{callset}/{cov}/{classification}.log",
     conda:
         "../envs/stats.yaml"
-    run:
-        import pandas as pd
-
-        df = pd.read_csv(input.table, sep="\t")
-        df_renamed = df.rename(columns=params.expression)
-        df_renamed.to_csv(output.renamed_table, sep="\t", index=False)
+    script:
+        "../scripts/reformat-fp-fn-tp-tables.py"
 
 
 rule calc_precision_recall:

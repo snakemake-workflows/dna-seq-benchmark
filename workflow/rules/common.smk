@@ -589,7 +589,7 @@ def get_rename_expression(wildcards):
     expr_list = fp_fn_expr.split(", ")
     if get_vaf_status(wildcards):
         rename_list = ["chromosome", "position", "alt_allele", "ref_allele", "vaf"]
-    else: 
+    else:
         rename_list = ["chromosome", "position", "alt_allele", "ref_allele"]
     return {expr: rename for expr, rename in zip(expr_list, rename_list)}
 
