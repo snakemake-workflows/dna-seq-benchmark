@@ -11,7 +11,7 @@ if "SAMPLE" in df.columns:
     if df["SAMPLE"].nunique(dropna=False) == 1:
         pass
     else:
-        df = df[df["SAMPLE"] == snakemake.params.tumor_sample_name]
+        df = df[df["SAMPLE"] == str(snakemake.params.tumor_sample_name)]
 
 # Rename columns with the expression handed to the script
 df = df.rename(columns=snakemake.params.expression)

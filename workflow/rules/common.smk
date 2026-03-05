@@ -575,13 +575,8 @@ def get_fp_fn_expression(wildcards):
             vaf = vaf_benchmark
         else:
             vaf = vaf_callset
-        if vaf is not None:
-            vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
-            if vaf["field"] == "FORMAT":
-                return f"CHROM, POS, ALT, REF, SAMPLE, {vaf_expr}"
-            return f"CHROM, POS, ALT, REF, {vaf_expr}"
-        else:
-            return "CHROM, POS, ALT, REF"
+        vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
+        return f"CHROM, POS, ALT, REF, {vaf_expr}"
     else:
         return "CHROM, POS, ALT, REF"
 
@@ -590,17 +585,7 @@ def get_rename_expression(wildcards):
     fp_fn_expr = get_fp_fn_expression(wildcards)
     expr_list = fp_fn_expr.split(", ")
     if get_vaf_status(wildcards):
-        if "SAMPLE" in expr_list:
-            rename_list = [
-                "chromosome",
-                "position",
-                "alt_allele",
-                "ref_allele",
-                "sample",
-                "vaf",
-            ]
-        else:
-            rename_list = ["chromosome", "position", "alt_allele", "ref_allele", "vaf"]
+        rename_list = ["chromosome", "position", "alt_allele", "ref_allele", "vaf"]
     else:
         rename_list = ["chromosome", "position", "alt_allele", "ref_allele"]
     return {expr: rename for expr, rename in zip(expr_list, rename_list)}

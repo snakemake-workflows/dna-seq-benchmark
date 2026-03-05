@@ -1,9 +1,0 @@
-SAMPLE	CHROM	POS	ALT	REF	"FORMAT[""AF""]"
-normal-wes	10	11463649	C	T	{'normal-wes': 0.0, 'tumor-wes': 0.04800000041723251}
-tumor-wes	10	11463649	C	T	{'normal-wes': 0.0, 'tumor-wes': 0.04800000041723251}
-normal-wes	2	197500335	G	C	{'normal-wes': 0.0, 'tumor-wes': 0.43799999356269836}
-tumor-wes	2	197500335	G	C	{'normal-wes': 0.0, 'tumor-wes': 0.43799999356269836}
-normal-wes	4	75046732	A	T	{'normal-wes': 0.0, 'tumor-wes': 0.02199999988079071}
-tumor-wes	4	75046732	A	T	{'normal-wes': 0.0, 'tumor-wes': 0.02199999988079071}
-normal-wes	8	132972576	G	GTT	{'normal-wes': 0.0, 'tumor-wes': 0.04699999839067459}
-tumor-wes	8	132972576	G	GTT	{'normal-wes': 0.0, 'tumor-wes': 0.04699999839067459}
