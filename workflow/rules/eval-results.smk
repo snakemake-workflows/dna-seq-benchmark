@@ -24,7 +24,7 @@ rule extract_fp_fn:
 ##  SOMATIC FP, FN and TP
 rule extract_fp_fn_tp:
     input:
-        tp="results/vcfeval/{callset}/{cov}/{classification}.vcf",
+        tp="results/vcfeval/{callset}/{cov}/{classification}.norm.vcf",
     output:
         vcf="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
     params:

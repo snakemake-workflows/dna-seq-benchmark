@@ -1,3 +1,16 @@
+rule norm_vcf:
+    input:
+        "{prefix}.vcf.gz",
+    output:
+        "{prefix}.norm.vcf.gz",
+    log:
+        "logs/bcftools-norm-vcf/{prefix}.log",
+    params:
+        extra="-m-any -Oz",
+    wrapper:
+        "v8.1.1/bio/bcftools/norm"
+
+
 rule index_vcf:
     input:
         "{prefix}.vcf.gz",
@@ -33,9 +46,9 @@ rule sort_vcf:
 
 rule unzip_vcf:
     input:
-        "{prefix}.vcf.gz",
+        "{prefix}.norm.vcf.gz",
     output:
-        "{prefix}.vcf",
+        "{prefix}.norm.vcf",
     log:
         "logs/unzip/{prefix}.log",
     conda:
