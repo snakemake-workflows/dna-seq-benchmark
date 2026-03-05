@@ -41,4 +41,4 @@ rule unzip_vcf:
     conda:
         "../envs/tools.yaml"
     shell:
-        "gunzip -keep {input} 2> {log}"
+        "gunzip --keep {input} 2> {log}"
