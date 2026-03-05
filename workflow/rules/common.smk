@@ -572,9 +572,14 @@ def get_fp_fn_expression(wildcards):
             wildcards.get("classification") == "fn"
             or wildcards.get("classification") == "tp-baseline"
         ):
-            return "CHROM, POS, ALT, REF, " + vaf_callset
+            vaf = vaf_benchmark
         else:
-            return "CHROM, POS, ALT, REF, " + vaf_benchmark
+            vaf = vaf_callset
+        if vaf is not None:
+            vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
+            return f"CHROM, POS, ALT, REF, {vaf_expr}"
+        else:
+            return "CHROM, POS, ALT, REF"
     else:
         return "CHROM, POS, ALT, REF"
 
