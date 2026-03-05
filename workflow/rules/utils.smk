@@ -38,5 +38,7 @@ rule unzip_vcf:
         "{prefix}.vcf",
     log:
         "logs/unzip/{prefix}.log",
+    conda:
+        "../envs/tools.yaml"
     shell:
         "gunzip -keep {input} 2> {log}"

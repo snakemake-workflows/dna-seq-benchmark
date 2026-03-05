@@ -113,7 +113,7 @@ def get_bwa_input(wildcards):
 
 def get_mosdepth_quantize(wildcards):
     coverages = get_coverages(wildcards)
-    return ":".join(map(str, sorted(coverages.values()))) + ":"
+    return f'{":".join(map(str, sorted(coverages.values())))}:'
 
 
 def get_plot_cov_labels():  # TODO check if ever used anywhere
@@ -274,7 +274,10 @@ def get_raw_callset_index(wildcards):
             suffix = ".csi"
         else:
             suffix = ".tbi"
-        return {"snvs": path["snvs"] + suffix, "indels": path["indels"] + suffix}
+        return {
+            "snvs": f"{path['snvs']}{suffix}",
+            "indels": f"{path['indels']}{suffix}",
+        }
     return path
 
 
@@ -460,7 +463,7 @@ def get_mosdepth_input(bai=False):
         if bam:
             if "bai" in benchmark and bai:
                 return benchmark["bai"]
-            return bam + ext
+            return f"{bam}{ext}"
         else:
             return f"results/read-alignments/{wildcards.benchmark}.dedup.bam{ext}"
 
