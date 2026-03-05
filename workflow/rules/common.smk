@@ -575,8 +575,11 @@ def get_fp_fn_expression(wildcards):
             vaf = vaf_benchmark
         else:
             vaf = vaf_callset
-        vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
-        return f"CHROM, POS, ALT, REF, {vaf_expr}"
+        if vaf is not None:
+            vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
+            return f"CHROM, POS, ALT, REF, {vaf_expr}"
+        else:
+            return "CHROM, POS, ALT, REF"
     else:
         return "CHROM, POS, ALT, REF"
 
