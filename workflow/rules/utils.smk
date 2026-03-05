@@ -2,11 +2,11 @@ rule norm_vcf:
     input:
         "{prefix}.vcf.gz",
     output:
-        "{prefix}.norm.vcf.gz",
+        "{prefix}.norm.vcf",
     log:
-        "logs/bcftools-norm-vcf/{prefix}.log",
+        "logs/norm/{prefix}.norm.log",
     params:
-        extra="-m-any -Oz",
+        extra="--rm-dup none -m-any",
     wrapper:
         "v8.1.1/bio/bcftools/norm"
 
@@ -42,16 +42,3 @@ rule sort_vcf:
         "logs/bcftools-sort-vcf/{prefix}.log",
     wrapper:
         "v8.1.1/bio/bcftools/sort"
-
-
-rule unzip_vcf:
-    input:
-        "{prefix}.norm.vcf.gz",
-    output:
-        "{prefix}.norm.vcf",
-    log:
-        "logs/unzip/{prefix}.log",
-    conda:
-        "../envs/tools.yaml"
-    shell:
-        "gunzip --keep {input} 2> {log}"
