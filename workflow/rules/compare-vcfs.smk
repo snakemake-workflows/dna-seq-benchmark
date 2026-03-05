@@ -221,7 +221,7 @@ rule generate_sdf:
         "rtg format --output {output} {input.genome} &> {log}"
 
 
-rule benchmark_variants:
+rule benchmark_variants_germline:
     input:
         truth=get_stratified_truth(),
         truth_idx=get_stratified_truth(".tbi"),
@@ -230,6 +230,27 @@ rule benchmark_variants:
         genome="resources/reference/genome-sdf",
     output:
         output="results/vcfeval/{callset}/{cov}/output.vcf.gz",
+    log:
+        "logs/vcfeval/{callset}/{cov}.log",
+    params:
+        output=lambda w, output: os.path.dirname(output[0]),
+    conda:
+        "../envs/rtg-tools.yaml"
+    threads: 32
+    shell:
+        "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
+        "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
+        "--output {params.output} --template {input.genome} &> {log}"
+
+
+rule benchmark_variants_somatic:
+    input:
+        truth=get_stratified_truth(),
+        truth_idx=get_stratified_truth(".tbi"),
+        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
+        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
+        genome="resources/reference/genome-sdf",
+    output:
         fp="results/vcfeval/{callset}/{cov}/fp.vcf.gz",
         fn="results/vcfeval/{callset}/{cov}/fn.vcf.gz",
         tp="results/vcfeval/{callset}/{cov}/tp.vcf.gz",
@@ -239,11 +260,10 @@ rule benchmark_variants:
     params:
         output=lambda w, output: os.path.dirname(output[0]),
         somatic=get_somatic_flag,
-        output_mode=get_vcfeval_output_mode,
     conda:
         "../envs/rtg-tools.yaml"
     threads: 32
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
-        "--output-mode {params.output_mode} --baseline {input.truth} --calls {input.query} "
+        "--output-mode split --baseline {input.truth} --calls {input.query} "
         "--output {params.output} --template {input.genome} {params.somatic} &> {log}"

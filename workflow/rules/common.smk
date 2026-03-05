@@ -535,13 +535,6 @@ def get_somatic_flag(wildcards):
     return somatic_flag
 
 
-def get_vcfeval_output_mode(wildcards):
-    if get_somatic_status(wildcards):
-        return "split"
-    else:
-        return "ga4gh"
-
-
 def get_fp_fn_expression(wildcards):
     if get_vaf_status(wildcards):
         vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
