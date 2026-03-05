@@ -43,13 +43,7 @@ rule rename_table_headers:
     output:
         renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     params:
-        expression={
-            "CHROM": "chromosome",
-            "POS": "position",
-            "REF": "ref_allele",
-            "ALT": "alt_allele",
-            "VAF": "vaf",
-        },
+        expression=get_rename_expression,
     log:
         "logs/rename-table-headers/{callset}/{cov}/{classification}.log",
     conda:

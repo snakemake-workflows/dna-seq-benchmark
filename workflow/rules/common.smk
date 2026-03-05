@@ -584,6 +584,16 @@ def get_fp_fn_expression(wildcards):
         return "CHROM, POS, ALT, REF"
 
 
+def get_rename_expression(wildcards):
+    fp_fn_expr = get_fp_fn_expression(wildcards)
+    expr_list = fp_fn_expr.split(",")
+    if get_vaf_status(wildcards):
+        rename_list = ["chromosome", "position", "alt_allele", "ref_allele", "vaf"]
+    else: 
+        rename_list = ["chromosome", "position", "alt_allele", "ref_allele"]
+    return {expr: rename for expr, rename in zip(expr_list, rename_list)}
+
+
 def get_high_coverage_status(wildcards):
     if hasattr(wildcards, "benchmark"):
         benchmark = get_benchmark(wildcards.benchmark)
