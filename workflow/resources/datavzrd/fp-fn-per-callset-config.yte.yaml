@@ -62,4 +62,5 @@ views:
             optional: true
             display-mode: hidden
         class:
+          optional: true
           display-mode: hidden
