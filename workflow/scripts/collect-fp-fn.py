@@ -28,17 +28,16 @@ def read_data(f, callset, chromosome=None):
         data = data.loc[data["chromosome"] == chromosome]
     print(data.head(), file=sys.stderr)
 
-    data = data.set_index(
-        [
-            "vaf",
-            "chromosome",
-            "position",
-            "ref_allele",
-            "alt_allele",
-            "true_genotype",
-        ]
-    )
-    data.drop("class", axis="columns", inplace=True)
+    index_cols = ["vaf", "chromosome", "position", "ref_allele", "alt_allele"]
+    if "true_genotype" in data.columns:
+        index_cols.append("true_genotype")
+
+    # Drop columns that should not be part of index or data
+    for col in ["class", "SAMPLE"]:
+        if col in data.columns:
+            data.drop(col, axis="columns", inplace=True)
+
+    data = data.set_index(index_cols)
 
     assert (
         not data.index.duplicated().any()

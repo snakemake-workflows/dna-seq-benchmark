@@ -63,6 +63,7 @@ views:
         genotype_mismatch_rate:
           ?if params.somatic:
             display-mode: hidden
+            optional: true
           ?else:
             display-mode: normal
           precision: 3
