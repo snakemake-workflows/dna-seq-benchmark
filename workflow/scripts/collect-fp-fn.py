@@ -28,9 +28,10 @@ def read_data(f, callset, chromosome=None):
         data = data.loc[data["chromosome"] == chromosome]
     print(data.head(), file=sys.stderr)
 
-    index_cols = ["vaf", "chromosome", "position", "ref_allele", "alt_allele"]
-    if "true_genotype" in data.columns:
-        index_cols.append("true_genotype")
+    index_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
+    for col in ["vaf", "true_genotype"]:
+        if col in data.columns:
+            index_cols.append(col)
 
     # Drop columns that should not be part of index or data
     for col in ["class", "SAMPLE"]:
