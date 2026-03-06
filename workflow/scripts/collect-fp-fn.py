@@ -43,7 +43,11 @@ def read_data(f, callset, chromosome=None):
         not data.index.duplicated().any()
     ), f"bug: not expecting any duplicates in FP/FN table {f}"
 
-    data.columns = [callset]
+    if data.columns.empty:
+        # Somatic tables have no data column after indexing; add a marker.
+        data[callset] = snakemake.wildcards.classification.upper()
+    else:
+        data.columns = [callset]
 
     if snakemake.wildcards.classification == "fn":
         data.loc[:, callset] = "FN"
