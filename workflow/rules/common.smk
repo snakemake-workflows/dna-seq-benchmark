@@ -21,6 +21,23 @@ used_benchmarks = {callset["benchmark"] for callset in callsets.values()}
 
 used_callsets = {callset for callset in callsets.keys()}
 
+somatic_callsets = {
+    name
+    for name, entries in callsets.items()
+    if genomes[benchmarks[entries["benchmark"]]["genome"]].get("somatic")
+}
+germline_callsets = used_callsets - somatic_callsets
+
+# Wildcard constraint patterns for callset-type-specific rules.
+# Use as:  wildcard_constraints: callset=somatic_callset_constraint,
+_UNMATCHABLE = "(?!x)x"
+somatic_callset_constraint = (
+    "|".join(somatic_callsets) if somatic_callsets else _UNMATCHABLE
+)
+germline_callset_constraint = (
+    "|".join(germline_callsets) if germline_callsets else _UNMATCHABLE
+)
+
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 used_benchmarks_callsets = [

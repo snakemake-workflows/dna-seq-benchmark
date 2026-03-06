@@ -232,6 +232,8 @@ rule benchmark_variants_germline:
         output="results/vcfeval/{callset}/{cov}/output.vcf.gz",
     log:
         "logs/vcfeval/{callset}/{cov}.log",
+    wildcard_constraints:
+        callset=germline_callset_constraint,
     params:
         output=lambda w, output: os.path.dirname(output[0]),
     conda:
@@ -257,6 +259,8 @@ rule benchmark_variants_somatic:
         tp_baseline="results/vcfeval/{callset}/{cov}/tp-baseline.vcf.gz",
     log:
         "logs/vcfeval/{callset}/{cov}.log",
+    wildcard_constraints:
+        callset=somatic_callset_constraint,
     params:
         output=lambda w, output: os.path.dirname(output[0]),
         somatic=get_somatic_flag,

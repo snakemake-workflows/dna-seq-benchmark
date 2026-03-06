@@ -1,7 +1,4 @@
 ## Germline FP / FN extraction
-ruleorder: extract_fp_fn > reformat_fp_fn_tp_tables
-
-
 rule extract_fp_fn:
     input:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
@@ -15,6 +12,8 @@ rule extract_fp_fn:
         "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     log:
         "logs/extract-fp-fn/{callset}/{cov}.{classification}.germline.log",
+    wildcard_constraints:
+        callset=germline_callset_constraint,
     params:
         vaf_fields=get_vaf_fields,
         vaf_status=get_vaf_status,
@@ -30,6 +29,8 @@ rule extract_fp_fn_tp:
         tp="results/vcfeval/{callset}/{cov}/{classification}.norm.vcf",
     output:
         vcf="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
+    wildcard_constraints:
+        callset=somatic_callset_constraint,
     params:
         expression=get_fp_fn_expression,
         extra="",
@@ -45,6 +46,8 @@ rule reformat_fp_fn_tp_tables:
         table="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
     output:
         renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
+    wildcard_constraints:
+        callset=somatic_callset_constraint,
     params:
         expression=get_rename_expression,
         tumor_sample_name=get_somatic_sample_name,
