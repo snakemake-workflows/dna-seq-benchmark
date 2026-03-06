@@ -36,7 +36,10 @@ def sort_key(col):
         return col
 
 
-results.sort_values(["callset", "coverage", "vaf"], inplace=True, key=sort_key)
+sort_cols = ["callset", "coverage"]
+if "vaf" in results.columns:
+    sort_cols.append("vaf")
+results.sort_values(sort_cols, inplace=True, key=sort_key)
 results["sort_index"] = results["coverage"].apply(cov_key)
 
 results.to_csv(snakemake.output[0], sep="\t", index=False)
