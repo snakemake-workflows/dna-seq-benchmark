@@ -565,6 +565,27 @@ def get_vaf_status(wildcards):
             return False
 
 
+def get_precision_recall_input(wildcards):
+    if get_somatic_status(wildcards):
+        return {
+            "fp": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.fp.tsv",
+            "fn": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.fn.tsv",
+            "tp": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.tp.tsv",
+            "tp_baseline": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.tp-baseline.tsv",
+        }
+    else:
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        return {
+            "calls": f"results/vcfeval/{wildcards.callset}/{wildcards.cov}/output.vcf.gz",
+            "idx": f"results/vcfeval/{wildcards.callset}/{wildcards.cov}/output.vcf.gz.tbi",
+            "common_src": common_src,
+            "truth": f"results/variants/{benchmark}.truth.cov-{wildcards.cov}.vcf.gz",
+            "truth_idx": f"results/variants/{benchmark}.truth.cov-{wildcards.cov}.vcf.gz.tbi",
+            "query": f"results/stratified-variants/{wildcards.callset}/{wildcards.cov}.vcf.gz",
+            "query_idx": f"results/stratified-variants/{wildcards.callset}/{wildcards.cov}.vcf.gz.tbi",
+        }
+
+
 def get_fp_fn_expression(wildcards):
     if get_vaf_status(wildcards):
         vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)

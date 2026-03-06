@@ -55,43 +55,19 @@ rule reformat_fp_fn_tp_tables:
 
 rule calc_precision_recall:
     input:
-        calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
-        idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
-        common_src=common_src,
-        truth=get_stratified_truth(),
-        truth_idx=get_stratified_truth(".tbi"),
-        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
-        query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
+        unpack(get_precision_recall_input),
     output:
-        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.germline.tsv",
+        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
     params:
+        somatic=get_somatic_status,
         vaf_fields=get_vaf_fields,
         vaf_status=get_vaf_status,
     conda:
         "../envs/pysam.yaml"
     script:
         "../scripts/calc-precision-recall.py"
-
-
-### Simpler than germline calculation as we do not worry about the genotype
-rule calc_precision_recall_somatic:
-    input:
-        fp="results/fp-fn/callsets/{callset}/{cov}.fp.tsv",
-        fn="results/fp-fn/callsets/{callset}/{cov}.fn.tsv",
-        tp="results/fp-fn/callsets/{callset}/{cov}.tp.tsv",
-        tp_baseline="results/fp-fn/callsets/{callset}/{cov}.tp-baseline.tsv",
-    output:
-        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
-    log:
-        "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
-    params:
-        vaf_status=get_vaf_status,
-    conda:
-        "../envs/pysam.yaml"
-    script:
-        "../scripts/calc-precision-recall-somatic.py"
 
 
 rule collect_stratifications:
