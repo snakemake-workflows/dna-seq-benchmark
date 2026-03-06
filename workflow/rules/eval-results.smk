@@ -1,4 +1,7 @@
 ## Germline FP / FN extraction
+ruleorder: extract_fp_fn > reformat_fp_fn_tp_tables
+
+
 rule extract_fp_fn:
     input:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
@@ -9,9 +12,9 @@ rule extract_fp_fn:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
-        "results/fp-fn/callsets/{callset}/{cov}.{classification}.germline.tsv",
+        "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     log:
-        "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
+        "logs/extract-fp-fn/{callset}/{cov}.{classification}.germline.log",
     params:
         vaf_fields=get_vaf_fields,
         vaf_status=get_vaf_status,
@@ -36,7 +39,7 @@ rule extract_fp_fn_tp:
         "v7.6.1/bio/vembrane/table"
 
 
-## Make Germline and Somatic Tables comparable
+## Reformat Somatic Tables
 rule reformat_fp_fn_tp_tables:
     input:
         table="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",

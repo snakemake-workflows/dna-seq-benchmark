@@ -524,7 +524,7 @@ def get_somatic_status(wildcards):
 
 
 def get_somatic_sample_name(wildcards):
-    return config["variant-calls"][wildcards.callset]["tumor_sample_name"]
+    return config["variant-calls"][wildcards.callset].get("tumor_sample_name")
 
 
 def get_somatic_flag(wildcards):
