@@ -5,7 +5,8 @@ __definitions__:
   - import pandas as pd
   - |
     columns = pd.read_table(input.main_dataset, sep="\t", nrows=1).columns
-    genotype_columns = list(columns[5:])
+    non_callset_cols = {"chromosome", "position", "ref_allele", "alt_allele", "vaf", "true_genotype", "p-value dependency", "FDR dependency"}
+    genotype_columns = [c for c in columns if c not in non_callset_cols]
 
 name: ?f"{wildcards.classification.upper()} calls at loci with {wildcards.cov} coverage on genome {wildcards.genome} for all callsets."
 default-view: main
@@ -23,7 +24,6 @@ datasets:
       path: ?os.path.join(input.dependency_sorting_datasets, f"{label}.tsv")
       separator: "\t"
       headers: 2
-  
 
 views:
   ?for view in ["main"] + params.labels:
@@ -68,6 +68,7 @@ views:
                   color-scheme: category20
         columns:
           true_genotype:
+            optional: true
             plot:
               heatmap:
                 scale: ordinal
