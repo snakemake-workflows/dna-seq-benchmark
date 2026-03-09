@@ -26,4 +26,8 @@ if "vaf" in df.columns:
         else v
     )
 
+# Remove SAMPLE column
+if "SAMPLE" in df.columns:
+    df = df.drop(columns=["SAMPLE"])
+
 df.to_csv(snakemake.output.renamed_table, sep="\t", index=False)
