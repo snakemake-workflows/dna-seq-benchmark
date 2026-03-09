@@ -16,7 +16,19 @@ def collect_chromosomes(f):
     return d["chromosome"].tolist()
 
 
-def read_data(f, callset, chromosome=None):
+def collect_index_cols(files):
+    """Determine the union of index columns across all input files."""
+    index_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
+    optional_cols = ["vaf", "true_genotype"]
+    for f in files:
+        cols = pd.read_csv(f, sep="\t", dtype=str, nrows=0).columns
+        for col in optional_cols:
+            if col in cols and col not in index_cols:
+                index_cols.append(col)
+    return index_cols
+
+
+def read_data(f, callset, index_cols, chromosome=None):
     print("reading", f, "...", file=sys.stderr)
     data = pd.read_csv(
         f,
@@ -28,10 +40,10 @@ def read_data(f, callset, chromosome=None):
         data = data.loc[data["chromosome"] == chromosome]
     print(data.head(), file=sys.stderr)
 
-    index_cols = ["chromosome", "position", "ref_allele", "alt_allele"]
-    for col in ["vaf", "true_genotype"]:
-        if col in data.columns:
-            index_cols.append(col)
+    # Ensure all expected index columns are present (add NA for missing ones)
+    for col in index_cols:
+        if col not in data.columns:
+            data[col] = pd.NA
 
     # Drop columns that should not be part of index or data
     for col in ["class", "SAMPLE"]:
@@ -40,9 +52,9 @@ def read_data(f, callset, chromosome=None):
 
     data = data.set_index(index_cols)
 
-    assert (
-        not data.index.duplicated().any()
-    ), f"bug: not expecting any duplicates in FP/FN table {f}"
+    assert not data.index.duplicated().any(), (
+        f"bug: not expecting any duplicates in FP/FN table {f}"
+    )
 
     if data.columns.empty:
         # Somatic tables have no data column after indexing; add a marker.
@@ -61,6 +73,8 @@ def get_idx_sorted_by_clustering(data):
     return idx
 
 
+index_cols = collect_index_cols(snakemake.input.tables)
+
 chromosomes = sorted(
     {chrom for f in snakemake.input.tables for chrom in collect_chromosomes(f)}
 )
@@ -77,7 +91,7 @@ for i, chromosome in enumerate(chromosomes):
 
     data = pd.concat(
         [
-            read_data(f, callset, chromosome)
+            read_data(f, callset, index_cols, chromosome)
             for f, callset in zip(snakemake.input.tables, snakemake.params.callsets)
         ],
         axis="columns",
@@ -102,7 +116,7 @@ for i, chromosome in enumerate(chromosomes):
         if i == 0:
             mode = "w"
             header = True
-             # add labels
+            # add labels
             index_cols = data.index.names
             cols = data.columns
             data = pd.concat([_label_df, data.reset_index()]).set_index(index_cols)
@@ -143,7 +157,6 @@ for i, chromosome in enumerate(chromosomes):
             sorted_target_vector = target_vector.sort_values()
             sorted_data = sorted_data[sorted_target_vector.index]
             if not not_na_target_vector.empty:
-
                 feature_matrix = feature_matrix.loc[not_na_target_vector.index]
 
                 # perfom chi² test against each feature
