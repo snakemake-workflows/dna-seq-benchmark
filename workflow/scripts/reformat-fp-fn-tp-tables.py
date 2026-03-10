@@ -3,6 +3,17 @@ import sys
 sys.stderr = open(snakemake.log[0], "w")
 
 import pandas as pd
+import re
+
+def parse_vaf(v):
+    if isinstance(v, str) and v.startswith("{"):
+        v = v.split(f"'{sample}': ")[1].split(",")[0].strip("}")
+    if isinstance(v, str) and "%" in v:
+        # Handle entries like "np.str_('100%')" or plain "100%"
+        match = re.search(r"([\d.]+)%", v)
+        if match:
+            return float(match.group(1)) / 100
+    return float(v) if isinstance(v, str) else v
 
 df = pd.read_csv(snakemake.input.table, sep="\t")
 
@@ -20,11 +31,8 @@ df = df.rename(columns=snakemake.params.expression)
 # extract only the tumor sample value.
 if "vaf" in df.columns:
     sample = str(snakemake.params.tumor_sample_name)
-    df["vaf"] = df["vaf"].apply(
-        lambda v: float(v.split(f"'{sample}': ")[1].split(",")[0].strip("}"))
-        if isinstance(v, str) and v.startswith("{")
-        else v
-    )
+
+    df["vaf"] = df["vaf"].apply(parse_vaf)
 
 # Remove SAMPLE column
 if "SAMPLE" in df.columns:
