@@ -20,7 +20,8 @@ def vaf_to_bin(vaf):
     """
     if isinstance(vaf, str):
         vaf = float(vaf.replace("%", "")) / 100 if "%" in vaf else float(vaf)
-    return max(0, min(9, int(float(vaf) * 10) - 1))
+    value = float(vaf)
+    return max(0, min(9, int(value * 10)))
 
 
 def bin_vafs(series):
