@@ -80,11 +80,31 @@ class SomaticClassifications:
         return _safe_divide_vaf(self.tp_query_vaf, denom)
 
 
+def _filter_by_vartype(df, vartype):
+    """Subset a somatic table to SNVs or INDELs.
+
+    Variant type is inferred from ref_allele / alt_allele lengths:
+      SNV  – both alleles are exactly 1 bp
+      INDEL – at least one allele is longer than 1 bp
+    Returns the dataframe unchanged if the required columns are absent.
+    """
+    if "ref_allele" not in df.columns or "alt_allele" not in df.columns:
+        return df
+    is_snv = (df["ref_allele"].str.len() == 1) & (df["alt_allele"].str.len() == 1)
+    return df[is_snv] if vartype == "snvs" else df[~is_snv]
+
+
 def collect_results_somatic():
     tp_df = pd.read_csv(snakemake.input.tp, sep="\t")
     tp_baseline_df = pd.read_csv(snakemake.input.tp_baseline, sep="\t")
     fp_df = pd.read_csv(snakemake.input.fp, sep="\t")
     fn_df = pd.read_csv(snakemake.input.fn, sep="\t")
+
+    vartype = snakemake.wildcards.vartype  # "snvs" or "indels"
+    tp_df = _filter_by_vartype(tp_df, vartype)
+    tp_baseline_df = _filter_by_vartype(tp_baseline_df, vartype)
+    fp_df = _filter_by_vartype(fp_df, vartype)
+    fn_df = _filter_by_vartype(fn_df, vartype)
 
     vaf_status = snakemake.params.vaf_status
     has_vaf = vaf_status and all(
