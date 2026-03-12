@@ -535,9 +535,11 @@ def get_coverages_of_callset(callset):
 def get_somatic_status(wildcards):
     if hasattr(wildcards, "benchmark"):
         return genomes[benchmarks[wildcards.benchmark]["genome"]].get("somatic")
-    else:
+    elif hasattr(wildcards, "callset"):
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
         return genomes[benchmarks[benchmark]["genome"]].get("somatic")
+    else:
+        return genomes[wildcards.genome].get("somatic")
 
 
 def get_somatic_sample_name(wildcards):
