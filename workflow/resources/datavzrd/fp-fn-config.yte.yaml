@@ -33,8 +33,7 @@ views:
       ?if view == "main":
         desc: |
           ?f"""
-          The values 0/0, 0/1, and 1/1 represent the genotype (not present, heterozygous, homozygous).
-          If a callset does not have an entry, this means that the variant matches the truth.
+          {"For somatic callsets, FP indicates a variant was called but absent from the truth (ALT-based comparison); a missing entry means the variant matches the truth." if params.somatic else "The values 0/0, 0/1, and 1/1 represent the genotype of the called variant (not present, heterozygous, homozygous). If a callset does not have an entry, this means that the variant matches the truth."}
 
           Rows and columns are sorted according to an unsupervised hiearchical clustering with hamming distance and ward linkage.
 
@@ -49,8 +48,7 @@ views:
           They represent the probability to observe an at least as strong dependency by chance.
           Rows with highest dependency are shown first.
 
-          The values 0/0, 0/1, and 1/1 represent the genotype (not present, heterozygous, homozygous).
-          If a callset does not have an entry, this means that the variant matches the truth.
+          {"For somatic callsets, FP indicates a variant was called but absent from the truth (ALT-based comparison); a missing entry means the variant matches the truth." if params.somatic else "The values 0/0, 0/1, and 1/1 represent the genotype of the called variant (not present, heterozygous, homozygous). If a callset does not have an entry, this means that the variant matches the truth."}
 
           Benchmark version: {wildcards.genome} {params.version}
           """
@@ -93,7 +91,7 @@ views:
           ?for callset in genotype_columns:
             ?callset:
               plot:
-                ?if wildcards.classification == "fp":
+                ?if wildcards.classification == "fp" and not params.somatic:
                   heatmap:
                     scale: ordinal
                     domain:
@@ -104,6 +102,13 @@ views:
                       - "#fdae6b"
                       - "#c6dbef"
                       - "#6baed6"
+                ?elif wildcards.classification == "fp" and params.somatic:
+                  heatmap:
+                    scale: ordinal
+                    domain:
+                      - "FP"
+                    range:
+                      - "#fd8d3c"
                 ?else:
                   heatmap:
                     scale: ordinal

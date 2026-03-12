@@ -296,6 +296,7 @@ rule report_fp_fn:
     params:
         labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
         version=get_genome_version,
+        somatic=get_somatic_status,
     wrapper:
         "v8.0.3/utils/datavzrd"
 
