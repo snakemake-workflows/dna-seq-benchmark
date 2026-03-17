@@ -16,22 +16,25 @@ def parse_vaf(v):
     return float(v) if isinstance(v, str) else v
 
 def check_samplename_existence(df, sample_name):
+    exists = True
     if "SAMPLE" in df.columns:
         if sample_name not in df["SAMPLE"].unique():
-            raise ValueError(f"Sample name '{sample_name}' not found in SAMPLE column.")
+            print(f"Sample name '{sample_name}' not found in SAMPLE column.\nSample column is not filtered and removed for this callset.", file=sys.stderr)
+            exists = False
     else:
-        raise ValueError("SAMPLE column not found in the input table.")
+        print("SAMPLE column not found in the input table.\nSample column is not filtered and removed for this callset", file=sys.stderr)
+        exists = False
+    return exists
 
 df = pd.read_csv(snakemake.input.table, sep="\t")
 
-check_samplename_existence(df, snakemake.params.tumor_sample_name)
-
-# Remove all normal samples
-if "SAMPLE" in df.columns:
-    if df["SAMPLE"].nunique(dropna=False) == 1:
-        pass
-    else:
-        df = df[df["SAMPLE"] == str(snakemake.params.tumor_sample_name)]
+if check_samplename_existence(df, snakemake.params.tumor_sample_name):
+    # Remove all normal samples
+    if "SAMPLE" in df.columns:
+        if df["SAMPLE"].nunique(dropna=False) == 1:
+            pass
+        else:
+            df = df[df["SAMPLE"] == str(snakemake.params.tumor_sample_name)]
 
 # Rename columns with the expression handed to the script
 df = df.rename(columns=snakemake.params.expression)
