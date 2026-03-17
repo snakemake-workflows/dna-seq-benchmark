@@ -15,7 +15,16 @@ def parse_vaf(v):
             return float(match.group(1)) / 100
     return float(v) if isinstance(v, str) else v
 
+def check_samplename_existence(df, sample_name):
+    if "SAMPLE" in df.columns:
+        if sample_name not in df["SAMPLE"].unique():
+            raise ValueError(f"Sample name '{sample_name}' not found in SAMPLE column.")
+    else:
+        raise ValueError("SAMPLE column not found in the input table.")
+
 df = pd.read_csv(snakemake.input.table, sep="\t")
+
+check_samplename_existence(df, snakemake.params.tumor_sample_name)
 
 # Remove all normal samples
 if "SAMPLE" in df.columns:
