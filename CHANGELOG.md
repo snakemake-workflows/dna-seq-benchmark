@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.16.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.15.0...v1.16.0) (2026-03-17)
+
+
+### Features
+
+* ALT as somatic sample name and ignore genotype for somatic samples ([#165](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/165)) ([37e41f7](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/37e41f7112b74a4f9cb4ed00191881d7c9f5561c))
+
+
+### Bug Fixes
+
+* remove vatools env from autobump action to enable autobump ([#159](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/159)) ([7195fd5](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/7195fd5314fabdfd956c29d60f1a7b0aab8de4c8))
+
+
+### Performance Improvements
+
+* autobump snakemake wrappers ([#164](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/164)) ([d27fec0](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/d27fec03b661c36a46d1f658f085547b8a71dafa))
+
 ## [1.15.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.14.1...v1.15.0) (2026-02-05)
 
 
