@@ -1,4 +1,5 @@
-rule calc_precision_recall:
+## Germline FP / FN extraction
+rule extract_fp_fn:
     input:
         calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
         idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
@@ -8,10 +9,65 @@ rule calc_precision_recall:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
+        "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
+    log:
+        "logs/extract-fp-fn/{callset}/{cov}.{classification}.germline.log",
+    wildcard_constraints:
+        callset=germline_callset_constraint,
+    params:
+        vaf_fields=get_vaf_fields,
+        vaf_status=get_vaf_status,
+    conda:
+        "../envs/vembrane.yaml"
+    script:
+        "../scripts/extract-fp-fn.py"
+
+
+##  SOMATIC FP, FN and TP
+rule extract_fp_fn_tp:
+    input:
+        tp="results/vcfeval/{callset}/{cov}/{classification}.norm.vcf",
+    output:
+        vcf="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
+    wildcard_constraints:
+        callset=somatic_callset_constraint,
+    params:
+        expression=get_fp_fn_expression,
+        extra="",
+    log:
+        "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
+    wrapper:
+        "v7.6.1/bio/vembrane/table"
+
+
+## Reformat Somatic Tables
+rule reformat_fp_fn_tp_tables:
+    input:
+        table="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
+    output:
+        renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
+    wildcard_constraints:
+        callset=somatic_callset_constraint,
+    params:
+        expression=get_rename_expression,
+        tumor_sample_name=get_somatic_sample_name,
+    log:
+        "logs/reformat-fp-fn-tp-tables/{callset}/{cov}/{classification}.log",
+    conda:
+        "../envs/stats.yaml"
+    script:
+        "../scripts/reformat-fp-fn-tp-tables.py"
+
+
+rule calc_precision_recall:
+    input:
+        unpack(get_precision_recall_input),
+    output:
         "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
     params:
+        somatic=get_somatic_status,
         vaf_fields=get_vaf_fields,
         vaf_status=get_vaf_status,
     conda:
@@ -82,28 +138,6 @@ rule report_precision_recall:
         version=get_genome_version,
     wrapper:
         "v8.0.3/utils/datavzrd"
-
-
-rule extract_fp_fn:
-    input:
-        calls="results/vcfeval/{callset}/{cov}/output.vcf.gz",
-        idx="results/vcfeval/{callset}/{cov}/output.vcf.gz.tbi",
-        common_src=common_src,
-        truth=get_stratified_truth(),
-        truth_idx=get_stratified_truth(".tbi"),
-        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
-        query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
-    output:
-        "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
-    log:
-        "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
-    params:
-        vaf_fields=get_vaf_fields,
-        vaf_status=get_vaf_status,
-    conda:
-        "../envs/vembrane.yaml"
-    script:
-        "../scripts/extract-fp-fn.py"
 
 
 # TODO: if one of the input callsets has all sites as FN, the resulting merged table
@@ -262,6 +296,7 @@ rule report_fp_fn:
     params:
         labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
         version=get_genome_version,
+        somatic=get_somatic_status,
     wrapper:
         "v8.0.3/utils/datavzrd"
 

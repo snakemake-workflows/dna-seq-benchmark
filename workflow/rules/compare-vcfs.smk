@@ -66,23 +66,6 @@ rule rename_contigs:
         "-Oz -o {output} 2> {log}"
 
 
-rule add_genotype_field:
-    input:
-        get_callset_correct_contigs_liftover,
-    output:
-        "results/normalized-variants/{callset}.gt-added.vcf.gz",
-    log:
-        "logs/add_genotype_field/{callset}.log",
-    params:
-        get_somatic_sample_name,
-    conda:
-        "../envs/vatools.yaml"
-    shell:
-        # part after || gets executed if vcf-genotype-annotater fails because GT field is already present
-        # bcftools convert makes sure that input for vcf-genotype-annotator is in vcf format
-        "vcf-genotype-annotator <(bcftools convert -Ov {input}) {params} 0/1 -o {output} &> {log} || bcftools view {input} -Oz > {output}"
-
-
 rule add_format_field:
     input:
         bcf="resources/variants/{genome}/all.truth.norm.bcf",
@@ -238,7 +221,7 @@ rule generate_sdf:
         "rtg format --output {output} {input.genome} &> {log}"
 
 
-rule benchmark_variants:
+rule benchmark_variants_germline:
     input:
         truth=get_stratified_truth(),
         truth_idx=get_stratified_truth(".tbi"),
@@ -246,9 +229,38 @@ rule benchmark_variants:
         query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
         genome="resources/reference/genome-sdf",
     output:
-        "results/vcfeval/{callset}/{cov}/output.vcf.gz",
+        output="results/vcfeval/{callset}/{cov}/output.vcf.gz",
     log:
         "logs/vcfeval/{callset}/{cov}.log",
+    wildcard_constraints:
+        callset=germline_callset_constraint,
+    params:
+        output=lambda w, output: os.path.dirname(output[0]),
+    conda:
+        "../envs/rtg-tools.yaml"
+    threads: 32
+    shell:
+        "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
+        "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
+        "--output {params.output} --template {input.genome} &> {log}"
+
+
+rule benchmark_variants_somatic:
+    input:
+        truth=get_stratified_truth(),
+        truth_idx=get_stratified_truth(".tbi"),
+        query="results/stratified-variants/{callset}/{cov}.vcf.gz",
+        query_index="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
+        genome="resources/reference/genome-sdf",
+    output:
+        fp="results/vcfeval/{callset}/{cov}/fp.vcf.gz",
+        fn="results/vcfeval/{callset}/{cov}/fn.vcf.gz",
+        tp="results/vcfeval/{callset}/{cov}/tp.vcf.gz",
+        tp_baseline="results/vcfeval/{callset}/{cov}/tp-baseline.vcf.gz",
+    log:
+        "logs/vcfeval/{callset}/{cov}.log",
+    wildcard_constraints:
+        callset=somatic_callset_constraint,
     params:
         output=lambda w, output: os.path.dirname(output[0]),
         somatic=get_somatic_flag,
@@ -257,5 +269,5 @@ rule benchmark_variants:
     threads: 32
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
-        "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
+        "--output-mode split --baseline {input.truth} --calls {input.query} "
         "--output {params.output} --template {input.genome} {params.somatic} &> {log}"

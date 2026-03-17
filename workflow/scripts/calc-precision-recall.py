@@ -8,12 +8,156 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import pandas as pd
 import numpy as np
+
+
+# --- Somatic helpers ---
+
+
+def vaf_to_bin(vaf):
+    """Convert a VAF value to a bin index (0-9).
+
+    Bins correspond to VAF ranges: [0, 0.1), [0.1, 0.2), ..., [0.9, 1.0].
+    """
+    if isinstance(vaf, str):
+        vaf = float(vaf.replace("%", "")) / 100 if "%" in vaf else float(vaf)
+    value = float(vaf)
+    return max(0, min(9, int(value * 10)))
+
+
+def bin_vafs(series):
+    """Bin a series of VAF values into 10 bins and return counts per bin."""
+    counts = np.zeros(10, dtype=np.uint64)
+    for vaf in series.dropna():
+        counts[vaf_to_bin(vaf)] += 1
+    return counts
+
+
+def _safe_divide_vaf(numerator, denominator):
+    """Element-wise division with 1.0 default where denominator is zero."""
+    result = np.ones(10, dtype=np.float64)
+    mask = denominator > 0
+    result[mask] = numerator[mask] / denominator[mask]
+    return result
+
+
+class SomaticClassifications:
+    """Count-based classifications for somatic callsets (from TSV tables)."""
+
+    def __init__(self, tp_df, tp_baseline_df, fp_df, fn_df, vaf_stratify=False):
+        self.tp_query = len(tp_df)
+        self.tp_truth = len(tp_baseline_df)
+        self.fp = len(fp_df)
+        self.fn = len(fn_df)
+
+        self.stratify_by_vaf = vaf_stratify
+        if vaf_stratify:
+            self.tp_query_vaf = bin_vafs(tp_df["vaf"])
+            self.tp_truth_vaf = bin_vafs(tp_baseline_df["vaf"])
+            self.fp_vaf = bin_vafs(fp_df["vaf"])
+            self.fn_vaf = bin_vafs(fn_df["vaf"])
+
+    def precision(self):
+        p = self.tp_query + self.fp
+        return 1.0 if p == 0 else float(self.tp_query) / float(p)
+
+    def recall(self):
+        t = self.tp_truth + self.fn
+        return 1.0 if t == 0 else float(self.tp_truth) / float(t)
+
+    def fstar(self):
+        a = self.tp_query + self.fn + self.fp
+        return 1.0 if a == 0 else float(self.tp_query) / float(a)
+
+    def precision_vaf(self):
+        denom = self.tp_query_vaf.astype(np.float64) + self.fp_vaf
+        return _safe_divide_vaf(self.tp_query_vaf, denom)
+
+    def recall_vaf(self):
+        denom = self.tp_truth_vaf.astype(np.float64) + self.fn_vaf
+        return _safe_divide_vaf(self.tp_truth_vaf, denom)
+
+    def fstar_vaf(self):
+        denom = self.tp_query_vaf.astype(np.float64) + self.fn_vaf + self.fp_vaf
+        return _safe_divide_vaf(self.tp_query_vaf, denom)
+
+
+def _filter_by_vartype(df, vartype):
+    """Subset a somatic table to SNVs or INDELs.
+
+    Variant type is inferred from ref_allele / alt_allele lengths:
+      SNV  – both alleles are exactly 1 bp
+      INDEL – at least one allele is longer than 1 bp
+    Returns the dataframe unchanged if the required columns are absent.
+    """
+    if "ref_allele" not in df.columns or "alt_allele" not in df.columns:
+        return df
+    is_snv = (df["ref_allele"].str.len() == 1) & (df["alt_allele"].str.len() == 1)
+    return df[is_snv] if vartype == "snvs" else df[~is_snv]
+
+
+def collect_results_somatic():
+    tp_df = pd.read_csv(snakemake.input.tp, sep="\t")
+    tp_baseline_df = pd.read_csv(snakemake.input.tp_baseline, sep="\t")
+    fp_df = pd.read_csv(snakemake.input.fp, sep="\t")
+    fn_df = pd.read_csv(snakemake.input.fn, sep="\t")
+
+    vartype = snakemake.wildcards.vartype  # "snvs" or "indels"
+    tp_df = _filter_by_vartype(tp_df, vartype)
+    tp_baseline_df = _filter_by_vartype(tp_baseline_df, vartype)
+    fp_df = _filter_by_vartype(fp_df, vartype)
+    fn_df = _filter_by_vartype(fn_df, vartype)
+
+    vaf_status = snakemake.params.vaf_status
+    has_vaf = vaf_status and all(
+        "vaf" in df.columns for df in [tp_df, tp_baseline_df, fp_df, fn_df]
+    )
+
+    c = SomaticClassifications(
+        tp_df, tp_baseline_df, fp_df, fn_df, vaf_stratify=has_vaf
+    )
+
+    d = pd.DataFrame(
+        {
+            "#variants_truth": [c.tp_truth + c.fn],
+            "precision": [c.precision()],
+            "tp_query": [c.tp_query],
+            "fp": [c.fp],
+            "recall": [c.recall()],
+            "tp_truth": [c.tp_truth],
+            "fn": [c.fn],
+            "F*": [c.fstar()],
+        }
+    )
+
+    if has_vaf:
+        vafs = [0.1 * x for x in range(1, 11)]
+        d_vaf = pd.DataFrame(
+            {
+                "vaf": vafs,
+                "#variants_truth": c.tp_truth_vaf + c.fn_vaf,
+                "precision": c.precision_vaf(),
+                "tp_query": c.tp_query_vaf,
+                "fp": c.fp_vaf,
+                "recall": c.recall_vaf(),
+                "tp_truth": c.tp_truth_vaf,
+                "fn": c.fn_vaf,
+                "F*": c.fstar_vaf(),
+            }
+        )
+    else:
+        d_vaf = None
+
+    return (d, d_vaf)
+
+
+# --- Germline helpers ---
+
 import pysam
 
 from common.classification import CompareExactGenotype, CompareExistence, Class
 
 
-class Classifications:
+class GermlineClassifications:
     def __init__(self, comparator, vaf_fields):
         self.comparator = comparator
         # if vaf information is given: stratify results by vaf and add addtional counters for stratified tp, fp, fn
@@ -141,10 +285,10 @@ class Classifications:
 
 
 
-def collect_results(vartype):
+def collect_results_germline(vartype):
     vaf_fields = snakemake.params.vaf_fields
-    classifications_exact = Classifications(CompareExactGenotype(vartype), vaf_fields)
-    classifications_existence = Classifications(CompareExistence(vartype), vaf_fields)
+    classifications_exact = GermlineClassifications(CompareExactGenotype(vartype), vaf_fields)
+    classifications_existence = GermlineClassifications(CompareExistence(vartype), vaf_fields)
     truth = pysam.VariantFile(snakemake.input.truth)
     query = pysam.VariantFile(snakemake.input.query)
 
@@ -229,9 +373,12 @@ def collect_results(vartype):
 
 
 assert snakemake.wildcards.vartype in ["snvs", "indels"]
-vartype = "SNV" if snakemake.wildcards.vartype == "snvs" else "INDEL"
 
-results, results_vaf = collect_results(vartype)
+if snakemake.params.somatic:
+    results, results_vaf = collect_results_somatic()
+else:
+    vartype = "SNV" if snakemake.wildcards.vartype == "snvs" else "INDEL"
+    results, results_vaf = collect_results_germline(vartype)
 if snakemake.wildcards.mode == "base":
     results.to_csv(snakemake.output[0], sep="\t", index=False)
 else:

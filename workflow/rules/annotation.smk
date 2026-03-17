@@ -143,19 +143,6 @@ rule annotate_unique_fp_fn:
         "v8.0.0/bio/vep/annotate"
 
 
-rule norm_vcf:
-    input:
-        "{prefix}.vcf.gz",
-    output:
-        "{prefix}.norm.vcf",
-    log:
-        "logs/norm/{prefix}.norm.log",
-    params:
-        extra="--rm-dup none -m-any",
-    wrapper:
-        "v8.1.1/bio/bcftools/norm"
-
-
 rule vembrane_table_shared_fn:
     input:
         "results/annotated/vcf/{benchmark}/{benchmark}.shared_fn.annotated.norm.vcf",

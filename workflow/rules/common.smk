@@ -21,6 +21,23 @@ used_benchmarks = {callset["benchmark"] for callset in callsets.values()}
 
 used_callsets = {callset for callset in callsets.keys()}
 
+somatic_callsets = {
+    name
+    for name, entries in callsets.items()
+    if genomes[benchmarks[entries["benchmark"]]["genome"]].get("somatic")
+}
+germline_callsets = used_callsets - somatic_callsets
+
+# Wildcard constraint patterns for callset-type-specific rules.
+# Use as:  wildcard_constraints: callset=somatic_callset_constraint,
+_UNMATCHABLE = "(?!x)x"
+somatic_callset_constraint = (
+    "|".join(somatic_callsets) if somatic_callsets else _UNMATCHABLE
+)
+germline_callset_constraint = (
+    "|".join(germline_callsets) if germline_callsets else _UNMATCHABLE
+)
+
 used_genomes = {benchmarks[benchmark]["genome"] for benchmark in used_benchmarks}
 
 used_benchmarks_callsets = [
@@ -113,7 +130,7 @@ def get_bwa_input(wildcards):
 
 def get_mosdepth_quantize(wildcards):
     coverages = get_coverages(wildcards)
-    return ":".join(map(str, sorted(coverages.values()))) + ":"
+    return f'{":".join(map(str, sorted(coverages.values())))}:'
 
 
 def get_plot_cov_labels():  # TODO check if ever used anywhere
@@ -213,9 +230,7 @@ def get_cov_interval(name, coverages):
 def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
-    if get_somatic_status(wildcards):
-        return "results/normalized-variants/{callset}.gt-added.vcf.gz"
-    elif callset.get("rename-contigs", False):
+    if callset.get("rename-contigs", False):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
@@ -276,7 +291,10 @@ def get_raw_callset_index(wildcards):
             suffix = ".csi"
         else:
             suffix = ".tbi"
-        return {"snvs": path["snvs"] + suffix, "indels": path["indels"] + suffix}
+        return {
+            "snvs": f"{path['snvs']}{suffix}",
+            "indels": f"{path['indels']}{suffix}",
+        }
     return path
 
 
@@ -462,7 +480,7 @@ def get_mosdepth_input(bai=False):
         if bam:
             if "bai" in benchmark and bai:
                 return benchmark["bai"]
-            return bam + ext
+            return f"{bam}{ext}"
         else:
             return f"results/read-alignments/{wildcards.benchmark}.dedup.bam{ext}"
 
@@ -517,24 +535,20 @@ def get_coverages_of_callset(callset):
 def get_somatic_status(wildcards):
     if hasattr(wildcards, "benchmark"):
         return genomes[benchmarks[wildcards.benchmark]["genome"]].get("somatic")
-    else:
+    elif hasattr(wildcards, "callset"):
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
         return genomes[benchmarks[benchmark]["genome"]].get("somatic")
+    else:
+        return genomes[wildcards.genome].get("somatic")
 
 
 def get_somatic_sample_name(wildcards):
-    return config["variant-calls"][wildcards.callset]["tumor_sample_name"]
+    return config["variant-calls"][wildcards.callset].get("tumor_sample_name")
 
 
 def get_somatic_flag(wildcards):
     if get_somatic_status(wildcards):
-        sample_name_baseline = "truth"
-        sample_name_callset = config["variant-calls"][wildcards.callset][
-            "tumor_sample_name"
-        ]  # get name tumor via config -> from dict
-        somatic_flag = (
-            f"--squash-ploidy --sample {sample_name_baseline},{sample_name_callset}"
-        )
+        somatic_flag = f"--squash-ploidy --sample truth,ALT"
     else:
         somatic_flag = ""
     return somatic_flag
@@ -568,6 +582,56 @@ def get_vaf_status(wildcards):
             return True
         else:
             return False
+
+
+def get_precision_recall_input(wildcards):
+    if get_somatic_status(wildcards):
+        return {
+            "fp": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.fp.tsv",
+            "fn": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.fn.tsv",
+            "tp": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.tp.tsv",
+            "tp_baseline": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.tp-baseline.tsv",
+        }
+    else:
+        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
+        return {
+            "calls": f"results/vcfeval/{wildcards.callset}/{wildcards.cov}/output.vcf.gz",
+            "idx": f"results/vcfeval/{wildcards.callset}/{wildcards.cov}/output.vcf.gz.tbi",
+            "common_src": common_src,
+            "truth": f"results/variants/{benchmark}.truth.cov-{wildcards.cov}.vcf.gz",
+            "truth_idx": f"results/variants/{benchmark}.truth.cov-{wildcards.cov}.vcf.gz.tbi",
+            "query": f"results/stratified-variants/{wildcards.callset}/{wildcards.cov}.vcf.gz",
+            "query_idx": f"results/stratified-variants/{wildcards.callset}/{wildcards.cov}.vcf.gz.tbi",
+        }
+
+
+def get_fp_fn_expression(wildcards):
+    if get_vaf_status(wildcards):
+        vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
+        if (
+            wildcards.get("classification") == "fn"
+            or wildcards.get("classification") == "tp-baseline"
+        ):
+            vaf = vaf_benchmark
+        else:
+            vaf = vaf_callset
+        if vaf is not None:
+            vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
+            return f"CHROM, POS, ALT, REF, {vaf_expr}"
+        else:
+            return "CHROM, POS, ALT, REF"
+    else:
+        return "CHROM, POS, ALT, REF"
+
+
+def get_rename_expression(wildcards):
+    fp_fn_expr = get_fp_fn_expression(wildcards)
+    expr_list = fp_fn_expr.split(", ")
+    if get_vaf_status(wildcards):
+        rename_list = ["chromosome", "position", "alt_allele", "ref_allele", "vaf"]
+    else:
+        rename_list = ["chromosome", "position", "alt_allele", "ref_allele"]
+    return {expr: rename for expr, rename in zip(expr_list, rename_list)}
 
 
 def get_high_coverage_status(wildcards):
@@ -730,7 +794,7 @@ if "variant-calls" in config:
 
     wildcard_constraints:
         callset="|".join(config["variant-calls"]),
-        classification="fp|fn",
+        classification="fp|fn|tp|tp-baseline",
         comparison="genotype|existence",
         vartype="snvs|indels",
 
