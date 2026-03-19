@@ -16,6 +16,9 @@ def parse_vaf(v):
     return float(v) if isinstance(v, str) else v
 
 def check_samplename_existence(df, sample_name):
+    if snakemake.wildcards.classification == "tp-baseline" or snakemake.wildcards.classification == "fn":
+        print(f"Classification is '{snakemake.wildcards.classification}'.\nSample column is not filtered and removed for this table.", file=sys.stderr)
+        return False
     exists = True
     if "SAMPLE" in df.columns:
         if sample_name not in df["SAMPLE"].unique():
