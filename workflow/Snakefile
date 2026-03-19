@@ -20,20 +20,16 @@ if "variant-calls" in config:
     rule all:
         input:
             expand(
-                "results/fp-fn/callsets/{callset}.{classification}.tsv",
-                callset=used_callsets,
-                classification=["fp", "fn"],
-            ),
-            expand(
-                "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
-                benchmark=used_benchmarks,
-                classification=["fp", "fn"],
-            ),
-            expand(
-                "results/precision-recall/benchmarks/{benchmark}.{vartype}.base.tsv",
+                "results/report/precision-recall/{benchmark}/{vartype}",
                 benchmark=used_benchmarks,
                 vartype=["snvs", "indels"],
             ),
+            expand(
+                "results/report/fp-fn/callsets/{callset}/{classification}",
+                callset=used_callsets,
+                classification=["fp", "fn"],
+            ),
+            get_fp_fn_reports,
             expand(
                 "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
                 benchmark=used_benchmarks,
