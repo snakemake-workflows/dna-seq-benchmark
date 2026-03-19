@@ -28,7 +28,9 @@ rule extract_fp_fn_tp:
     input:
         tp="results/vcfeval/{callset}/{cov}/{classification}.norm.vcf",
     output:
-        temp("results/intermediate/fp-fn/raw/callsets/{callset}/{cov}.{classification}.tsv"),
+        temp(
+            "results/intermediate/fp-fn/raw/callsets/{callset}/{cov}.{classification}.tsv"
+        ),
     wildcard_constraints:
         callset=somatic_callset_constraint,
     params:
