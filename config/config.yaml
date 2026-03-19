@@ -10,7 +10,8 @@ variant-calls:
       site: University of Duisburg-Essen
     # Optional subcategory for separating callsets in the report. Comment out if not needed.
     subcategory: agilent
-    path: "path/to/unified.vcf.gz" # either path to a unified VCF file
+    path: /Users/famke/01-pm4onco/repositories/pm4onco-ap4-benchmark/bm-output/annotated/vcf/seqc2-wes/seqc2-wes-ukw-varscan2-indel.unique_fp.annotated.vcf.gz 
+    #"path/to/unified.vcf.gz" # either path to a unified VCF file
     # OR, for separate files, use:
     # path:
     #   snvs: "path/to/snvs.vcf.gz"

@@ -9,7 +9,7 @@ rule extract_fp_fn:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
-        "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
+        temp("results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv"),
     log:
         "logs/extract-fp-fn/{callset}/{cov}.{classification}.germline.log",
     wildcard_constraints:
@@ -28,7 +28,9 @@ rule extract_fp_fn_tp:
     input:
         tp="results/vcfeval/{callset}/{cov}/{classification}.norm.vcf",
     output:
-        vcf="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
+        vcf=temp(
+            "results/intermediate/fp-fn/raw/callsets/{callset}/{cov}.{classification}.tsv"
+        ),
     wildcard_constraints:
         callset=somatic_callset_constraint,
     params:
@@ -43,9 +45,11 @@ rule extract_fp_fn_tp:
 ## Reformat Somatic Tables
 rule reformat_fp_fn_tp_tables:
     input:
-        table="results/vembrane/callsets/{callset}/{cov}.{classification}.tsv",
+        table="results/intermediate/fp-fn/raw/callsets/{callset}/{cov}.{classification}.tsv",
     output:
-        renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
+        renamed_table=temp(
+            "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv"
+        ),
     wildcard_constraints:
         callset=somatic_callset_constraint,
     params:
@@ -63,7 +67,7 @@ rule calc_precision_recall:
     input:
         unpack(get_precision_recall_input),
     output:
-        "results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv",
+        temp("results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv"),
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
     params:
@@ -80,7 +84,7 @@ rule collect_stratifications:
     input:
         get_collect_stratifications_input,
     output:
-        "results/precision-recall/callsets/{callset}.{vartype}.{mode}.tsv",
+        temp("results/precision-recall/callsets/{callset}.{vartype}.{mode}.tsv"),
     params:
         coverages=get_nonempty_coverages,
         coverage_lower_bounds=get_coverages,
