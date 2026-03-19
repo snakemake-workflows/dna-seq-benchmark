@@ -15,18 +15,13 @@ If you use this workflow in a paper, don't forget to give credits to the authors
 
 The workflow writes both final deliverables and intermediate files under `results/`.
 
-### Final results (usually what you want)
+### Primary result tables
 
-- `results/report/precision-recall/<benchmark>/<snvs|indels>/`: interactive precision/recall reports
-- `results/report/fp-fn/callsets/<callset>/<fp|fn>/`: per-callset FP/FN reports
-- `results/report/fp-fn/genomes/<genome>/<coverage>/<fp|fn>/`: genome-level FP/FN reports
+- `results/fp-fn/callsets/<callset>.{fp|fn}.tsv`: aggregated FP/FN tables per callset across coverages
+- `results/fp-fn/benchmarks/<benchmark>.{fp|fn}.tsv`: aggregated FP/FN tables per benchmark
+- `results/precision-recall/benchmarks/<benchmark>.<snvs|indels>.<base|vaf-stratified>.tsv`: aggregated precision/recall tables per benchmark (optionally stratified by vaf)
 - `results/annotated/tsv/<benchmark>/`: annotated shared FN tables
 - `results/annotated/tsv/<benchmark>/<callset>.unique_<fp|fn>.annotated.tsv`: annotated unique FP/FN tables
-
-### Supporting analysis tables
-
-- `results/precision-recall/benchmarks/`: aggregated precision/recall benchmark tables
-- `results/fp-fn/benchmarks/`: aggregated FP/FN benchmark tables and shared/unique splits
 - `results/fp-fn/vcf/`: VCFs generated from shared/unique FP/FN tables
 
 ### Intermediates and automatic cleanup
