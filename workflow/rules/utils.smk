@@ -2,7 +2,7 @@ rule norm_vcf:
     input:
         "{prefix}.vcf.gz",
     output:
-        "{prefix}.norm.vcf",
+        temp("{prefix}.norm.vcf"),
     log:
         "logs/norm/{prefix}.norm.log",
     params:
