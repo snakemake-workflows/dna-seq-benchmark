@@ -88,7 +88,7 @@ rule tabix_revel_scores:
     log:
         "logs/tabix/revel.log",
     wrapper:
-        "v8.1.1/bio/tabix/index"
+        "v9.4.1/bio/tabix/index"
 
 
 rule annotate_shared_fn:
@@ -114,7 +114,7 @@ rule annotate_shared_fn:
     group:
         "annotation"
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.4.0/bio/vep/annotate"
 
 
 rule annotate_unique_fp_fn:
@@ -140,7 +140,7 @@ rule annotate_unique_fp_fn:
     group:
         "annotation"
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.4.0/bio/vep/annotate"
 
 
 rule vembrane_table_shared_fn:
@@ -154,7 +154,7 @@ rule vembrane_table_shared_fn:
     log:
         "logs/vembrane/{benchmark}/{benchmark}.shared_fn.annotate.log",
     wrapper:
-        "v7.6.1/bio/vembrane/table"
+        "v9.4.0/bio/vembrane/table"
 
 
 rule vembrane_table_unique_fp_fn:
@@ -168,4 +168,4 @@ rule vembrane_table_unique_fp_fn:
     log:
         "logs/vembrane/{benchmark}/{callset}.unique_{classification}.annotate.log",
     wrapper:
-        "v7.6.1/bio/vembrane/table"
+        "v9.4.0/bio/vembrane/table"

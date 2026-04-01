@@ -8,7 +8,7 @@ rule norm_vcf:
     params:
         extra="--rm-dup none -m-any",
     wrapper:
-        "v8.1.1/bio/bcftools/norm"
+        "v9.4.1/bio/bcftools/norm"
 
 
 rule index_vcf:
