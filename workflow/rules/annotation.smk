@@ -114,7 +114,7 @@ rule annotate_shared_fn:
     group:
         "annotation"
     wrapper:
-        "v9.4.0/bio/vep/annotate"
+        "v8.0.0/bio/vep/annotate"
 
 
 rule annotate_unique_fp_fn:
@@ -140,7 +140,7 @@ rule annotate_unique_fp_fn:
     group:
         "annotation"
     wrapper:
-        "v9.4.0/bio/vep/annotate"
+        "v8.0.0/bio/vep/annotate"
 
 
 rule vembrane_table_shared_fn:
