@@ -95,7 +95,7 @@ rule remove_non_pass:
     params:
         extra="-f 'PASS,.'",
     wrapper:
-        "v8.1.1/bio/bcftools/view"
+        "v9.4.1/bio/bcftools/view"
 
 
 rule intersect_calls_with_target_regions:

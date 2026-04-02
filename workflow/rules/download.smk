@@ -91,7 +91,7 @@ rule normalize_truth:
     log:
         "logs/normalize-truth/{genome}.log",
     wrapper:
-        "v8.1.1/bio/bcftools/norm"
+        "v9.4.1/bio/bcftools/norm"
 
 
 rule get_confidence_bed:
@@ -188,7 +188,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "v8.1.1/bio/samtools/faidx"
+        "v9.4.1/bio/samtools/faidx"
 
 
 rule bwa_index:
@@ -246,7 +246,7 @@ rule samtools_index:
         "logs/samtools-index/{benchmark}.log",
     threads: 4  # This value - 1 will be sent to -@
     wrapper:
-        "v8.1.1/bio/samtools/index"
+        "v9.4.1/bio/samtools/index"
 
 
 rule mosdepth:
