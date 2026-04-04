@@ -3,8 +3,8 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - bcftools =1.22
-  - samtools =1.22
-  - curl =8
+  - bcftools =1.23.1
+  - samtools =1.23.1
+  - curl =8.19.0
   - bedtools =2.31.1
   - ucsc-liftover =482
