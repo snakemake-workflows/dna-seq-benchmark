@@ -234,7 +234,7 @@ rule mark_duplicates:
     resources:
         mem_mb=1024,
     wrapper:
-        "v9.0.0/bio/picard/markduplicates"
+        "v9.4.0/bio/picard/markduplicates"
 
 
 rule samtools_index:
