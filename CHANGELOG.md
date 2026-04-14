@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.16.1](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.16.0...v1.16.1) (2026-04-14)
+
+
+### Bug Fixes
+
+* make more files temporary ([#168](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/168)) ([5fa52d3](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/5fa52d31abbd2293e0387bab380519c40e99785e))
+
+
+### Performance Improvements
+
+* autobump snakemake wrappers ([#167](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/167)) ([6cf2a6a](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/6cf2a6a8d120be8b32052529ed343424a11fff20))
+
 ## [1.16.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.15.0...v1.16.0) (2026-03-17)
 
 
