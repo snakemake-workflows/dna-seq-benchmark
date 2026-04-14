@@ -54,7 +54,7 @@ if "variant-calls" in config:
                 classification=["fp", "fn"],
             ),
             expand(
-                "results/fp-fn/{benchmark}.{classification}.tsv",
+                "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
                 classification=["fp", "fn"],
             ),
