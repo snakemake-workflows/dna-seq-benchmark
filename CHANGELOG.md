@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.16.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.15.0...v1.16.0) (2026-03-17)
+
+
+### Features
+
+* ALT as somatic sample name and ignore genotype for somatic samples ([#165](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/165)) ([37e41f7](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/37e41f7112b74a4f9cb4ed00191881d7c9f5561c))
+
+
+### Bug Fixes
+
+* remove vatools env from autobump action to enable autobump ([#159](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/159)) ([7195fd5](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/7195fd5314fabdfd956c29d60f1a7b0aab8de4c8))
+
+
+### Performance Improvements
+
+* autobump snakemake wrappers ([#164](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/164)) ([d27fec0](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/d27fec03b661c36a46d1f658f085547b8a71dafa))
+
+## [1.15.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.14.1...v1.15.0) (2026-02-05)
+
+
+### Features
+
+* VEP annotation with REVEL, Sift and PolyPhen Scores to fp/fn vcfs ([#154](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/154)) ([d2512d0](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/d2512d0afb43d7db0a6a49caf793f124bde2f979))
+
+
+### Bug Fixes
+
+* change SEQC2 SNV truth to enable VAF comparison for WGS ([#157](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/157)) ([925a157](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/925a157158b2b7c216c231140ab4df2f39c303a9))
+
+
+### Performance Improvements
+
+* autobump snakemake wrappers ([#155](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/155)) ([bfa37e2](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/bfa37e2262253447f7e6b1fb5f914f56718bd78d))
+* bump snakemake wrappers to v8.0.2 ([#150](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/150)) ([0647f12](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/0647f12b9c5b32270c9b74ba14f6e98ffd1efab9))
+
 ## [1.14.1](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.14.0...v1.14.1) (2025-11-14)
 
 

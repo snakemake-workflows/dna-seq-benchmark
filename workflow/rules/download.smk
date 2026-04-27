@@ -91,7 +91,7 @@ rule normalize_truth:
     log:
         "logs/normalize-truth/{genome}.log",
     wrapper:
-        "v8.0.2/bio/bcftools/norm"
+        "v9.4.1/bio/bcftools/norm"
 
 
 rule get_confidence_bed:
@@ -166,7 +166,7 @@ rule get_reference:
         "logs/get-genome.log",
     cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
-        "v8.0.2/bio/reference/ensembl-sequence"
+        "v5.10.0/bio/reference/ensembl-sequence"
 
 
 rule get_liftover_chain:
@@ -188,7 +188,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "v8.0.2/bio/samtools/faidx"
+        "v9.4.1/bio/samtools/faidx"
 
 
 rule bwa_index:
@@ -201,7 +201,7 @@ rule bwa_index:
     log:
         "logs/bwa_index/genome.log",
     wrapper:
-        "v8.0.2/bio/bwa/index"
+        "v5.10.0/bio/bwa/index"
 
 
 rule bwa_mem:
@@ -218,7 +218,7 @@ rule bwa_mem:
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v8.0.2/bio/bwa/mem"
+        "v8.1.1/bio/bwa/mem"
 
 
 rule mark_duplicates:
@@ -234,7 +234,7 @@ rule mark_duplicates:
     resources:
         mem_mb=1024,
     wrapper:
-        "v8.0.2/bio/picard/markduplicates"
+        "v9.4.0/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -246,7 +246,7 @@ rule samtools_index:
         "logs/samtools-index/{benchmark}.log",
     threads: 4  # This value - 1 will be sent to -@
     wrapper:
-        "v8.0.2/bio/samtools/index"
+        "v9.4.1/bio/samtools/index"
 
 
 rule mosdepth:

@@ -56,8 +56,11 @@ views:
                   - "#6baed6"
         ?if params.somatic:
           true_genotype:
+            optional: true
             display-mode: hidden
           predicted_genotype:
+            optional: true
             display-mode: hidden
         class:
+          optional: true
           display-mode: hidden

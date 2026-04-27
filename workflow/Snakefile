@@ -15,6 +15,7 @@ if "variant-calls" in config:
 
     include: "rules/compare-vcfs.smk"
     include: "rules/eval-results.smk"
+    include: "rules/annotation.smk"
 
     rule all:
         input:
@@ -30,11 +31,11 @@ if "variant-calls" in config:
             ),
             get_fp_fn_reports,
             expand(
-                "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.sorted.vcf.gz",
+                "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
                 benchmark=used_benchmarks,
             ),
             expand(
-                "results/fp-fn/vcf/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.sorted.vcf.gz",
+                "results/annotated/tsv/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.annotated.tsv",
                 benchmark_callset=used_benchmarks_callsets,
                 classification=["fp", "fn"],
             ),
@@ -53,7 +54,7 @@ if "variant-calls" in config:
                 classification=["fp", "fn"],
             ),
             expand(
-                "results/fp-fn/{benchmark}.{classification}.tsv",
+                "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
                 classification=["fp", "fn"],
             ),
