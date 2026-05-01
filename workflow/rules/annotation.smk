@@ -24,7 +24,7 @@ rule get_vep_cache:
         "logs/vep/cache.log",
     cache: "omit-software"
     wrapper:
-        "v7.6.0/bio/vep/cache"
+        "v9.4.2/bio/vep/cache"
 
 
 rule get_vep_plugins:
@@ -35,7 +35,7 @@ rule get_vep_plugins:
     log:
         "logs/vep/plugins.log",
     wrapper:
-        "v9.0.1/bio/vep/plugins"
+        "v9.5.0/bio/vep/plugins"
 
 
 rule download_revel:
@@ -114,7 +114,7 @@ rule annotate_shared_fn:
     group:
         "annotation"
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.4.0/bio/vep/annotate"
 
 
 rule annotate_unique_fp_fn:
@@ -140,7 +140,7 @@ rule annotate_unique_fp_fn:
     group:
         "annotation"
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.4.0/bio/vep/annotate"
 
 
 rule vembrane_table_shared_fn:
