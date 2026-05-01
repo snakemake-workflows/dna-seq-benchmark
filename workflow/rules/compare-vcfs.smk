@@ -191,7 +191,7 @@ rule index_stratified_truth:
     log:
         "logs/bcftools-index/{benchmark}.truth.{cov}.log",
     wrapper:
-        "v8.1.1/bio/bcftools/index"
+        "v9.4.2/bio/bcftools/index"
 
 
 checkpoint stat_truth:

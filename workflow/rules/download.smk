@@ -218,7 +218,7 @@ rule bwa_mem:
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v8.1.1/bio/bwa/mem"
+        "v9.4.2/bio/bwa/mem"
 
 
 rule mark_duplicates:
@@ -234,7 +234,7 @@ rule mark_duplicates:
     resources:
         mem_mb=1024,
     wrapper:
-        "v9.4.0/bio/picard/markduplicates"
+        "v9.4.2/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -265,7 +265,7 @@ rule mosdepth:
     # additional decompression threads through `--threads`
     threads: 4  # This value - 1 will be sent to `--threads`
     wrapper:
-        "v8.0.2/bio/mosdepth"
+        "v9.4.2/bio/mosdepth"
 
 
 rule stratify_regions:
