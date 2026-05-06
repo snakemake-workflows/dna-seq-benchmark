@@ -496,9 +496,11 @@ def _get_nonempty_coverages(callset):
         coverages = low_coverages
 
     def isempty(cov):
-        with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
-            0
-        ].open() as f:
+        with (
+            checkpoints.stat_truth.get(benchmark=benchmark, cov=cov)
+            .output[0]
+            .open() as f
+        ):
             stat = json.load(f)
         return stat["isempty"]
 
@@ -606,28 +608,25 @@ def get_precision_recall_input(wildcards):
 
 
 def get_fp_fn_expression(wildcards):
-    if get_vaf_status(wildcards):
-        vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
-        if (
-            wildcards.get("classification") == "fn"
-            or wildcards.get("classification") == "tp-baseline"
-        ):
-            vaf = vaf_benchmark
-        else:
-            vaf = vaf_callset
-        if vaf is not None:
-            vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
-            return f"CHROM, POS, ALT, REF, {vaf_expr}"
-        else:
-            return "CHROM, POS, ALT, REF"
+    vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
+    if (
+        wildcards.get("classification") == "fn"
+        or wildcards.get("classification") == "tp-baseline"
+    ):
+        vaf = vaf_benchmark
     else:
-        return "CHROM, POS, ALT, REF"
+        vaf = vaf_callset
+
+    if vaf is not None:
+        vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
+        return f"CHROM, POS, ALT, REF, {vaf_expr}"
+    return "CHROM, POS, ALT, REF"
 
 
 def get_rename_expression(wildcards):
     fp_fn_expr = get_fp_fn_expression(wildcards)
     expr_list = fp_fn_expr.split(", ")
-    if get_vaf_status(wildcards):
+    if len(expr_list) == 5:
         rename_list = ["chromosome", "position", "alt_allele", "ref_allele", "vaf"]
     else:
         rename_list = ["chromosome", "position", "alt_allele", "ref_allele"]
