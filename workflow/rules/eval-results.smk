@@ -60,7 +60,7 @@ rule reformat_fp_fn_tp_tables:
         expression=get_rename_expression,
         tumor_sample_name=get_somatic_sample_name,
     script:
-        "../scripts/reformat-fp-fn-tables.py"
+        "../scripts/reformat-fp-fn-tp-tables.py"
 
 
 rule calc_precision_recall:

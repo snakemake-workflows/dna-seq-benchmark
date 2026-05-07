@@ -16,13 +16,13 @@ rule get_downsampled_vep_cache:
 rule get_vep_cache:
     output:
         directory("resources/vep/cache"),
-    log:
-        "logs/vep/cache.log",
-    cache: "omit-software"
     params:
         species="homo_sapiens",
         build=get_reference_genome_build(),
         release="115",
+    log:
+        "logs/vep/cache.log",
+    cache: "omit-software"
     wrapper:
         "v7.6.0/bio/vep/cache"
 
@@ -30,10 +30,10 @@ rule get_vep_cache:
 rule get_vep_plugins:
     output:
         directory("resources/vep/plugins"),
-    log:
-        "logs/vep/plugins.log",
     params:
         release="115",
+    log:
+        "logs/vep/plugins.log",
     wrapper:
         "v9.0.1/bio/vep/plugins"
 
