@@ -110,9 +110,9 @@ rule annotate_shared_fn:
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
     log:
         "logs/vep/fp-fn/{benchmark}/{benchmark}.shared_fn.annotate.log",
+    threads: 4
     group:
         "annotation"
-    threads: 4
     wrapper:
         "v8.0.0/bio/vep/annotate"
 
@@ -136,9 +136,9 @@ rule annotate_unique_fp_fn:
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
     log:
         "logs/vep/fp-fn/{benchmark}/{callset}.unique_{classification}.annotate.log",
+    threads: 4
     group:
         "annotation"
-    threads: 4
     wrapper:
         "v8.0.0/bio/vep/annotate"
 
