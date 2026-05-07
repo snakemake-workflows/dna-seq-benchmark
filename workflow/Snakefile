@@ -27,7 +27,7 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn-tp/callsets/{callset}/{classification}",
                 callset=used_callsets,
-                classification=["fp", "fn", "tp"],
+                classification=["fp", "fn"],
             ),
             get_fp_fn_reports,
             expand(
@@ -51,12 +51,12 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn-tp/callsets/{callset}/{classification}",
                 callset=used_callsets,
-                classification=["fp", "fn", "tp"],
+                classification=["fp", "fn"],
             ),
             expand(
                 "results/fp-fn-tp/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
-                classification=["fp", "fn", "tp"],
+                classification=["fp", "fn"],
             ),
             get_fp_fn_reports,
             # collect the checkpoint inputs to avoid issues when
@@ -83,6 +83,15 @@ if "variant-calls" in config:
 
     rule eval_fp_fn_tp_collection:
         # Stop after collecting fp/fn/tp tables, before unique/shared filtering
-        # Use this rule with: snakemake --until eval_fp_fn_tp_collection
+        # Use this rule with: snakemake eval_fp_fn_tp_collection
         input:
-            "results/.checkpoints/fp-fn-tp-collection.done",
+            expand(
+                "results/fp-fn-tp/benchmarks/{benchmark}.{classification}.tsv",
+                benchmark=used_benchmarks,
+                classification=["fp", "fn", "tp", "tp-baseline"],
+            ),
+            expand(
+                "results/fp-fn-tp/callsets/{callset}.{classification}.tsv",
+                callset=used_callsets,
+                classification=["fp", "fn", "tp", "tp-baseline"],
+            ),
