@@ -586,10 +586,10 @@ def get_vaf_status(wildcards):
 def get_precision_recall_input(wildcards):
     if get_somatic_status(wildcards):
         return {
-            "fp": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.fp.tsv",
-            "fn": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.fn.tsv",
-            "tp": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.tp.tsv",
-            "tp_baseline": f"results/fp-fn/callsets/{wildcards.callset}/{wildcards.cov}.tp-baseline.tsv",
+            "fp": f"results/fp-fn-tp/callsets/{wildcards.callset}/{wildcards.cov}.fp.tsv",
+            "fn": f"results/fp-fn-tp/callsets/{wildcards.callset}/{wildcards.cov}.fn.tsv",
+            "tp": f"results/fp-fn-tp/callsets/{wildcards.callset}/{wildcards.cov}.tp.tsv",
+            "tp_baseline": f"results/fp-fn-tp/callsets/{wildcards.callset}/{wildcards.cov}.tp-baseline.tsv",
         }
     else:
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
@@ -650,7 +650,7 @@ def get_collect_stratifications_input(wildcards):
 
 def get_collect_stratifications_fp_fn_input(wildcards):
     return expand(
-        "results/fp-fn/callsets/{{callset}}/{cov}.{{classification}}.tsv",
+        "results/fp-fn-tp/callsets/{{callset}}/{cov}.{{classification}}.tsv",
         cov=get_nonempty_coverages(wildcards),
     )
 
@@ -658,7 +658,7 @@ def get_collect_stratifications_fp_fn_input(wildcards):
 def get_fp_fn_reports(wildcards):
     for genome in used_genomes:
         yield from expand(
-            "results/report/fp-fn/genomes/{genome}/{cov}/{classification}",
+            "results/report/fp-fn-tp/genomes/{genome}/{cov}/{classification}",
             genome=genome,
             cov={
                 cov
@@ -672,7 +672,7 @@ def get_fp_fn_reports(wildcards):
 def get_fp_fn_reports_benchmarks(wildcards):
     for genome in used_genomes:
         yield from expand(
-            "results/report/fp-fn/benchmarks/{benchmark}/{classification}",
+            "results/report/fp-fn-tp/benchmarks/{benchmark}/{classification}",
             benchmark={benchmark for benchmark in used_benchmarks},
             classification=["fp", "fn"],
         )
@@ -706,7 +706,7 @@ def get_report_precision_recall_input(wildcards):
 def get_collect_fp_fn_benchmark_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
     return expand(
-        "results/fp-fn/callsets/{callset}.{{classification}}.tsv", callset=callsets
+        "results/fp-fn-tp/callsets/{callset}.{{classification}}.tsv", callset=callsets
     )
 
 
@@ -771,7 +771,7 @@ def get_collect_fp_fn_callsets(wildcards):
 def get_collect_fp_fn_input(wildcards):
     callsets = get_collect_fp_fn_callsets(wildcards)
     return expand(
-        "results/fp-fn/callsets/{callset}/{{cov}}.{{classification}}.tsv",
+        "results/fp-fn-tp/callsets/{callset}/{{cov}}.{{classification}}.tsv",
         callset=callsets,
     )
 
