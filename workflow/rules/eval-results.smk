@@ -9,16 +9,16 @@ rule extract_fp_fn:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
-        temp("results/fp-fn-tp/callsets/{callset}/{cov}.{classification}.tsv"),
+        temp("results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv"),
     log:
         "logs/extract-fp-fn/{callset}/{cov}.{classification}.germline.log",
     wildcard_constraints:
         callset=germline_callset_constraint,
+    conda:
+        "../envs/vembrane.yaml"
     params:
         vaf_fields=get_vaf_fields,
         vaf_status=get_vaf_status,
-    conda:
-        "../envs/vembrane.yaml"
     script:
         "../scripts/extract-fp-fn.py"
 
@@ -29,15 +29,15 @@ rule extract_fp_fn_tp:
         tp="results/vcfeval/{callset}/{cov}/{classification}.norm.vcf",
     output:
         temp(
-            "results/intermediate/fp-fn-tp/raw/callsets/{callset}/{cov}.{classification}.tsv"
+            "results/intermediate/fp-fn/raw/callsets/{callset}/{cov}.{classification}.tsv"
         ),
+    log:
+        "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
     wildcard_constraints:
         callset=somatic_callset_constraint,
     params:
         expression=get_fp_fn_expression,
         extra="",
-    log:
-        "logs/extract-fp-fn/{callset}/{cov}.{classification}.log",
     wrapper:
         "v9.4.0/bio/vembrane/table"
 
@@ -45,22 +45,22 @@ rule extract_fp_fn_tp:
 ## Reformat Somatic Tables
 rule reformat_fp_fn_tp_tables:
     input:
-        table="results/intermediate/fp-fn-tp/raw/callsets/{callset}/{cov}.{classification}.tsv",
+        table="results/intermediate/fp-fn/raw/callsets/{callset}/{cov}.{classification}.tsv",
     output:
         renamed_table=temp(
-            "results/fp-fn-tp/callsets/{callset}/{cov}.{classification}.tsv"
+            "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv"
         ),
+    log:
+        "logs/reformat-fp-fn-tables/{callset}/{cov}/{classification}.log",
     wildcard_constraints:
         callset=somatic_callset_constraint,
+    conda:
+        "../envs/stats.yaml"
     params:
         expression=get_rename_expression,
         tumor_sample_name=get_somatic_sample_name,
-    log:
-        "logs/reformat-fp-fn-tp-tables/{callset}/{cov}/{classification}.log",
-    conda:
-        "../envs/stats.yaml"
     script:
-        "../scripts/reformat-fp-fn-tp-tables.py"
+        "../scripts/reformat-fp-fn-tables.py"
 
 
 rule calc_precision_recall:
@@ -70,12 +70,12 @@ rule calc_precision_recall:
         temp("results/precision-recall/callsets/{callset}/{cov}.{vartype}.{mode}.tsv"),
     log:
         "logs/calc-precision-recall/{callset}/{cov}/{vartype}.{mode}.log",
+    conda:
+        "../envs/pysam.yaml"
     params:
         somatic=get_somatic_status,
         vaf_fields=get_vaf_fields,
         vaf_status=get_vaf_status,
-    conda:
-        "../envs/pysam.yaml"
     script:
         "../scripts/calc-precision-recall.py"
 
@@ -85,16 +85,16 @@ rule collect_stratifications:
         get_collect_stratifications_input,
     output:
         temp("results/precision-recall/callsets/{callset}.{vartype}.{mode}.tsv"),
-    params:
-        coverages=get_nonempty_coverages,
-        coverage_lower_bounds=get_coverages,
     log:
         "logs/collect-stratifications/{callset}/{vartype}.{mode}.log",
-    conda:
-        "../envs/stats.yaml"
     # We want this to be determined before FP/FN collection in order to avoid memory
     # issues with callsets that do not match the truth at all.
     priority: 2
+    conda:
+        "../envs/stats.yaml"
+    params:
+        coverages=get_nonempty_coverages,
+        coverage_lower_bounds=get_coverages,
     script:
         "../scripts/collect-stratifications.py"
 
@@ -104,14 +104,14 @@ rule collect_precision_recall:
         tables=get_collect_precision_recall_input,
     output:
         "results/precision-recall/benchmarks/{benchmark}.{vartype}.{mode}.tsv",
-    params:
-        callsets=lambda w: get_benchmark_callsets(w.benchmark),
-        labels=get_collect_precision_recall_labels,
-        vaf=get_vaf_status,
     log:
         "logs/collect-precision-recall/{benchmark}/{vartype}.{mode}.log",
     conda:
         "../envs/stats.yaml"
+    params:
+        callsets=lambda w: get_benchmark_callsets(w.benchmark),
+        labels=get_collect_precision_recall_labels,
+        vaf=get_vaf_status,
     script:
         "../scripts/collect-precision-recall.py"
 
@@ -151,22 +151,22 @@ rule collect_fp_fn:
     input:
         tables=get_collect_fp_fn_input,
     output:
-        main="results/fp-fn-tp/genomes/{genome}/{cov}/{classification}/main.tsv",
+        main="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
         dependency_sorting=directory(
-            "results/fp-fn-tp/genomes/{genome}/{cov}/{classification}/dependency-sorting"
+            "results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting"
         ),
+    log:
+        "logs/collect-fp-fn/{genome}/{cov}/{classification}.log",
+    # This has to happen after precision/recall has been computed, otherwise we risk
+    # extremely high memory usage if a callset does not match the truth at all.
+    priority: 1
+    conda:
+        "../envs/stats.yaml"
     params:
         callsets=get_collect_fp_fn_callsets,
         labels=get_collect_fp_fn_labels,
         label_names=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
         max_entries=config.get("max-fp-fn-entries", 300),
-    log:
-        "logs/collect-fp-fn/{genome}/{cov}/{classification}.log",
-    conda:
-        "../envs/stats.yaml"
-    # This has to happen after precision/recall has been computed, otherwise we risk
-    # extremely high memory usage if a callset does not match the truth at all.
-    priority: 1
     script:
         "../scripts/collect-fp-fn.py"
 
@@ -175,17 +175,17 @@ rule collect_stratifications_fp_fn:
     input:
         get_collect_stratifications_fp_fn_input,
     output:
-        "results/fp-fn-tp/callsets/{callset}.{classification}.tsv",
-    params:
-        coverages=get_nonempty_coverages,
-        coverage_lower_bounds=get_coverages,
+        "results/fp-fn/callsets/{callset}.{classification}.tsv",
     log:
-        "logs/fp-fn-tp/callsets/{callset}.{classification}.log",
-    conda:
-        "../envs/stats.yaml"
+        "logs/fp-fn/callsets/{callset}.{classification}.log",
     # This has to happen after precision/recall has been computed, otherwise we risk
     # extremely high memory usage if a callset does not match the truth at all.
     priority: 1
+    conda:
+        "../envs/stats.yaml"
+    params:
+        coverages=get_nonempty_coverages,
+        coverage_lower_bounds=get_coverages,
     script:
         "../scripts/collect-stratifications-fp-fn.py"
 
@@ -194,22 +194,22 @@ rule collect_fp_fn_benchmark:
     input:
         tables=get_collect_fp_fn_benchmark_input,
     output:
-        "results/fp-fn-tp/benchmarks/{benchmark}.{classification}.tsv",
-    params:
-        callsets=lambda w: get_benchmark_callsets(w.benchmark),
+        "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
     log:
-        "logs/fp-fn-tp/benchmarks/{benchmark}.{classification}.log",
+        "logs/fp-fn/benchmarks/{benchmark}.{classification}.log",
     conda:
         "../envs/stats.yaml"
+    params:
+        callsets=lambda w: get_benchmark_callsets(w.benchmark),
     script:
         "../scripts/collect-fp-fn-benchmarks.py"
 
 
 rule filter_shared_fn:
     input:
-        fn="results/fp-fn-tp/benchmarks/{benchmark}.fn.tsv",
+        fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
     output:
-        shared_fn="results/fp-fn-tp/benchmarks/{benchmark}.shared_fn.tsv",
+        shared_fn="results/fp-fn/benchmarks/{benchmark}.shared_fn.tsv",
     log:
         "logs/filter-shared-fn/{benchmark}/{benchmark}.log",
     conda:
@@ -223,9 +223,9 @@ rule filter_shared_fn:
 
 rule filter_unique:
     input:
-        table="results/fp-fn-tp/benchmarks/{benchmark}.{classification}.tsv",
+        table="results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
     output:
-        "results/fp-fn-tp/benchmarks/{benchmark}/{callset}.unique_{classification}.tsv",
+        "results/fp-fn/benchmarks/{benchmark}/{callset}.unique_{classification}.tsv",
     log:
         "logs/filter-unique-variants/{benchmark}/{callset}.unique_{classification}.log",
     conda:
@@ -236,11 +236,11 @@ rule filter_unique:
 
 rule write_shared_fn_vcf:
     input:
-        benchmark_table="results/fp-fn-tp/benchmarks/{benchmark}.shared_fn.tsv",
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}.shared_fn.tsv",
         base_vcf=get_benchmark_renamed_truth,
         base_vcf_index=get_benchmark_renamed_truth_index,
     output:
-        "results/fp-fn-tp/vcf/{benchmark}/{benchmark}.shared_fn.vcf.gz",
+        "results/fp-fn/vcf/{benchmark}/{benchmark}.shared_fn.vcf.gz",
     log:
         "logs/write-shared-fn-vcf/{benchmark}/{benchmark}.shared_fn.log",
     conda:
@@ -251,11 +251,11 @@ rule write_shared_fn_vcf:
 
 rule write_unique_fn_vcf:
     input:
-        benchmark_table="results/fp-fn-tp/benchmarks/{benchmark}/{callset}.unique_fn.tsv",
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fn.tsv",
         base_vcf=get_benchmark_renamed_truth,
         base_vcf_index=get_benchmark_renamed_truth_index,
     output:
-        "results/fp-fn-tp/vcf/{benchmark}/{callset}.unique_fn.vcf.gz",
+        "results/fp-fn/vcf/{benchmark}/{callset}.unique_fn.vcf.gz",
     log:
         "logs/write-unique-fn-vcf/{benchmark}/{callset}.unique_fn.log",
     conda:
@@ -266,11 +266,11 @@ rule write_unique_fn_vcf:
 
 rule write_unique_fp_vcf:
     input:
-        benchmark_table="results/fp-fn-tp/benchmarks/{benchmark}/{callset}.unique_fp.tsv",
+        benchmark_table="results/fp-fn/benchmarks/{benchmark}/{callset}.unique_fp.tsv",
         base_vcf="results/normalized-variants/{callset}.vcf.gz",
         base_vcf_index="results/normalized-variants/{callset}.vcf.gz.tbi",
     output:
-        "results/fp-fn-tp/vcf/{benchmark}/{callset}.unique_fp.vcf.gz",
+        "results/fp-fn/vcf/{benchmark}/{callset}.unique_fp.vcf.gz",
     log:
         "logs/write-unique-fp-vcf/{benchmark}/{callset}.unique_fp.log",
     conda:
@@ -281,8 +281,8 @@ rule write_unique_fp_vcf:
 
 rule report_fp_fn:
     input:
-        main_dataset="results/fp-fn-tp/genomes/{genome}/{cov}/{classification}/main.tsv",
-        dependency_sorting_datasets="results/fp-fn-tp/genomes/{genome}/{cov}/{classification}/dependency-sorting",
+        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
         config=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
     output:
         report(
@@ -307,7 +307,7 @@ rule report_fp_fn:
 
 rule report_fp_fn_callset:
     input:
-        table="results/fp-fn-tp/callsets/{callset}.{classification}.tsv",
+        table="results/fp-fn/callsets/{callset}.{classification}.tsv",
         config=workflow.source_path(
             "../resources/datavzrd/fp-fn-per-callset-config.yte.yaml"
         ),

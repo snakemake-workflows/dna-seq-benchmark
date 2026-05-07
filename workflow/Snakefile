@@ -25,7 +25,7 @@ if "variant-calls" in config:
                 vartype=["snvs", "indels"],
             ),
             expand(
-                "results/report/fp-fn-tp/callsets/{callset}/{classification}",
+                "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
                 classification=["fp", "fn"],
             ),
@@ -49,12 +49,12 @@ if "variant-calls" in config:
                 vartype=["snvs", "indels"],
             ),
             expand(
-                "results/report/fp-fn-tp/callsets/{callset}/{classification}",
+                "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
                 classification=["fp", "fn"],
             ),
             expand(
-                "results/fp-fn-tp/benchmarks/{benchmark}.{classification}.tsv",
+                "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
                 classification=["fp", "fn"],
             ),
@@ -86,12 +86,12 @@ if "variant-calls" in config:
         # Use this rule with: snakemake eval_fp_fn_tp_collection
         input:
             expand(
-                "results/fp-fn-tp/benchmarks/{benchmark}.{classification}.tsv",
+                "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
                 classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             expand(
-                "results/fp-fn-tp/callsets/{callset}.{classification}.tsv",
+                "results/fp-fn/callsets/{callset}.{classification}.tsv",
                 callset=used_callsets,
                 classification=["fp", "fn", "tp", "tp-baseline"],
             ),
