@@ -214,8 +214,12 @@ checkpoint fp_fn_tp_collection_done:
         ),
     output:
         "results/.checkpoints/fp-fn-tp-collection.done",
+    log:
+        "logs/fp-fn-tp-collection-done.log",
+    conda:
+        "../envs/stats.yaml"
     shell:
-        "mkdir -p $(dirname {output}) && touch {output}"
+        "mkdir -p $(dirname {output}) && touch {output} 2> {log}"
 
 
 rule filter_shared_fn:
