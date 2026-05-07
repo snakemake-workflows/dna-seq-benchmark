@@ -225,11 +225,6 @@ checkpoint fp_fn_tp_collection_done:
 rule filter_shared_fn:
     input:
         fn="results/fp-fn-tp/benchmarks/{benchmark}.fn.tsv",
-        checkpoint=(
-            ancient("results/.checkpoints/fp-fn-tp-collection.done")
-            if not config.get("stop-at-fp-fn-tp-collection")
-            else []
-        ),
     output:
         shared_fn="results/fp-fn-tp/benchmarks/{benchmark}.shared_fn.tsv",
     log:
@@ -246,11 +241,6 @@ rule filter_shared_fn:
 rule filter_unique:
     input:
         table="results/fp-fn-tp/benchmarks/{benchmark}.{classification}.tsv",
-        checkpoint=(
-            ancient("results/.checkpoints/fp-fn-tp-collection.done")
-            if not config.get("stop-at-fp-fn-tp-collection")
-            else []
-        ),
     output:
         "results/fp-fn-tp/benchmarks/{benchmark}/{callset}.unique_{classification}.tsv",
     log:
