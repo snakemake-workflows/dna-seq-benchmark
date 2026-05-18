@@ -51,12 +51,12 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             expand(
                 "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             get_fp_fn_reports,
             # collect the checkpoint inputs to avoid issues when
@@ -79,19 +79,4 @@ if "variant-calls" in config:
                     if not benchmarks[benchmark].get("high-coverage")
                 ],
                 cov=low_coverages,
-            ),
-
-    rule eval_fp_fn_tp_collection:
-        # Stop after collecting fp/fn/tp tables, before unique/shared filtering
-        # Use this rule with: snakemake eval_fp_fn_tp_collection
-        input:
-            expand(
-                "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
-                benchmark=used_benchmarks,
-                classification=["fp", "fn", "tp", "tp-baseline"],
-            ),
-            expand(
-                "results/fp-fn/callsets/{callset}.{classification}.tsv",
-                callset=used_callsets,
-                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
