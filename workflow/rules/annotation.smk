@@ -24,7 +24,7 @@ rule get_vep_cache:
         "logs/vep/cache.log",
     cache: "omit-software"
     wrapper:
-        "v9.4.2/bio/vep/cache"
+        "v7.6.0/bio/vep/cache"
 
 
 rule get_vep_plugins:
