@@ -465,7 +465,7 @@ def get_norm_params(wildcards):
     target = ""
     if config.get("limit-reads"):
         target = "--targets 1"
-    return f"--atomize --check-ref s --rm-dup exact {target}"
+    return f"--atomize --check-ref s --rm-dup exact -m-both {target}"
 
 
 def get_mosdepth_input(bai=False):
