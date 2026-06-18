@@ -53,7 +53,7 @@ rule liftover_callset:
 
 rule rename_contigs:
     input:
-        calls=get_callset_correct_contigs_liftover_merge,
+        calls=get_callset_merged,
         repl_file=get_rename_contig_file,
     output:
         "results/normalized-variants/{callset}.replaced-contigs.vcf.gz",
