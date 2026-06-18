@@ -6,7 +6,7 @@ rule norm_vcf:
     log:
         "logs/norm/{prefix}.norm.log",
     params:
-        extra="--rm-dup none -m-both",
+        extra="--rm-dup none -m-both --atomize --atom-overlaps . ",
     wrapper:
         "v9.4.1/bio/bcftools/norm"
 
