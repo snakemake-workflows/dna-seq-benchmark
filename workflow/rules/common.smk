@@ -453,7 +453,7 @@ def get_norm_params(wildcards):
     target = ""
     if config.get("limit-reads"):
         target = "--targets 1"
-    return f"--atomize --check-ref s --rm-dup exact {target}"
+    return f"--atomize --atom-overlaps . --check-ref s --rm-dup exact {target}"
 
 
 def get_mosdepth_input(bai=False):
