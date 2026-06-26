@@ -266,8 +266,7 @@ rule benchmark_variants_somatic:
     threads: 32
     params:
         output=lambda w, output: os.path.dirname(output[0]),
-        somatic=get_somatic_flag,
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
         "--output-mode split --baseline {input.truth} --calls {input.query} "
-        "--output {params.output} --template {input.genome} {params.somatic} &> {log}"
+        "--output {params.output} --template {input.genome} --sample truth,ALT &> {log}"

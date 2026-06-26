@@ -532,15 +532,6 @@ def get_somatic_status(wildcards):
 def get_somatic_sample_name(wildcards):
     return config["variant-calls"][wildcards.callset].get("tumor_sample_name")
 
-
-def get_somatic_flag(wildcards):
-    if get_somatic_status(wildcards):
-        somatic_flag = f"--squash-ploidy"
-    else:
-        somatic_flag = ""
-    return somatic_flag
-
-
 def get_vaf_fields(wildcards):
     vaf_callset = config["variant-calls"][wildcards.callset].get("vaf-field")
 
