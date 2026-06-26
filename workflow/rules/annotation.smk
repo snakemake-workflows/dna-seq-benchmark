@@ -1,15 +1,3 @@
-rule get_downsampled_vep_cache:
-    input:
-        workflow.source_path(
-            "../resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz",
-        ),
-    output:
-        directory("resources/vep/cache_downsampled"),
-    log:
-        "logs/vep/downsampled_cache.log",
-    conda:
-        "../envs/tools.yaml"
-    shell:
 # rule get_downsampled_vep_cache:
 #     input:
 #         workflow.source_path(
