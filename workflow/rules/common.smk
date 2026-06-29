@@ -30,16 +30,12 @@ germline_callsets = used_callsets - somatic_callsets
 
 # Callsets that require VAF calculation (vaf-field: 'tbc').
 tbc_callsets = {
-    name
-    for name, entries in callsets.items()
-    if entries.get("vaf-field") == "tbc"
+    name for name, entries in callsets.items() if entries.get("vaf-field") == "tbc"
 }
 
 # Wildcard constraint patterns for callset-type-specific rules.
 # Use as:  wildcard_constraints: callset=tbc_callset_constraint,
-tbc_callset_constraint = (
-    "|".join(tbc_callsets) if tbc_callsets else _UNMATCHABLE
-)
+tbc_callset_constraint = "|".join(tbc_callsets) if tbc_callsets else _UNMATCHABLE
 # Use as:  wildcard_constraints: callset=somatic_callset_constraint,
 _UNMATCHABLE = "(?!x)x"
 somatic_callset_constraint = (
@@ -507,9 +503,11 @@ def _get_nonempty_coverages(callset):
         coverages = low_coverages
 
     def isempty(cov):
-        with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
-            0
-        ].open() as f:
+        with (
+            checkpoints.stat_truth.get(benchmark=benchmark, cov=cov)
+            .output[0]
+            .open() as f
+        ):
             stat = json.load(f)
         return stat["isempty"]
 
