@@ -19,7 +19,7 @@ rule index_vcf:
     log:
         "logs/bcftools-index-vcf/{prefix}.log",
     wrapper:
-        "v8.1.1/bio/bcftools/index"
+        "v9.4.2/bio/bcftools/index"
 
 
 rule index_bcf:
@@ -30,7 +30,7 @@ rule index_bcf:
     log:
         "logs/bcftools-index-bcf/{prefix}.log",
     wrapper:
-        "v8.1.1/bio/bcftools/index"
+        "v9.4.2/bio/bcftools/index"
 
 
 rule sort_vcf:
@@ -41,4 +41,4 @@ rule sort_vcf:
     log:
         "logs/bcftools-sort-vcf/{prefix}.log",
     wrapper:
-        "v8.1.1/bio/bcftools/sort"
+        "v9.4.2/bio/bcftools/sort"

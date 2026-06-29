@@ -234,7 +234,7 @@ rule mark_duplicates:
     params:
         extra="--REMOVE_DUPLICATES true",
     wrapper:
-        "v9.4.0/bio/picard/markduplicates"
+        "v9.4.2/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -265,7 +265,7 @@ rule mosdepth:
         extra="--mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize,
     wrapper:
-        "v8.0.2/bio/mosdepth"
+        "v9.8.0/bio/mosdepth"
 
 
 rule stratify_regions:
