@@ -99,6 +99,12 @@ rule remove_non_pass:
 
 
 rule calculate_vaf:
+    """Calculate VAF and add it to the VCF/BCF.
+
+    Only runs for callsets with vaf-field: 'tbc' (enforced by wildcard constraint).
+    When vaf-numerator/vaf-denominator are defined, VAF is computed from those two
+    fields. Otherwise, VAF is computed from the AD FORMAT field.
+    """
     input:
         vcf="results/filtered-variants/{wildcards.callset}.bcf",
         script=workflow.source_path("../scripts/calc-vaf.py"),
@@ -107,12 +113,6 @@ rule calculate_vaf:
         index="results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi",
     log:
         "logs/calculate-vaf/{wildcards.callset}.log",
-    """Calculate VAF and add it to the VCF/BCF.
-
-    Only runs for callsets with vaf-field: 'tbc' (enforced by wildcard constraint).
-    When vaf-numerator/vaf-denominator are defined, VAF is computed from those two
-    fields. Otherwise, VAF is computed from the AD FORMAT field.
-    """
     wildcard_constraints:
         callset=tbc_callset_constraint,
     conda:
