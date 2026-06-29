@@ -28,7 +28,18 @@ somatic_callsets = {
 }
 germline_callsets = used_callsets - somatic_callsets
 
+# Callsets that require VAF calculation (vaf-field: 'tbc').
+tbc_callsets = {
+    name
+    for name, entries in callsets.items()
+    if entries.get("vaf-field") == "tbc"
+}
+
 # Wildcard constraint patterns for callset-type-specific rules.
+# Use as:  wildcard_constraints: callset=tbc_callset_constraint,
+tbc_callset_constraint = (
+    "|".join(tbc_callsets) if tbc_callsets else _UNMATCHABLE
+)
 # Use as:  wildcard_constraints: callset=somatic_callset_constraint,
 _UNMATCHABLE = "(?!x)x"
 somatic_callset_constraint = (
@@ -555,9 +566,11 @@ def get_somatic_flag(wildcards):
 
 
 def _normalise_vaf_field(value):
-    """Return None for tbc (calculated), otherwise the dict from config."""
-    if value is None or value == "tbc":
+    """Return VAF field spec: dict for pre-existing fields, FORMAT/VAF for tbc."""
+    if value is None:
         return None
+    if value == "tbc":
+        return {"field": "FORMAT", "name": "VAF"}
     if isinstance(value, dict):
         return value
     return value
@@ -614,39 +627,6 @@ def get_vaf_calc_status(wildcards):
     return False
 
 
-def get_vaf_calc_params(wildcards):
-    """Return VAF calculation params for the calculate_vaf rule.
-
-    When vaf-field is 'tbc' and vaf-numerator/vaf-denominator are set,
-    calculate VAF from those two fields. Otherwise, calculate from AD.
-    """
-    callset_name = getattr(wildcards, "callset", None)
-    if not callset_name:
-        return {}
-    callset = config["variant-calls"].get(callset_name, {})
-    if callset.get("vaf-field") != "tbc":
-        return {}
-
-    num = callset.get("vaf-numerator")
-    den = callset.get("vaf-denominator")
-
-    if num and den:
-        return {
-            "num_field": num.get("field"),
-            "num_name": num.get("name"),
-            "den_field": den.get("field"),
-            "den_name": den.get("name"),
-        }
-    return {"mode": "from_ad"}
-
-
-def _get_vaf_calc_input(wildcards):
-    """Return the input path for the calculate_vaf rule."""
-    if intersect_calls(wildcards):
-        return "results/normalized-variants/{callset}_intersected.vcf"
-    return "results/filtered-variants/{callset}_restricted.bcf"
-
-
 def get_normalized_calls_input(wildcards):
     """Return the input path for the normalize_calls rule.
 
@@ -660,6 +640,37 @@ def get_normalized_calls_input(wildcards):
     if intersect_calls(wildcards):
         return "results/normalized-variants/{callset}_intersected.vcf"
     return "results/filtered-variants/{callset}_restricted.bcf"
+
+
+def get_vaf_calculated_input(wildcards, callset):
+    """Return the input path for tbc callsets (VAF-calculated BCF) or regular BCF."""
+    if wildcards.get("callset") in tbc_callsets:
+        return f"results/calculate-vaf/{callset}.added-vaf.bcf"
+    return f"results/filtered-variants/{callset}.bcf"
+
+
+def calc_vaf_args(wildcards):
+    """Return CLI arguments for the calculate_vaf rule.
+
+    When vaf-field is 'tbc' and vaf-numerator/vaf-denominator are set,
+    calculate VAF from those two fields. Otherwise, calculate from AD.
+    """
+    callset_name = getattr(wildcards, "callset", None)
+    if not callset_name:
+        return ""
+    callset = config["variant-calls"].get(callset_name, {})
+    if callset.get("vaf-field") != "tbc":
+        return ""
+
+    num = callset.get("vaf-numerator")
+    den = callset.get("vaf-denominator")
+
+    if num and den:
+        return (
+            f"--num-field {num.get('field')} --num-name {num.get('name')} "
+            f"--den-field {den.get('field')} --den-name {den.get('name')}"
+        )
+    return "--from-ad"
 
 
 def get_precision_recall_input(wildcards):

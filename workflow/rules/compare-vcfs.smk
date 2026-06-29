@@ -101,16 +101,15 @@ rule remove_non_pass:
 rule calculate_vaf:
     """Calculate VAF and add it to the VCF/BCF.
 
-    If vaf-field is 'tbc' with vaf-numerator/vaf-denominator defined,
-    VAF is computed from those two fields. Otherwise, VAF is computed
-    from the AD FORMAT field.
+    Only runs for callsets with vaf-field: 'tbc' (enforced by wildcard constraint).
+    When vaf-numerator/vaf-denominator are defined, VAF is computed from those two
+    fields. Otherwise, VAF is computed from the AD FORMAT field.
     """
+    wildcard_constraints:
+        callset=tbc_callset_constraint,
     input:
-        vcf=lambda wildcards: (
-            "results/filtered-variants/{wildcards.callset}.bcf"
-            if get_vaf_calc_status(wildcards)
-            else []
-        ),
+        vcf="results/filtered-variants/{wildcards.callset}.bcf",
+        script=workflow.source_path("../scripts/calc-vaf.py"),
     output:
         temp("results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"),
         index="results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi",
@@ -118,17 +117,23 @@ rule calculate_vaf:
         "logs/calculate-vaf/{wildcards.callset}.log",
     conda:
         "../envs/cyvcf.yaml"
+    params:
+        vaf_args=calc_vaf_args,
     shell:
         """
         bcftools index -c {input.vcf}
-        python {script} {input.vcf} {output}
-        bcftools index {output} > {log} 2>&1
+        python {input.script} {input.vcf} {output[0]} {params.vaf_args}
+        bcftools index {output[0]} > {log} 2>&1
         """
 
 
 rule intersect_calls_with_target_regions:
     input:
-        bcf="results/filtered-variants/{callset}.bcf",
+        bcf=lambda wildcards: (
+            f"results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"
+            if get_vaf_calc_status(wildcards)
+            else "results/filtered-variants/{callset}.bcf"
+        ),
         regions=get_target_regions,
     output:
         pipe("results/normalized-variants/{callset}_intersected.vcf"),
@@ -143,8 +148,12 @@ rule intersect_calls_with_target_regions:
 
 rule restrict_to_reference_contigs:
     input:
-        calls="results/filtered-variants/{callset}.bcf",
-        calls_index="results/filtered-variants/{callset}.bcf.csi",
+        calls=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
+        calls_index=lambda wildcards: (
+            f"results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi"
+            if get_vaf_calc_status(wildcards)
+            else f"results/filtered-variants/{wildcards.callset}.bcf.csi"
+        ),
         ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/filtered-variants/{callset}_restricted.bcf",
@@ -159,11 +168,7 @@ rule restrict_to_reference_contigs:
 
 rule normalize_calls:
     input:
-        calls=branch(
-            intersect_calls,
-            then="results/normalized-variants/{callset}_intersected.vcf",
-            otherwise="results/filtered-variants/{callset}_restricted.bcf",
-        ),
+        calls=get_normalized_calls_input,
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
     output:
@@ -176,7 +181,7 @@ rule normalize_calls:
         "../envs/tools.yaml"
     shell:
         "(bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | "
-        "bcftools view -Oz > {output}) 2> {log}"
+        " bcftools view -Oz > {output}) 2> {log}"
 
 
 rule stratify_truth:

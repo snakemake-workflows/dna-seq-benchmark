@@ -21,8 +21,7 @@ def calculate_vaf_from_ad(variant, samples):
         return None
 
     n_samples = len(samples)
-    n_alleles = len(variant.alleles)
-    n_alt_alleles = n_alleles - 1
+    n_alt_alleles = len(variant.ALT)
 
     vaf_values = np.full((n_samples, n_alt_alleles), np.nan, dtype=np.float32)
 
@@ -44,7 +43,16 @@ def calculate_vaf_from_ad(variant, samples):
     return vaf_values
 
 
-def calculate_vaf_from_fields(variant, field, name):
+def _num_samples_from_samples(samples):
+    """Determine number of samples from VCF samples list or variant object."""
+    if isinstance(samples, (list, tuple)):
+        return len(samples)
+    elif hasattr(samples, '__len__'):
+        return len(samples)
+    return 0
+
+
+def calculate_vaf_from_fields(variant, field, name, samples=None):
     """
     Calculates the VAF for each sample by dividing two numeric fields.
 
@@ -52,11 +60,12 @@ def calculate_vaf_from_fields(variant, field, name):
         variant (cyvcf2.Variant): The variant record.
         field (str): Either "INFO" or "FORMAT".
         name (str): The field ID (e.g. "NUMERATOR" / "DENOMINATOR").
+        samples (list or None): List of sample names, or None to infer from variant.
 
     Returns:
         numpy.ndarray: shape (n_samples, n_alt_alleles), or None if fields are missing.
     """
-    n_samples = len(variant.samples)
+    n_samples = _num_samples_from_samples(samples) if samples else 1
 
     if n_samples == 0:
         return np.array([], dtype=np.float32).reshape(0, 0)
@@ -69,8 +78,8 @@ def calculate_vaf_from_fields(variant, field, name):
 
     # Fetch numerator and denominator values
     if field == "INFO":
-        num_val = variant.info.get(name)
-        den_val = variant.info.get(f"{name}_den")
+        num_val = variant.INFO.get(name)
+        den_val = variant.INFO.get(f"{name}_den")
         if num_val is None or den_val is None:
             return None
     elif field == "FORMAT":
