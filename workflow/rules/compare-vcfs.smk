@@ -269,4 +269,4 @@ rule benchmark_variants_somatic:
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
         "--output-mode split --baseline {input.truth} --calls {input.query} "
-        "--output {params.output} --template {input.genome} --sample truth,ALT &> {log}"
+        "--output {params.output} --template {input.genome} --sample ALT,ALT &> {log}"
