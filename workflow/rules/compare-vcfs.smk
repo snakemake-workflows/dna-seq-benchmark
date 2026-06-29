@@ -99,16 +99,31 @@ rule remove_non_pass:
 
 
 rule calculate_vaf:
+    """Calculate VAF and add it to the VCF/BCF.
+
+    If vaf-field is 'tbc' with vaf-numerator/vaf-denominator defined,
+    VAF is computed from those two fields. Otherwise, VAF is computed
+    from the AD FORMAT field.
+    """
     input:
-        "results/filtered-variants/{callset}.bcf",
+        vcf=lambda wildcards: (
+            "results/filtered-variants/{wildcards.callset}.bcf"
+            if get_vaf_calc_status(wildcards)
+            else []
+        ),
     output:
-        "results/calculate-vaf/{callset}.added-vaf.bcf",
+        temp("results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"),
+        index="results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi",
     log:
-        "logs/calculate-vaf/{callset}.log",
+        "logs/calculate-vaf/{wildcards.callset}.log",
     conda:
         "../envs/cyvcf.yaml"
-    script:
-        "../scripts/calc-vaf.py"
+    shell:
+        """
+        bcftools index -c {input.vcf}
+        python {script} {input.vcf} {output}
+        bcftools index {output} > {log} 2>&1
+        """
 
 
 rule intersect_calls_with_target_regions:
