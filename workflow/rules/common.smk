@@ -34,10 +34,10 @@ tbc_callsets = {
 }
 
 # Wildcard constraint patterns for callset-type-specific rules.
+_UNMATCHABLE = "(?!x)x"
 # Use as:  wildcard_constraints: callset=tbc_callset_constraint,
 tbc_callset_constraint = "|".join(tbc_callsets) if tbc_callsets else _UNMATCHABLE
 # Use as:  wildcard_constraints: callset=somatic_callset_constraint,
-_UNMATCHABLE = "(?!x)x"
 somatic_callset_constraint = (
     "|".join(somatic_callsets) if somatic_callsets else _UNMATCHABLE
 )
