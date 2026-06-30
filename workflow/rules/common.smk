@@ -28,9 +28,16 @@ somatic_callsets = {
 }
 germline_callsets = used_callsets - somatic_callsets
 
+# Callsets that require VAF calculation (vaf-field: 'tbc').
+tbc_callsets = {
+    name for name, entries in callsets.items() if entries.get("vaf-field") == "tbc"
+}
+
 # Wildcard constraint patterns for callset-type-specific rules.
-# Use as:  wildcard_constraints: callset=somatic_callset_constraint,
 _UNMATCHABLE = "(?!x)x"
+# Use as:  wildcard_constraints: callset=tbc_callset_constraint,
+tbc_callset_constraint = "|".join(tbc_callsets) if tbc_callsets else _UNMATCHABLE
+# Use as:  wildcard_constraints: callset=somatic_callset_constraint,
 somatic_callset_constraint = (
     "|".join(somatic_callsets) if somatic_callsets else _UNMATCHABLE
 )
@@ -496,9 +503,11 @@ def _get_nonempty_coverages(callset):
         coverages = low_coverages
 
     def isempty(cov):
-        with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
-            0
-        ].open() as f:
+        with (
+            checkpoints.stat_truth.get(benchmark=benchmark, cov=cov)
+            .output[0]
+            .open() as f
+        ):
             stat = json.load(f)
         return stat["isempty"]
 
@@ -554,34 +563,112 @@ def get_somatic_flag(wildcards):
     return somatic_flag
 
 
+def _normalise_vaf_field(value):
+    """Return VAF field spec: dict for pre-existing fields, FORMAT/VAF for tbc."""
+    if value is None:
+        return None
+    if value == "tbc":
+        return {"field": "FORMAT", "name": "VAF"}
+    if isinstance(value, dict):
+        return value
+    return value
+
+
 def get_vaf_fields(wildcards):
     vaf_callset = config["variant-calls"][wildcards.callset].get("vaf-field")
 
     benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
     vaf_benchmark = benchmarks[benchmark].get("vaf-field")
 
-    # can return (None, None) if param not set
-    return (vaf_callset, vaf_benchmark)
+    # tbc means the VAF will be *calculated* via the calculate_vaf rule,
+    # so downstream scripts should read from the VAF FORMAT field instead
+    # of a specific pre-existing field.
+    return (
+        _normalise_vaf_field(vaf_callset),
+        _normalise_vaf_field(vaf_benchmark),
+    )
 
 
 def get_vaf_status(wildcards):
+    """Return True if VAF is available (pre-existing or calculated).
+
+    Priority: callset-level vaf-field > benchmark-level vaf-field.
+    """
+    callset_name = getattr(wildcards, "callset", None)
+
+    # Check callset-level first (more specific)
+    if callset_name:
+        vaf_callset = config["variant-calls"].get(callset_name, {}).get("vaf-field")
+        if vaf_callset is not None:
+            return True
+
+    # Get benchmark
     if hasattr(wildcards, "benchmark"):
         benchmark = wildcards.benchmark
+    elif callset_name:
+        benchmark = config["variant-calls"][callset_name].get("benchmark")
     else:
-        benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
-
-    vaf_benchmark = benchmarks[benchmark].get("vaf-field")
-    if vaf_benchmark is None:
         return False
-    else:
-        callsets = get_benchmark_callsets(benchmark)
-        vaf_callsets = [
-            config["variant-calls"][callset].get("vaf-field") for callset in callsets
-        ]
-        if any(vaf_callset is not None for vaf_callset in vaf_callsets):
-            return True
-        else:
-            return False
+
+    # Check benchmark-level
+    vaf_benchmark = benchmarks.get(benchmark, {}).get("vaf-field")
+    if vaf_benchmark is not None:
+        return True
+    return False
+
+
+def get_vaf_calc_status(wildcards):
+    """Return True if VAF must be calculated (callset has vaf-field: 'tbc')."""
+    callset_name = getattr(wildcards, "callset", None)
+    if callset_name:
+        return config["variant-calls"].get(callset_name, {}).get("vaf-field") == "tbc"
+    return False
+
+
+def get_normalized_calls_input(wildcards):
+    """Return the input path for the normalize_calls rule.
+
+    When vaf-field is 'tbc', use the calculated VAF BCF as input.
+    Otherwise use the normal intersect-or-restricted path.
+    """
+    vaf_field = config["variant-calls"][wildcards.callset].get("vaf-field")
+    if vaf_field == "tbc":
+        return "results/calculate-vaf/{callset}.added-vaf.bcf"
+    # Normal flow: intersect or restricted
+    if intersect_calls(wildcards):
+        return "results/normalized-variants/{callset}_intersected.vcf"
+    return "results/filtered-variants/{callset}_restricted.bcf"
+
+
+def get_vaf_calculated_input(wildcards, callset):
+    """Return the input path for tbc callsets (VAF-calculated BCF) or regular BCF."""
+    if wildcards.get("callset") in tbc_callsets:
+        return f"results/calculate-vaf/{callset}.added-vaf.bcf"
+    return f"results/filtered-variants/{callset}.bcf"
+
+
+def calc_vaf_args(wildcards):
+    """Return CLI arguments for the calculate_vaf rule.
+
+    When vaf-field is 'tbc' and vaf-numerator/vaf-denominator are set,
+    calculate VAF from those two fields. Otherwise, calculate from AD.
+    """
+    callset_name = getattr(wildcards, "callset", None)
+    if not callset_name:
+        return ""
+    callset = config["variant-calls"].get(callset_name, {})
+    if callset.get("vaf-field") != "tbc":
+        return ""
+
+    num = callset.get("vaf-numerator")
+    den = callset.get("vaf-denominator")
+
+    if num and den:
+        return (
+            f"--num-field {num.get('field')} --num-name {num.get('name')} "
+            f"--den-field {den.get('field')} --den-name {den.get('name')}"
+        )
+    return "--from-ad"
 
 
 def get_precision_recall_input(wildcards):

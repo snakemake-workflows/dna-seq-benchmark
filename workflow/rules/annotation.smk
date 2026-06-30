@@ -16,13 +16,13 @@ rule get_downsampled_vep_cache:
 rule get_vep_cache:
     output:
         directory("resources/vep/cache"),
+    log:
+        "logs/vep/cache.log",
+    cache: "omit-software"
     params:
         species="homo_sapiens",
         build=get_reference_genome_build(),
         release="115",
-    log:
-        "logs/vep/cache.log",
-    cache: "omit-software"
     wrapper:
         "v7.6.0/bio/vep/cache"
 
@@ -30,10 +30,10 @@ rule get_vep_cache:
 rule get_vep_plugins:
     output:
         directory("resources/vep/plugins"),
-    params:
-        release="115",
     log:
         "logs/vep/plugins.log",
+    params:
+        release="115",
     wrapper:
         "v9.0.1/bio/vep/plugins"
 
@@ -54,25 +54,25 @@ rule process_revel_scores:
         "resources/revel_scores.zip",
     output:
         "resources/revel_scores.tsv.gz",
-    params:
-        build=get_reference_genome_build(),
     log:
         "logs/vep_plugins/process_revel_scores.log",
-    resources:
-        tmpdir=temp("tmpdir"),
     conda:
         "../envs/tools.yaml"
+    resources:
+        tmpdir=temp("tmpdir"),
+    params:
+        build=get_reference_genome_build(),
     shell:
         """
         tmpfile=$(mktemp "${{TMPDIR:-/tmp}}"/revel_scores.XXXXXX)
         trap "rm -f $tmpfile" EXIT
-        unzip -p {input} | tr "," "\t" | sed '1s/.*/#&/' | bgzip -c > $tmpfile
-        if [ "{params.build}" == "GRCh38" ] ; then
-            zgrep -h -v ^#chr $tmpfile | awk '$3 != "." ' | sort -k1,1 -k3,3n - | cat <(zcat $tmpfile | head -n1) - | bgzip -c > {output}
-        elif [ "{params.build}" == "GRCh37" ] ; then
-            cat $tmpfile > {output}
+        unzip -p {input} | tr "," "\t" | sed '1s/.*/#&/' | bgzip -c >$tmpfile
+        if [ "{params.build}" == "GRCh38" ]; then
+            zgrep -h -v ^#chr $tmpfile | awk '$3 != "." ' | sort -k1,1 -k3,3n - | cat <(zcat $tmpfile | head -n1) - | bgzip -c >{output}
+        elif [ "{params.build}" == "GRCh37" ]; then
+            cat $tmpfile >{output}
         else
-            echo "Annotation of REVEL scores only supported for GRCh37 or GRCh38" > {log}
+            echo "Annotation of REVEL scores only supported for GRCh37 or GRCh38" >{log}
             exit 125
         fi
         """
@@ -83,10 +83,10 @@ rule tabix_revel_scores:
         "resources/revel_scores.tsv.gz",
     output:
         "resources/revel_scores.tsv.gz.tbi",
-    params:
-        get_tabix_revel_params(),
     log:
         "logs/tabix/revel.log",
+    params:
+        get_tabix_revel_params(),
     wrapper:
         "v9.4.1/bio/tabix/index"
 
@@ -103,16 +103,16 @@ rule annotate_shared_fn:
     output:
         calls="results/annotated/vcf/{benchmark}/{benchmark}.shared_fn.annotated.vcf.gz",
         stats="results/annotated/stats/{benchmark}/{benchmark}.shared_fn.stats.html",
+    log:
+        "logs/vep/fp-fn/{benchmark}/{benchmark}.shared_fn.annotate.log",
+    group:
+        "annotation"
+    threads: 4
     params:
         # Pass a list of plugins to use, see https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
         # Plugin args can be added as well, e.g. via an entry "MyPlugin,1,FOO", see docs.
         plugins=["REVEL"],
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
-    log:
-        "logs/vep/fp-fn/{benchmark}/{benchmark}.shared_fn.annotate.log",
-    threads: 4
-    group:
-        "annotation"
     wrapper:
         "v8.0.0/bio/vep/annotate"
 
@@ -129,16 +129,16 @@ rule annotate_unique_fp_fn:
     output:
         calls="results/annotated/vcf/{benchmark}/{callset}.unique_{classification}.annotated.vcf.gz",
         stats="results/annotated/stats/{benchmark}/{callset}.unique_{classification}.stats.html",
+    log:
+        "logs/vep/fp-fn/{benchmark}/{callset}.unique_{classification}.annotate.log",
+    group:
+        "annotation"
+    threads: 4
     params:
         # Pass a list of plugins to use, see https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html
         # Plugin args can be added as well, e.g. via an entry "MyPlugin,1,FOO", see docs.
         plugins=["REVEL"],
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
-    log:
-        "logs/vep/fp-fn/{benchmark}/{callset}.unique_{classification}.annotate.log",
-    threads: 4
-    group:
-        "annotation"
     wrapper:
         "v8.0.0/bio/vep/annotate"
 
@@ -148,11 +148,11 @@ rule vembrane_table_shared_fn:
         "results/annotated/vcf/{benchmark}/{benchmark}.shared_fn.annotated.norm.vcf",
     output:
         "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
+    log:
+        "logs/vembrane/{benchmark}/{benchmark}.shared_fn.annotate.log",
     params:
         expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
         extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
-    log:
-        "logs/vembrane/{benchmark}/{benchmark}.shared_fn.annotate.log",
     wrapper:
         "v9.4.0/bio/vembrane/table"
 
@@ -162,10 +162,10 @@ rule vembrane_table_unique_fp_fn:
         "results/annotated/vcf/{benchmark}/{callset}.unique_{classification}.annotated.norm.vcf",
     output:
         "results/annotated/tsv/{benchmark}/{callset}.unique_{classification}.annotated.tsv",
+    log:
+        "logs/vembrane/{benchmark}/{callset}.unique_{classification}.annotate.log",
     params:
         expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
         extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
-    log:
-        "logs/vembrane/{benchmark}/{callset}.unique_{classification}.annotate.log",
     wrapper:
         "v9.4.0/bio/vembrane/table"

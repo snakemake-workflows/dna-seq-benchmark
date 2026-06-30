@@ -1,0 +1,11 @@
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth">
+##FORMAT=<ID=NUM,Number=1,Type=Integer,Description="Numerator">
+##FORMAT=<ID=NUM_den,Number=1,Type=Integer,Description="Denominator">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1
+chr1	100	.	A	G	.	PASS	.	GT:DP:NUM:NUM_den	0/1:45:15:45
+chr1	200	.	C	T	.	PASS	.	GT:DP:NUM:NUM_den	0/1:30:10:30
+chr1	300	.	G	A	.	PASS	.	GT:DP:NUM:NUM_den	0/1:5:0:5
+chr1	400	.	T	C	.	PASS	.	GT:DP:NUM:NUM_den	1/1:40:40:40
+chr1	500	.	A	G	.	PASS	.	GT:DP:NUM:NUM_den	0/0:50:0:50

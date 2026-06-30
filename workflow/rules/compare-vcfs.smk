@@ -78,9 +78,9 @@ rule add_format_field:
     shell:
         """
         if bcftools view -h {input.bcf} | grep -q FORMAT; then
-            bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz > {output}
+            bcftools reheader -s <(echo 'truth') {input.bcf} | bcftools view -Oz >{output}
         else
-            vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &> {log}
+            vcf-genotype-annotator <(bcftools convert -Ov {input.bcf}) truth 0/1 -o {output} &>{log}
         fi
         """
 
@@ -98,9 +98,42 @@ rule remove_non_pass:
         "v9.4.1/bio/bcftools/view"
 
 
+rule calculate_vaf:
+    """Calculate VAF and add it to the VCF/BCF.
+
+    Only runs for callsets with vaf-field: 'tbc' (enforced by wildcard constraint).
+    When vaf-numerator/vaf-denominator are defined, VAF is computed from those two
+    fields. Otherwise, VAF is computed from the AD FORMAT field.
+    """
+    input:
+        vcf="results/filtered-variants/{wildcards.callset}.bcf",
+        script=workflow.source_path("../scripts/calc-vaf.py"),
+    output:
+        added_vaf=temp("results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"),
+        index="results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi",
+    log:
+        "logs/calculate-vaf/{wildcards.callset}.log",
+    wildcard_constraints:
+        callset=tbc_callset_constraint,
+    conda:
+        "../envs/cyvcf.yaml"
+    params:
+        vaf_args=calc_vaf_args,
+    shell:
+        """
+        bcftools index -c {input.vcf}
+        python {input.script} {input.vcf} {output.added_vaf} {params.vaf_args}
+        bcftools index {output.added_vaf} >{log} 2>&1
+        """
+
+
 rule intersect_calls_with_target_regions:
     input:
-        bcf="results/filtered-variants/{callset}.bcf",
+        bcf=lambda wildcards: (
+            f"results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"
+            if get_vaf_calc_status(wildcards)
+            else "results/filtered-variants/{callset}.bcf"
+        ),
         regions=get_target_regions,
     output:
         pipe("results/normalized-variants/{callset}_intersected.vcf"),
@@ -115,8 +148,12 @@ rule intersect_calls_with_target_regions:
 
 rule restrict_to_reference_contigs:
     input:
-        calls="results/filtered-variants/{callset}.bcf",
-        calls_index="results/filtered-variants/{callset}.bcf.csi",
+        calls=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
+        calls_index=lambda wildcards: (
+            f"results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi"
+            if get_vaf_calc_status(wildcards)
+            else f"results/filtered-variants/{wildcards.callset}.bcf.csi"
+        ),
         ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/filtered-variants/{callset}_restricted.bcf",
@@ -131,24 +168,20 @@ rule restrict_to_reference_contigs:
 
 rule normalize_calls:
     input:
-        calls=branch(
-            intersect_calls,
-            then="results/normalized-variants/{callset}_intersected.vcf",
-            otherwise="results/filtered-variants/{callset}_restricted.bcf",
-        ),
+        calls=get_normalized_calls_input,
         ref="resources/reference/genome.fasta",
         ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/normalized-variants/{callset}.vcf.gz",
-    params:
-        extra=get_norm_params,
     log:
         "logs/normalize-calls/{callset}.log",
     conda:
         "../envs/tools.yaml"
+    params:
+        extra=get_norm_params,
     shell:
         "(bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | "
-        "bcftools view -Oz > {output}) 2> {log}"
+        " bcftools view -Oz > {output}) 2> {log}"
 
 
 rule stratify_truth:
@@ -234,11 +267,11 @@ rule benchmark_variants_germline:
         "logs/vcfeval/{callset}/{cov}.log",
     wildcard_constraints:
         callset=germline_callset_constraint,
-    params:
-        output=lambda w, output: os.path.dirname(output[0]),
     conda:
         "../envs/rtg-tools.yaml"
     threads: 32
+    params:
+        output=lambda w, output: os.path.dirname(output[0]),
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
         "--output-mode ga4gh --baseline {input.truth} --calls {input.query} "
@@ -261,12 +294,12 @@ rule benchmark_variants_somatic:
         "logs/vcfeval/{callset}/{cov}.log",
     wildcard_constraints:
         callset=somatic_callset_constraint,
-    params:
-        output=lambda w, output: os.path.dirname(output[0]),
-        somatic=get_somatic_flag,
     conda:
         "../envs/rtg-tools.yaml"
     threads: 32
+    params:
+        output=lambda w, output: os.path.dirname(output[0]),
+        somatic=get_somatic_flag,
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
         "--output-mode split --baseline {input.truth} --calls {input.query} "
