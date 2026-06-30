@@ -109,7 +109,7 @@ rule calculate_vaf:
         vcf="results/filtered-variants/{wildcards.callset}.bcf",
         script=workflow.source_path("../scripts/calc-vaf.py"),
     output:
-        temp("results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"),
+        added_vaf=temp("results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"),
         index="results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi",
     log:
         "logs/calculate-vaf/{wildcards.callset}.log",
@@ -122,8 +122,8 @@ rule calculate_vaf:
     shell:
         """
         bcftools index -c {input.vcf}
-        python {input.script} {input.vcf} {output[0]} {params.vaf_args}
-        bcftools index {output[0]} >{log} 2>&1
+        python {input.script} {input.vcf} {output.added_vaf} {params.vaf_args}
+        bcftools index {output.added_vaf} >{log} 2>&1
         """
 
 
