@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.16.1](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.16.0...v1.16.1) (2026-07-01)
+
+
+### Bug Fixes
+
+* make more files temporary ([#168](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/168)) ([5fa52d3](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/5fa52d31abbd2293e0387bab380519c40e99785e))
+* scripts after major pandas update ([#177](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/177)) ([c2022c9](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/c2022c9bdd8ffd14922c5ac735a5f63b5a6fa069))
+
+
+### Performance Improvements
+
+* autobump conda envs ([#163](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/163)) ([0f84e00](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/0f84e00ed9768c4125ddee101195ef9416999ede))
+* autobump conda envs ([#176](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/176)) ([9faca35](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/9faca356e50d32fd6652a47c46600c3ab164da74))
+* autobump snakemake wrappers ([#167](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/167)) ([6cf2a6a](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/6cf2a6a8d120be8b32052529ed343424a11fff20))
+* autobump snakemake wrappers ([#171](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/171)) ([b9c69a4](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/b9c69a431a2671ed7f3234141bdb93e583d88347))
+* autobump snakemake wrappers ([#175](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/175)) ([7e2416f](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/7e2416f31fe7bbfe939d7a8f423d9636102b0501))
+
 ## [1.16.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.15.0...v1.16.0) (2026-03-17)
 
 
