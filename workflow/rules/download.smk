@@ -166,7 +166,7 @@ rule get_reference:
         "logs/get-genome.log",
     cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
-        "v5.10.0/bio/reference/ensembl-sequence"
+        "v9.12.0/bio/reference/ensembl-sequence"
 
 
 rule get_liftover_chain:
@@ -218,7 +218,7 @@ rule bwa_mem:
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     threads: 8
     wrapper:
-        "v8.1.1/bio/bwa/mem"
+        "v9.9.0/bio/bwa/mem"
 
 
 rule mark_duplicates:
