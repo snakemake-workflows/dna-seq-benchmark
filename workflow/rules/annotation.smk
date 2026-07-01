@@ -35,7 +35,7 @@ rule get_vep_plugins:
     log:
         "logs/vep/plugins.log",
     wrapper:
-        "v9.0.1/bio/vep/plugins"
+        "v9.11.0/bio/vep/plugins"
 
 
 rule download_revel:
@@ -154,7 +154,7 @@ rule vembrane_table_shared_fn:
     log:
         "logs/vembrane/{benchmark}/{benchmark}.shared_fn.annotate.log",
     wrapper:
-        "v9.4.0/bio/vembrane/table"
+        "v9.9.0/bio/vembrane/table"
 
 
 rule vembrane_table_unique_fp_fn:
@@ -168,4 +168,4 @@ rule vembrane_table_unique_fp_fn:
     log:
         "logs/vembrane/{benchmark}/{callset}.unique_{classification}.annotate.log",
     wrapper:
-        "v9.4.0/bio/vembrane/table"
+        "v9.9.0/bio/vembrane/table"
