@@ -5,6 +5,6 @@ channels:
 dependencies:
   - bcftools =1.23.1
   - samtools =1.23.1
-  - curl =8.20.0
+  - curl =8.21.0
   - bedtools =2.31.1
   - ucsc-liftover =482
