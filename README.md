@@ -19,6 +19,8 @@ The workflow writes both final deliverables and intermediate files under `result
 
 - `results/fp-fn/callsets/<callset>.{fp|fn}.tsv`: aggregated FP/FN tables per callset across coverages
 - `results/fp-fn/benchmarks/<benchmark>.{fp|fn}.tsv`: aggregated FP/FN tables per benchmark
+- `results/fp-fn/callsets/<callset>.{tp|tp-baseline}.tsv`: aggregated TP tables per callset (optional, see below)
+- `results/fp-fn/benchmarks/<benchmark>.{tp|tp-baseline}.tsv`: aggregated TP tables per benchmark (optional, see below)
 - `results/precision-recall/benchmarks/<benchmark>.<snvs|indels>.<base|vaf-stratified>.tsv`: aggregated precision/recall tables per benchmark (optionally stratified by vaf)
 - `results/annotated/tsv/<benchmark>/`: annotated shared FN tables
 - `results/annotated/tsv/<benchmark>/<callset>.unique_<fp|fn>.annotated.tsv`: annotated unique FP/FN tables

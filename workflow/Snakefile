@@ -27,18 +27,9 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             get_fp_fn_reports,
-            expand(
-                "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
-                benchmark=used_benchmarks,
-            ),
-            expand(
-                "results/annotated/tsv/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.annotated.tsv",
-                benchmark_callset=used_benchmarks_callsets,
-                classification=["fp", "fn"],
-            ),
 
     rule eval:
         # TODO: after integrating unqique/shared fp/fn into report add them here
@@ -51,12 +42,12 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             expand(
                 "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             get_fp_fn_reports,
             # collect the checkpoint inputs to avoid issues when
