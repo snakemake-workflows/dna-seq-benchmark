@@ -142,9 +142,8 @@ for i, chromosome in enumerate(chromosomes):
             # le = LabelEncoder()
             # feature matrix: genotypes, transposed into samples x features, replace NA with False (match)
             # and any genotype with True (mismatch with truth).
-            feature_matrix = data.reset_index(drop=True).T.copy()
-            feature_matrix[~pd.isna(feature_matrix)] = True
-            feature_matrix[pd.isna(feature_matrix)] = False
+            feature_matrix = data.reset_index(drop=True).T
+            feature_matrix = feature_matrix.notna()
 
             # target vector: label values, converted into factors
             target_vector = label_df.loc[label]
