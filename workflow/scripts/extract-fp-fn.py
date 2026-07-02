@@ -28,6 +28,20 @@ else:
     vaf_field_name_truth = None
 
 
+def _get_vaf(record, varfile, vaf_field, vaf_field_name):
+    """Fetch VAF from a variant file."""
+    if vaf_field is None:
+        return float('nan')
+    try:
+        r = list(varfile.fetch(record.contig, record.start, record.stop))
+        if len(r) > 0:
+            r = r[0]
+        vaf = r.info[vaf_field_name] if vaf_field == "INFO" else r.samples[0][vaf_field_name]
+        return vaf
+    except (KeyError, IndexError):
+        return float('nan')
+
+
 with open(snakemake.output[0], "w", newline="") as outfile:
     writer = csv.writer(outfile, delimiter="\t")
     writer.writerow(
@@ -60,6 +74,20 @@ with open(snakemake.output[0], "w", newline="") as outfile:
                     #No VAF information available -> float na
                     vaf = float('nan')
 
+            elif c.cls == Class.TP_query and snakemake.wildcards.classification == "tp":
+                classification = "TP"
+                truth_gt = "/".join(str(g) for g in sorted(record.samples[0].get("GT", [None, None])))
+                query_gt = "/".join(str(g) for g in sorted(record.samples[1].get("GT", [None, None])))
+                # For TP, try VAF from query first, fall back to truth
+                vaf = _get_vaf(record, query, vaf_field_query, vaf_field_name_query)
+
+            elif c.cls == Class.TP_truth and snakemake.wildcards.classification == "tp-baseline":
+                classification = "TP-BASELINE"
+                truth_gt = "/".join(str(g) for g in sorted(record.samples[0].get("GT", [None, None])))
+                query_gt = "/".join(str(g) for g in sorted(record.samples[1].get("GT", [None, None])))
+                # For TP-baseline, use truth VAF
+                vaf = _get_vaf(record, truth, vaf_field_truth, vaf_field_name_truth)
+
             elif c.cls == Class.FN and snakemake.wildcards.classification == "fn":
                 classification = "FN"
                 truth_gt = "0/1" if is_het(record, 0, c.variant) else "1/1"
@@ -78,6 +106,7 @@ with open(snakemake.output[0], "w", newline="") as outfile:
             else:
                 continue
 
+            # For TP and TP-BASELINE, VAF can come from either sample
             if isinstance(vaf, tuple):
                 vaf = vaf[0]
             if isinstance(vaf, str):

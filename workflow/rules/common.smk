@@ -628,10 +628,16 @@ def get_collect_stratifications_input(wildcards):
     )
 
 
+def _get_fp_fn_classifications(wildcards):
+    """Return the list of classifications to collect for the given callset/genome."""
+    return ["fp", "fn", "tp", "tp-baseline"]
+
+
 def get_collect_stratifications_fp_fn_input(wildcards):
     return expand(
         "results/fp-fn/callsets/{{callset}}/{cov}.{{classification}}.tsv",
         cov=get_nonempty_coverages(wildcards),
+        classification=_get_fp_fn_classifications(wildcards),
     )
 
 
@@ -686,7 +692,9 @@ def get_report_precision_recall_input(wildcards):
 def get_collect_fp_fn_benchmark_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
     return expand(
-        "results/fp-fn/callsets/{callset}.{{classification}}.tsv", callset=callsets
+        "results/fp-fn/callsets/{callset}.{{classification}}.tsv",
+        callset=callsets,
+        classification=_get_fp_fn_classifications(wildcards),
     )
 
 
@@ -753,6 +761,7 @@ def get_collect_fp_fn_input(wildcards):
     return expand(
         "results/fp-fn/callsets/{callset}/{{cov}}.{{classification}}.tsv",
         callset=callsets,
+        classification=_get_fp_fn_classifications(wildcards),
     )
 
 
