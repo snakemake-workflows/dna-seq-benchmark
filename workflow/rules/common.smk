@@ -587,8 +587,7 @@ def get_precision_recall_input(wildcards):
 def get_fp_fn_expression(wildcards):
     vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
     if hasattr(wildcards, "classification") and (
-        wildcards.classification == "fn"
-        or wildcards.classification == "tp-baseline"
+        wildcards.classification == "fn" or wildcards.classification == "tp-baseline"
     ):
         vaf = vaf_benchmark
     else:
