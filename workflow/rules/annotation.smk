@@ -35,7 +35,7 @@ rule get_vep_plugins:
     params:
         release="115",
     wrapper:
-        "v9.0.1/bio/vep/plugins"
+        "v9.11.0/bio/vep/plugins"
 
 
 rule download_revel:
@@ -154,7 +154,7 @@ rule vembrane_table_shared_fn:
         expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
         extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     wrapper:
-        "v9.4.0/bio/vembrane/table"
+        "v9.9.0/bio/vembrane/table"
 
 
 rule vembrane_table_unique_fp_fn:
@@ -168,4 +168,4 @@ rule vembrane_table_unique_fp_fn:
         expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
         extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     wrapper:
-        "v9.4.0/bio/vembrane/table"
+        "v9.9.0/bio/vembrane/table"
