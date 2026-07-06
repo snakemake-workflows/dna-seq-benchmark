@@ -101,8 +101,8 @@ def calculate_vaf_from_strelka(variant, samples):
             return None
 
         for i in range(n_samples):
-            ref_count = float(ref_arr[i])
-            alt_count = float(alt_arr[i])
+            ref_count = float(ref_arr[i, 0])
+            alt_count = float(alt_arr[i, 0])
             total = ref_count + alt_count
             if total > 0:
                 vaf_values[i, 0] = alt_count / total
@@ -119,8 +119,8 @@ def calculate_vaf_from_strelka(variant, samples):
             return None
 
         for i in range(n_samples):
-            alt_count = float(tar_arr[i])
-            ref_count = float(tir_arr[i])
+            alt_count = float(tar_arr[i, 0])
+            ref_count = float(tir_arr[i, 0])
             total = ref_count + alt_count
             if total > 0:
                 vaf_values[i, 0] = alt_count / total
