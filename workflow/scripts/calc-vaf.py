@@ -14,9 +14,11 @@ def calculate_vaf_from_ad(variant, samples):
                        Returns None if AD field is missing.
                        Missing values or divisions by zero result in np.nan.
     """
-    ad = variant.format('AD')
+    try:
+        ad = variant.format('AD')
+    except KeyError:
+        return None
     if ad is None:
-        print(f"Warning: AD field missing for variant at {variant.CHROM}:{variant.POS}. Skipping VAF calculation.", file=sys.stderr)
         return None
 
     n_samples = len(samples)
@@ -38,6 +40,93 @@ def calculate_vaf_from_ad(variant, samples):
         for j in range(n_alt_alleles):
             alt_depth = sample_ad[j + 1]
             vaf_values[i, j] = alt_depth / total_depth
+
+    return vaf_values
+
+
+def calculate_vaf_from_strelka(variant, samples):
+    """
+    Calculate VAF from Strelka-specific FORMAT fields.
+
+    For biallelic SNVs: uses FORMAT/{BASE}U fields (AU, TU, GU, CU)
+        - ref_counts = FORMAT/{REF}U (e.g., FORMAT/AU if REF='A')
+        - alt_counts = FORMAT/{ALT}U (e.g., FORMAT/TU if ALT='T')
+        - VAF = alt_counts[tier0] / (alt_counts[tier0] + ref_counts[tier0])
+
+    For biallelic indels: uses FORMAT/TAR and FORMAT/TIR
+        - VAF = TAR[tier0] / (TAR[tier0] + TIR[tier0])
+
+    Args:
+        variant: cyvcf2.Variant record
+        samples: list of sample names
+
+    Returns:
+        numpy.ndarray: shape (n_samples, n_alt_alleles), or None if fields are
+                       missing or variant has >1 alternate allele.
+    """
+    n_samples = len(samples)
+    n_alt_alleles = len(variant.ALT)
+
+    if n_alt_alleles == 0:
+        return np.full((n_samples, 0), np.nan, dtype=np.float32)
+
+    vaf_values = np.full((n_samples, n_alt_alleles), np.nan, dtype=np.float32)
+
+    # Strelka per-nucleotide fields use Number=A, so we only handle
+    # single-allele (biallelic) variants reliably.
+    if n_alt_alleles > 1:
+        return None
+
+    ref_base = variant.REF
+    alt_base = variant.ALT[0]
+
+    # Biallelic SNV: REF and ALT are both single nucleotides, different bases
+    if (
+        len(ref_base) == 1
+        and len(alt_base) == 1
+        and ref_base in "ACGT"
+        and alt_base in "ACGT"
+        and ref_base != alt_base
+    ):
+        ref_field = f"{ref_base}U"
+        alt_field = f"{alt_base}U"
+
+        try:
+            ref_arr = variant.format(ref_field)
+            alt_arr = variant.format(alt_field)
+        except KeyError:
+            return None
+
+        if ref_arr is None or alt_arr is None:
+            return None
+
+        for i in range(n_samples):
+            ref_count = float(ref_arr[i])
+            alt_count = float(alt_arr[i])
+            total = ref_count + alt_count
+            if total > 0:
+                vaf_values[i, 0] = alt_count / total
+
+    # Biallelic indel: REF and ALT differ in length
+    elif len(ref_base) != len(alt_base):
+        try:
+            tar_arr = variant.format("TAR")
+            tir_arr = variant.format("TIR")
+        except KeyError:
+            return None
+
+        if tar_arr is None or tir_arr is None:
+            return None
+
+        for i in range(n_samples):
+            alt_count = float(tar_arr[i])
+            ref_count = float(tir_arr[i])
+            total = ref_count + alt_count
+            if total > 0:
+                vaf_values[i, 0] = alt_count / total
+
+    else:
+        return None
 
     return vaf_values
 
@@ -217,12 +306,9 @@ def add_vaf_to_vcf(input_vcf_path, output_vcf_path,
     """
     Reads an input VCF, calculates VAF, and writes to an output VCF file.
 
-    Args:
-        input_vcf_path: Path to the input VCF.
-        output_vcf_path: Path for the output VCF.
-        calculate_from_ad: If True, calculate VAF from AD FORMAT field.
-        num_field/den_field: Field location ("INFO" or "FORMAT") for custom calc.
-        num_name/den_name: Field name for numerator and denominator.
+    When calculate_from_ad=True, the script first tries Strelka-specific
+    FORMAT fields (AU/TU/GU/CU for SNVs, TAR/TIR for indels) and falls back
+    to the standard AD FORMAT field if those are not present.
     """
     try:
         vcf_reader = VCF(input_vcf_path)
@@ -256,7 +342,10 @@ def add_vaf_to_vcf(input_vcf_path, output_vcf_path,
         vaf_array = None
 
         if calculate_from_ad:
-            vaf_array = calculate_vaf_from_ad(variant, vcf_reader.samples)
+            # Try Strelka-specific fields first, then fall back to AD
+            vaf_array = calculate_vaf_from_strelka(variant, vcf_reader.samples)
+            if vaf_array is None:
+                vaf_array = calculate_vaf_from_ad(variant, vcf_reader.samples)
         elif num_field and num_name and den_field and den_name:
             vaf_array = calculate_vaf_from_fields(variant, num_field, num_name, den_field=den_field, den_name=den_name, samples=vcf_reader.samples)
 
