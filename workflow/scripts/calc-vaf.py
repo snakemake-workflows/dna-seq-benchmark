@@ -54,7 +54,7 @@ def calculate_vaf_from_strelka(variant, samples):
         - VAF = alt_counts[tier0] / (alt_counts[tier0] + ref_counts[tier0])
 
     For biallelic indels: uses FORMAT/TAR and FORMAT/TIR
-        - VAF = TAR[tier0] / (TAR[tier0] + TIR[tier0])
+        - VAF = TIR[tier0] / (TAR[tier0] + TIR[tier0])
 
     Args:
         variant: cyvcf2.Variant record
@@ -119,8 +119,8 @@ def calculate_vaf_from_strelka(variant, samples):
             return None
 
         for i in range(n_samples):
-            alt_count = float(tar_arr[i, 0])
-            ref_count = float(tir_arr[i, 0])
+            ref_count = float(tar_arr[i, 0])
+            alt_count = float(tir_arr[i, 0])
             total = ref_count + alt_count
             if total > 0:
                 vaf_values[i, 0] = alt_count / total
