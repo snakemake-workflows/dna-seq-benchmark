@@ -9,3 +9,4 @@ data/**
 report/**
 test/**
 *.pyc
+__pycache__/
