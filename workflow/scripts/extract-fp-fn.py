@@ -2,7 +2,7 @@ from collections import defaultdict
 import sys, os
 import numpy as np
 
-# sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(__file__))
 sys.stderr = open(snakemake.log[0], "w")
 
 import csv

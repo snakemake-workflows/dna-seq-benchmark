@@ -1,7 +1,7 @@
 from collections import defaultdict
 import sys, os
 
-# sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(__file__))
 sys.stderr = open(snakemake.log[0], "w")
 
 from abc import ABC, abstractmethod
