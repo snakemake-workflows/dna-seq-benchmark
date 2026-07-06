@@ -123,7 +123,7 @@ rule calculate_vaf:
         """
         bcftools index -c {input.vcf} >{log} 2>&1
         python {input.script} {input.vcf} {output.added_vaf} {params.vaf_args} >>{log} 2>&1
-        bcftools index {output.added_vaf} >>{log} 2>&1
+        bcftools index -f {output.added_vaf} >>{log} 2>&1
         """
 
 
