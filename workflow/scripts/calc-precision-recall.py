@@ -1,7 +1,7 @@
 from collections import defaultdict
 import sys, os
 
-sys.path.insert(0, os.path.dirname(__file__))
+# sys.path.insert(0, snakemake.script_dir)
 sys.stderr = open(snakemake.log[0], "w")
 
 from abc import ABC, abstractmethod
@@ -155,7 +155,7 @@ def collect_results_somatic():
 import pysam
 
 from common.classification import CompareExactGenotype, CompareExistence, Class
-from common.vaf_utils import get_vaf_from_record
+from workflow.scripts.common.vafutils import get_vaf_from_record
 
 
 class GermlineClassifications:

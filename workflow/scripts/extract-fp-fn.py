@@ -2,14 +2,14 @@ from collections import defaultdict
 import sys, os
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(__file__))
+# sys.path.insert(0, snakemake.script_dir)
 sys.stderr = open(snakemake.log[0], "w")
 
 import csv
 import pysam
 
 from common.classification import CompareExistence, Class, is_het
-from common.vaf_utils import get_vaf_from_record
+from common.vafutils import get_vaf_from_record
 
 cmp = CompareExistence()
 varfile = pysam.VariantFile(snakemake.input.calls)
