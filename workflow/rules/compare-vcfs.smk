@@ -176,7 +176,8 @@ rule normalize_calls:
     params:
         extra=get_norm_params,
     shell:
-        "(bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | "
+        "(bcftools view --regions-file <(cut -f1 {input.ref_index}) {input.calls} | "
+        " bcftools norm {params.extra} --fasta-ref {input.ref} - | "
         " bcftools view -Oz > {output}) 2> {log}"
 
 
