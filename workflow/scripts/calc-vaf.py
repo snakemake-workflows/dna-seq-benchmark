@@ -61,8 +61,7 @@ def calculate_vaf_from_fields(variant, field, name, den_field=None, den_name=Non
         name (str): The field ID for the numerator.
         den_field (str or None): Either "INFO" or "FORMAT" for the denominator.
             Defaults to ``field`` when None.
-        den_name (str or None): The field ID for the denominator.
-            Defaults to ``f"{name}_den"`` when None.
+        den_name (str): The field ID for the denominator. Must be provided by the caller.
         samples (list or None): List of sample names, or None to infer from variant.
 
     Returns:
@@ -80,7 +79,7 @@ def calculate_vaf_from_fields(variant, field, name, den_field=None, den_name=Non
         return np.array([], dtype=np.float32).reshape(n_samples, 0)
 
     # Fetch numerator and denominator values from their respective field locations
-    den_key = den_name if den_name is not None else f"{name}_den"
+    den_key = den_name
     dfield = den_field if den_field is not None else field
     if field == "INFO":
         num_val = variant.INFO.get(name)
