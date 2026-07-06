@@ -155,7 +155,7 @@ def collect_results_somatic():
 import pysam
 
 from common.classification import CompareExactGenotype, CompareExistence, Class
-from workflow.scripts.common.vafutils import get_vaf_from_record
+from common.vafutils import get_vaf_from_record
 
 
 class GermlineClassifications:
