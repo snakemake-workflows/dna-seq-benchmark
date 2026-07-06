@@ -1,7 +1,6 @@
 from collections import defaultdict
-import sys, os
+import sys
 
-# sys.path.insert(0, snakemake.script_dir)
 sys.stderr = open(snakemake.log[0], "w")
 
 from abc import ABC, abstractmethod
@@ -153,9 +152,40 @@ def collect_results_somatic():
 # --- Germline helpers ---
 
 import pysam
+import numpy as np
 
 from common.classification import CompareExactGenotype, CompareExistence, Class
-from common.vafutils import get_vaf_from_record
+
+
+def get_vaf_from_record(record, field, name):
+    """Extract VAF value from a record, handling FORMAT and INFO fields."""
+    try:
+        if field == "INFO":
+            vaf = record.info.get(name)
+        else:
+            sample_name = list(record.samples.keys())[0]
+            vaf = record.samples[sample_name].get(name)
+    except (KeyError, IndexError, AttributeError):
+        return float('nan')
+
+    if isinstance(vaf, (list, tuple, np.ndarray, np.generic)):
+        if hasattr(vaf, 'item'):
+            vaf = vaf.item()
+        elif len(vaf) > 0:
+            vaf = vaf[0]
+        else:
+            return float('nan')
+
+    if isinstance(vaf, str):
+        vaf = float(vaf.replace("%", "")) / 100
+
+    if hasattr(vaf, 'item'):
+        vaf = vaf.item()
+
+    try:
+        return float(vaf)
+    except (ValueError, TypeError):
+        return float('nan')
 
 
 class GermlineClassifications:
