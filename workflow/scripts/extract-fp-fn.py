@@ -9,6 +9,7 @@ import csv
 import pysam
 
 from common.classification import CompareExistence, Class, is_het
+from common.vaf_utils import get_vaf_from_record
 
 cmp = CompareExistence()
 varfile = pysam.VariantFile(snakemake.input.calls)
@@ -27,44 +28,6 @@ if vaf_fields and len(vaf_fields) > 1 and vaf_fields[1] is not None:
 else:
     vaf_field_truth = None
     vaf_field_name_truth = None
-
-
-def _get_vaf_from_record(record, field, name):
-    """Extract VAF value from a record, handling FORMAT and INFO fields.
-
-    Returns a scalar float VAF (first value if array-like), or nan if not found.
-    """
-    try:
-        if field == "INFO":
-            vaf = record.info.get(name)
-        else:
-            # FORMAT field - use samples dict
-            sample_name = list(record.samples.keys())[0]
-            vaf = record.samples[sample_name].get(name)
-    except (KeyError, IndexError, AttributeError):
-        return float('nan')
-
-    # Handle array-like values (e.g., multi-allelic variants)
-    if isinstance(vaf, (list, tuple, np.ndarray, np.generic)):
-        if hasattr(vaf, 'item'):  # numpy scalar
-            vaf = vaf.item()
-        elif len(vaf) > 0:
-            vaf = vaf[0]  # Take first value for multi-allelic
-        else:
-            return float('nan')
-
-    # Convert string percentages (e.g., "50%") to float (e.g., 0.5)
-    if isinstance(vaf, str):
-        vaf = float(vaf.replace("%", "")) / 100
-
-    # Handle numpy types
-    if hasattr(vaf, 'item'):
-        vaf = vaf.item()
-
-    try:
-        return float(vaf)
-    except (ValueError, TypeError):
-        return float('nan')
 
 
 with open(snakemake.output[0], "w", newline="") as outfile:
@@ -91,7 +54,7 @@ with open(snakemake.output[0], "w", newline="") as outfile:
                     r = list(query.fetch(record.contig, record.start, record.stop))
                     if len(r) > 0:
                         r = r[0]
-                    vaf = _get_vaf_from_record(r, vaf_field_query, vaf_field_name_query)
+                    vaf = get_vaf_from_record(r, vaf_field_query, vaf_field_name_query)
                 else:
                     # No VAF information available -> float na
                     vaf = float('nan')
@@ -104,7 +67,7 @@ with open(snakemake.output[0], "w", newline="") as outfile:
                     r = list(truth.fetch(record.contig, record.start, record.stop))
                     if len(r) > 0:
                         r = r[0]
-                    vaf = _get_vaf_from_record(r, vaf_field_truth, vaf_field_name_truth)
+                    vaf = get_vaf_from_record(r, vaf_field_truth, vaf_field_name_truth)
                 else:
                     # No VAF information available -> float na
                     vaf = float('nan')

@@ -106,13 +106,13 @@ rule calculate_vaf:
     fields. Otherwise, VAF is computed from the AD FORMAT field.
     """
     input:
-        vcf="results/filtered-variants/{wildcards.callset}.bcf",
+        vcf="results/filtered-variants/{callset}.bcf",
         script=workflow.source_path("../scripts/calc-vaf.py"),
     output:
-        added_vaf=temp("results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"),
-        index="results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi",
+        added_vaf=temp("results/calculate-vaf/{callset}.added-vaf.bcf"),
+        index="results/calculate-vaf/{callset}.added-vaf.bcf.csi",
     log:
-        "logs/calculate-vaf/{wildcards.callset}.log",
+        "logs/calculate-vaf/{callset}.log",
     wildcard_constraints:
         callset=tbc_callset_constraint,
     conda:
@@ -121,19 +121,15 @@ rule calculate_vaf:
         vaf_args=calc_vaf_args,
     shell:
         """
-        bcftools index -c {input.vcf}
-        python {input.script} {input.vcf} {output.added_vaf} {params.vaf_args}
-        bcftools index {output.added_vaf} >{log} 2>&1
+        bcftools index -c {input.vcf} >{log} 2>&1
+        python {input.script} {input.vcf} {output.added_vaf} {params.vaf_args} >>{log} 2>&1
+        bcftools index {output.added_vaf} >>{log} 2>&1
         """
 
 
 rule intersect_calls_with_target_regions:
     input:
-        bcf=lambda wildcards: (
-            f"results/calculate-vaf/{wildcards.callset}.added-vaf.bcf"
-            if get_vaf_calc_status(wildcards)
-            else "results/filtered-variants/{callset}.bcf"
-        ),
+        bcf=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
         regions=get_target_regions,
     output:
         pipe("results/normalized-variants/{callset}_intersected.vcf"),

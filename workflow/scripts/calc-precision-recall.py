@@ -155,10 +155,12 @@ def collect_results_somatic():
 import pysam
 
 from common.classification import CompareExactGenotype, CompareExistence, Class
+from common.vaf_utils import get_vaf_from_record
 
 
 class GermlineClassifications:
     def __init__(self, comparator, vaf_fields):
+        self._vaf_getter = get_vaf_from_record
         self.comparator = comparator
         # if vaf information is given: stratify results by vaf and add addtional counters for stratified tp, fp, fn
         if vaf_fields[0] is not None and vaf_fields[1] is not None:
@@ -186,42 +188,8 @@ class GermlineClassifications:
         self.fp = 0
 
     def _get_vaf_from_record(self, record, field, name):
-        """Extract VAF value from a record, handling FORMAT and INFO fields.
-
-        Returns a scalar float VAF (first value if array-like), or nan if not found.
-        """
-        import numpy as np
-        try:
-            if field == "INFO":
-                vaf = record.info.get(name)
-            else:
-                # FORMAT field - use samples dict
-                sample_name = list(record.samples.keys())[0]
-                vaf = record.samples[sample_name].get(name)
-        except (KeyError, IndexError, AttributeError):
-            return float('nan')
-
-        # Handle array-like values (e.g., multi-allelic variants)
-        if isinstance(vaf, (list, tuple, np.ndarray, np.generic)):
-            if hasattr(vaf, 'item'):  # numpy scalar
-                vaf = vaf.item()
-            elif len(vaf) > 0:
-                vaf = vaf[0]  # Take first value for multi-allelic
-            else:
-                return float('nan')
-
-        # Convert string percentages (e.g., "50%") to float (e.g., 0.5)
-        if isinstance(vaf, str):
-            vaf = float(vaf.replace("%", "")) / 100
-
-        # Handle numpy types
-        if hasattr(vaf, 'item'):
-            vaf = vaf.item()
-
-        try:
-            return float(vaf)
-        except (ValueError, TypeError):
-            return float('nan')
+        """Extract VAF value from a record (delegates to common.vaf_utils)."""
+        return self._vaf_getter(record, field, name)
 
     def increment_counter(self, current_record, other_record, counter, counter_vaf, fp=False):
         if self.stratify_by_vaf:

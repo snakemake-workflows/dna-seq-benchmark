@@ -14,9 +14,8 @@ def calculate_vaf_from_ad(variant, samples):
                        Returns None if AD field is missing.
                        Missing values or divisions by zero result in np.nan.
     """
-    try:
-        ad = variant.format('AD')
-    except KeyError:
+    ad = variant.format('AD')
+    if ad is None:
         print(f"Warning: AD field missing for variant at {variant.CHROM}:{variant.POS}. Skipping VAF calculation.", file=sys.stderr)
         return None
 
@@ -52,14 +51,18 @@ def _num_samples_from_samples(samples):
     return 0
 
 
-def calculate_vaf_from_fields(variant, field, name, samples=None):
+def calculate_vaf_from_fields(variant, field, name, den_field=None, den_name=None, samples=None):
     """
     Calculates the VAF for each sample by dividing two numeric fields.
 
     Args:
         variant (cyvcf2.Variant): The variant record.
         field (str): Either "INFO" or "FORMAT".
-        name (str): The field ID (e.g. "NUMERATOR" / "DENOMINATOR").
+        name (str): The field ID for the numerator.
+        den_field (str or None): Either "INFO" or "FORMAT" for the denominator.
+            Defaults to ``field`` when None.
+        den_name (str or None): The field ID for the denominator.
+            Defaults to ``f"{name}_den"`` when None.
         samples (list or None): List of sample names, or None to infer from variant.
 
     Returns:
@@ -76,20 +79,31 @@ def calculate_vaf_from_fields(variant, field, name, samples=None):
     if n_alt_alleles == 0:
         return np.array([], dtype=np.float32).reshape(n_samples, 0)
 
-    # Fetch numerator and denominator values
+    # Fetch numerator and denominator values from their respective field locations
+    den_key = den_name if den_name is not None else f"{name}_den"
+    dfield = den_field if den_field is not None else field
     if field == "INFO":
         num_val = variant.INFO.get(name)
-        den_val = variant.INFO.get(f"{name}_den")
-        if num_val is None or den_val is None:
-            return None
     elif field == "FORMAT":
         try:
             num_val = variant.format(name)
-            den_val = variant.format(f"{name}_den")
         except KeyError:
             return None
     else:
-        raise ValueError(f"Unsupported field location: {field}. Must be 'INFO' or 'FORMAT'.")
+        raise ValueError(f"Unsupported numerator field location: {field}. Must be 'INFO' or 'FORMAT'.")
+    if num_val is None:
+        return None
+    if dfield == "INFO":
+        den_val = variant.INFO.get(den_key)
+    elif dfield == "FORMAT":
+        try:
+            den_val = variant.format(den_key)
+        except KeyError:
+            return None
+    else:
+        raise ValueError(f"Unsupported denominator field location: {dfield}. Must be 'INFO' or 'FORMAT'.")
+    if den_val is None:
+        return None
 
     # Handle both scalar (INFO) and array (FORMAT) values
     if field == "INFO":
@@ -245,7 +259,7 @@ def add_vaf_to_vcf(input_vcf_path, output_vcf_path,
         if calculate_from_ad:
             vaf_array = calculate_vaf_from_ad(variant, vcf_reader.samples)
         elif num_field and num_name and den_field and den_name:
-            vaf_array = calculate_vaf_from_fields(variant, num_field, num_name)
+            vaf_array = calculate_vaf_from_fields(variant, num_field, num_name, den_field=den_field, den_name=den_name, samples=vcf_reader.samples)
 
         if vaf_array is not None:
             try:
