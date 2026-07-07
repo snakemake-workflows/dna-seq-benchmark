@@ -633,9 +633,9 @@ def get_normalized_calls_input(wildcards):
 
 
 def get_vaf_calculated_input(wildcards, callset):
-    """Return the input path for tbc callsets (VAF-calculated VCF) or regular BCF."""
+    """Return the input path for tbc callsets (VAF-calculated BCF) or regular BCF."""
     if wildcards.get("callset") in tbc_callsets:
-        return f"results/calculate-vaf/{callset}.added-vaf.vcf.gz"
+        return f"results/calculate-vaf/{callset}.added-vaf.vcf.gz.bcf"
     return f"results/filtered-variants/{callset}.bcf"
 
 

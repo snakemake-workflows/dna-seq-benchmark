@@ -99,19 +99,11 @@ rule remove_non_pass:
 
 
 rule calculate_vaf:
-    """Calculate VAF and add it to the VCF/BCF.
-
-    Only runs for callsets with vaf-field: 'tbc' (enforced by wildcard constraint).
-    When vaf-numerator/vaf-denominator are defined, VAF is computed from those two
-    fields. Otherwise, VAF is computed from the AD FORMAT field.
-    """
     input:
         vcf="results/filtered-variants/{callset}.bcf",
         script=workflow.source_path("../scripts/calc-vaf.py"),
     output:
         vcf=temp("results/calculate-vaf/{callset}.added-vaf.vcf"),
-        added_vaf=temp("results/calculate-vaf/{callset}.added-vaf.vcf.gz"),
-        index="results/calculate-vaf/{callset}.added-vaf.vcf.gz.tbi",
     log:
         "logs/calculate-vaf/{callset}.log",
     wildcard_constraints:
@@ -122,10 +114,24 @@ rule calculate_vaf:
         vaf_args=calc_vaf_args,
     shell:
         """
-        bcftools index -f -c {input.vcf} >{log} 2>&1
-        python {input.script} {input.vcf} {output.vcf} {params.vaf_args} >>{log} 2>&1
-        bgzip -c {output.vcf} > {output.added_vaf} >>{log} 2>&1
-        bcftools index -f {output.added_vaf} >>{log} 2>&1
+        python {input.script} {input.vcf} {output.vcf} {params.vaf_args} 2>{log}
+        """
+
+
+rule convert_vaf_bcf:
+    input:
+        vcf="results/calculate-vaf/{callset}.added-vaf.vcf",
+    output:
+        bcf="results/calculate-vaf/{callset}.added-vaf.bcf",
+    log:
+        "logs/convert-vaf-bcf/{callset}.log",
+    wildcard_constraints:
+        callset=tbc_callset_constraint,
+    conda:
+        "../envs/tools.yaml"
+    shell:
+        """
+        bcftools view {input.vcf} -O b -o {output.bcf} 2>{log}
         """
 
 
@@ -148,7 +154,7 @@ rule restrict_to_reference_contigs:
     input:
         calls=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
         calls_index=lambda wildcards: (
-            f"results/calculate-vaf/{wildcards.callset}.added-vaf.vcf.gz.tbi"
+            f"results/calculate-vaf/{wildcards.callset}.added-vaf.vcf.gz.bcf.tbi"
             if get_vaf_calc_status(wildcards)
             else f"results/filtered-variants/{wildcards.callset}.bcf.csi"
         ),
@@ -178,8 +184,8 @@ rule normalize_calls:
         extra=get_norm_params,
     shell:
         """
-        (bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | \
-         bcftools view -Oz > {output}) 2> {log}
+        (bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} \
+            | bcftools view -Oz >{output}) 2>{log}
         """
 
 
