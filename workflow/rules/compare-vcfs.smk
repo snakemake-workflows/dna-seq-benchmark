@@ -109,8 +109,9 @@ rule calculate_vaf:
         vcf="results/filtered-variants/{callset}.bcf",
         script=workflow.source_path("../scripts/calc-vaf.py"),
     output:
-        added_vaf=temp("results/calculate-vaf/{callset}.added-vaf.bcf"),
-        index="results/calculate-vaf/{callset}.added-vaf.bcf.csi",
+        vcf=temp("results/calculate-vaf/{callset}.added-vaf.vcf"),
+        added_vaf=temp("results/calculate-vaf/{callset}.added-vaf.vcf.gz"),
+        index="results/calculate-vaf/{callset}.added-vaf.vcf.gz.tbi",
     log:
         "logs/calculate-vaf/{callset}.log",
     wildcard_constraints:
@@ -122,7 +123,8 @@ rule calculate_vaf:
     shell:
         """
         bcftools index -f -c {input.vcf} >{log} 2>&1
-        python {input.script} {input.vcf} {output.added_vaf} {params.vaf_args} >>{log} 2>&1
+        python {input.script} {input.vcf} {output.vcf} {params.vaf_args} >>{log} 2>&1
+        bgzip -c {output.vcf} > {output.added_vaf} >>{log} 2>&1
         bcftools index -f {output.added_vaf} >>{log} 2>&1
         """
 
@@ -132,7 +134,7 @@ rule intersect_calls_with_target_regions:
         bcf=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
         regions=get_target_regions,
     output:
-        pipe("results/normalized-variants/{callset}_intersected.vcf"),
+        "results/normalized-variants/{callset}_intersected.vcf",
     log:
         "logs/intersect-calls/{callset}.log",
     conda:
@@ -146,7 +148,7 @@ rule restrict_to_reference_contigs:
     input:
         calls=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
         calls_index=lambda wildcards: (
-            f"results/calculate-vaf/{wildcards.callset}.added-vaf.bcf.csi"
+            f"results/calculate-vaf/{wildcards.callset}.added-vaf.vcf.gz.tbi"
             if get_vaf_calc_status(wildcards)
             else f"results/filtered-variants/{wildcards.callset}.bcf.csi"
         ),
@@ -166,7 +168,6 @@ rule normalize_calls:
     input:
         calls=get_normalized_calls_input,
         ref="resources/reference/genome.fasta",
-        ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     log:
@@ -177,11 +178,8 @@ rule normalize_calls:
         extra=get_norm_params,
     shell:
         """
-        cut -f1 {input.ref_index} > {output}.regions
-        (bcftools view --regions-file {output}.regions {input.calls} | \
-         bcftools norm {params.extra} --fasta-ref {input.ref} - | \
+        (bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | \
          bcftools view -Oz > {output}) 2> {log}
-        rm {output}.regions
         """
 
 

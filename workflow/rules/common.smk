@@ -626,24 +626,16 @@ def get_vaf_calc_status(wildcards):
 
 
 def get_normalized_calls_input(wildcards):
-    """Return the input path for the normalize_calls rule.
-
-    When vaf-field is 'tbc', use the calculated VAF BCF as input.
-    Otherwise use the normal intersect-or-restricted path.
-    """
-    vaf_field = config["variant-calls"][wildcards.callset].get("vaf-field")
-    if vaf_field == "tbc":
-        return "results/calculate-vaf/{callset}.added-vaf.bcf"
-    # Normal flow: intersect or restricted
+    """Return the input path for the normalize_calls rule."""
     if intersect_calls(wildcards):
         return "results/normalized-variants/{callset}_intersected.vcf"
     return "results/filtered-variants/{callset}_restricted.bcf"
 
 
 def get_vaf_calculated_input(wildcards, callset):
-    """Return the input path for tbc callsets (VAF-calculated BCF) or regular BCF."""
+    """Return the input path for tbc callsets (VAF-calculated VCF) or regular BCF."""
     if wildcards.get("callset") in tbc_callsets:
-        return f"results/calculate-vaf/{callset}.added-vaf.bcf"
+        return f"results/calculate-vaf/{callset}.added-vaf.vcf.gz"
     return f"results/filtered-variants/{callset}.bcf"
 
 
