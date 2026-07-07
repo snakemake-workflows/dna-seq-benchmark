@@ -176,9 +176,13 @@ rule normalize_calls:
     params:
         extra=get_norm_params,
     shell:
-        "(bcftools view --regions-file <(cut -f1 {input.ref_index}) {input.calls} | "
-        " bcftools norm {params.extra} --fasta-ref {input.ref} - | "
-        " bcftools view -Oz > {output}) 2> {log}"
+        """
+        cut -f1 {input.ref_index} > {output}.regions
+        (bcftools view --regions-file {output}.regions {input.calls} | \
+         bcftools norm {params.extra} --fasta-ref {input.ref} - | \
+         bcftools view -Oz > {output}) 2> {log}
+        rm {output}.regions
+        """
 
 
 rule stratify_truth:
