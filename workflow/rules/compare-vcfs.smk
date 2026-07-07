@@ -154,7 +154,7 @@ rule restrict_to_reference_contigs:
     input:
         calls=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
         calls_index=lambda wildcards: (
-            f"results/calculate-vaf/{wildcards.callset}.added-vaf.vcf.gz.bcf.tbi"
+            f"results/calculate-vaf/{wildcards.callset}.bcf.csi"
             if get_vaf_calc_status(wildcards)
             else f"results/filtered-variants/{wildcards.callset}.bcf.csi"
         ),
