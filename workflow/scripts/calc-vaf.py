@@ -85,11 +85,11 @@ def calculate_vaf_from_strelka(variant, samples):
     return vaf_values
 
 
-def calculate_vaf_from_fields(variant, field, name, den_field=None, den_name=None):
+def calculate_vaf_from_fields(variant, samples, field, name, den_field=None, den_name=None):
     """
     Calculates the VAF for each sample by dividing two numeric fields.
     """
-    n_samples = len(variant.samples)
+    n_samples = len(samples)
     n_alt_alleles = len(variant.ALT)
     if n_alt_alleles == 0:
         return np.array([], dtype=np.float32).reshape(n_samples, 0)
@@ -250,7 +250,8 @@ for variant in vcf_reader:
             vaf_array = calculate_vaf_from_ad(variant, vcf_reader.samples)
     elif calc_from_fields:
         vaf_array = calculate_vaf_from_fields(
-            variant, vaf_args["num_field"], vaf_args["num_name"],
+            variant, vcf_reader.samples,
+            vaf_args["num_field"], vaf_args["num_name"],
             den_field=vaf_args["den_field"], den_name=vaf_args["den_name"]
         )
 
