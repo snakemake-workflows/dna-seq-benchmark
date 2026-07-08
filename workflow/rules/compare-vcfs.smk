@@ -121,7 +121,7 @@ rule vaf_vcf_to_bcf:
     output:
         "results/calculate-vaf/{callset}.added-vaf.bcf",
     log:
-        "logs/vaf-vcf-to-bcf/{prefix}.log",
+        "logs/vaf-vcf-to-bcf/{callset}.log",
     wrapper:
         "v9.4.1/bio/bcftools/view"
 
