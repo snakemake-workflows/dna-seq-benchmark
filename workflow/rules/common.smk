@@ -140,16 +140,6 @@ def get_mosdepth_quantize(wildcards):
     return f'{":".join(map(str, sorted(coverages.values())))}:'
 
 
-def get_plot_cov_labels():  # TODO check if ever used anywhere
-    def label(name):
-        lower, upper = get_cov_interval(name)
-        if upper:
-            return f"{lower}-{upper-1}"
-        return f"≥{lower}"
-
-    return {name: label(name) for name in low_coverages}
-
-
 def get_truth_url(wildcards, input):
     genome = genomes[wildcards.genome]
     truth = genome["truth"][get_genome_build()]
@@ -201,20 +191,6 @@ def get_genome_build():
     return config["reference-genome"]
 
 
-def get_io_prefix(getter):
-    def inner(wildcards, input, output):
-        return getter(input, output).split(".")[0]
-
-    return inner
-
-
-def get_happy_prefix(wildcards, output):
-    runinfo_suffix = ".runinfo.json"
-    for f in output:
-        if f.endswith(runinfo_suffix):
-            return f[: -len(runinfo_suffix)]
-
-
 def get_cov_label(wildcards):
     coverages = get_coverages(wildcards)
     lower, upper = get_cov_interval(wildcards.cov, coverages)
@@ -254,19 +230,6 @@ def get_callset_correct_contigs(wildcards):
         return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
-    elif isinstance(vcf, dict):
-        return "results/merge-callsets/{callset}.merged.vcf.gz"
-    else:
-        return get_raw_callset(wildcards)
-
-
-def get_callset_correct_contigs_liftover(wildcards):
-    callset = config["variant-calls"][wildcards.callset]
-    vcf = callset["path"]
-    if callset.get("genome-build", "grch38") == "grch37":
-        return "results/normalized-variants/{callset}.lifted.vcf.gz"
-    elif callset.get("rename-contigs", False):
-        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
@@ -313,8 +276,7 @@ def get_target_bed_input(wildcards):
     target_bed = get_benchmark(wildcards.benchmark)["target-regions"]
     if is_local_file(target_bed):
         return target_bed
-    else:
-        return []
+    return []
 
 
 def get_target_bed_statement(wildcards):
@@ -397,17 +359,6 @@ def get_benchmark_truth(wildcards):
         return f"resources/variants/{wildcards.genome}/all.truth.norm.bcf"
 
 
-def get_benchmark_truth_index(wildcards):
-    if hasattr(wildcards, "benchmark"):
-        genome = get_benchmark(wildcards.benchmark)["genome"]
-        if get_somatic_status(wildcards):
-            return f"resources/variants/{genome}/all.truth.format-added.vcf.gz.tbi"
-        else:
-            return f"resources/variants/{genome}/all.truth.norm.bcf.csi"
-    else:
-        return f"resources/variants/{wildcards.genome}/all.truth.norm.bcf.csi"
-
-
 def get_benchmark_renamed_truth(wildcards):
     genome = get_benchmark(wildcards.benchmark)["genome"]
     return f"resources/variants/{genome}/all.truth.replaced-contigs.vcf.gz"
@@ -467,15 +418,11 @@ def get_rename_contig_file(wildcards):
         return config["variant-calls"][wildcards.callset].get("rename-contigs", False)
 
 
-def get_callset_subcategory(wildcards):
-    return config["variant-calls"][wildcards.callset].get("subcategory")
-
-
 def get_norm_params(wildcards):
     target = ""
     if config.get("limit-reads"):
         target = "--targets 1"
-    return f"--atomize --check-ref ws --rm-dup exact {target}"
+    return f"--atomize --check-ref s --rm-dup exact {target}"
 
 
 def get_mosdepth_input(bai=False):
@@ -524,16 +471,6 @@ def get_coverages(wildcards):
     else:
         benchmark = config["variant-calls"][wildcards.callset]["benchmark"]
         high_cov_status = benchmarks[benchmark].get("high-coverage")
-    if high_cov_status:
-        coverages = high_coverages
-    else:
-        coverages = low_coverages
-    return coverages
-
-
-def get_coverages_of_callset(callset):
-    benchmark = config["variant-calls"][callset]["benchmark"]
-    high_cov_status = benchmarks[benchmark].get("high-coverage")
     if high_cov_status:
         coverages = high_coverages
     else:
@@ -736,29 +673,6 @@ def get_collect_stratifications_fp_fn_input(wildcards):
     )
 
 
-def get_fp_fn_reports(wildcards):
-    for genome in used_genomes:
-        yield from expand(
-            "results/report/fp-fn/genomes/{genome}/{cov}/{classification}",
-            genome=genome,
-            cov={
-                cov
-                for callset in get_genome_callsets(genome)
-                for cov in _get_nonempty_coverages(callset)
-            },
-            classification=["fp", "fn"],
-        )
-
-
-def get_fp_fn_reports_benchmarks(wildcards):
-    for genome in used_genomes:
-        yield from expand(
-            "results/report/fp-fn/benchmarks/{benchmark}/{classification}",
-            benchmark={benchmark for benchmark in used_benchmarks},
-            classification=["fp", "fn"],
-        )
-
-
 def get_benchmark_callsets(benchmark):
     return [
         callset
@@ -874,12 +788,6 @@ if "variant-calls" in config:
         classification="fp|fn|tp|tp-baseline",
         comparison="genotype|existence",
         vartype="snvs|indels",
-
-
-def get_downsampled_vep_cache_input():
-    return workflow.source_path(
-        "../resources/ci-test-references/vep_cache_113_GRCh38_chr22.tar.gz",
-    )
 
 
 def get_tabix_revel_params():

@@ -42,14 +42,3 @@ rule sort_vcf:
         "logs/bcftools-sort-vcf/{prefix}.log",
     wrapper:
         "v9.4.2/bio/bcftools/sort"
-
-
-rule vcf_to_bcf:
-    input:
-        "{prefix}.vcf",
-    output:
-        "{prefix}.bcf",
-    log:
-        "logs/bcftools-view-vcf-to-bcf/{prefix}.log",
-    wrapper:
-        "v9.4.1/bio/bcftools/view"

@@ -101,7 +101,6 @@ rule remove_non_pass:
 rule calculate_vaf:
     input:
         bcf="results/filtered-variants/{callset}.bcf",
-        script=workflow.source_path("../scripts/calc-vaf.py"),
     output:
         vcf=temp("results/calculate-vaf/{callset}.added-vaf.vcf"),
     log:
@@ -112,8 +111,19 @@ rule calculate_vaf:
         "../envs/cyvcf.yaml"
     params:
         vaf_args=calc_vaf_args,
-    shell:
-        "python {input.script} {input.bcf} {output.vcf} {params.vaf_args} 2>{log}"
+    script:
+        "../scripts/calc-vaf.py"
+
+
+rule vaf_vcf_to_bcf:
+    input:
+        "results/calculate-vaf/{callset}.added-vaf.vcf",
+    output:
+        "results/calculate-vaf/{callset}.added-vaf.bcf",
+    log:
+        "logs/vaf-vcf-to-bcf/{prefix}.log",
+    wrapper:
+        "v9.4.1/bio/bcftools/view"
 
 
 rule intersect_calls_with_target_regions:
