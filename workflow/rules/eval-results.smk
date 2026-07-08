@@ -205,6 +205,63 @@ rule collect_fp_fn_benchmark:
         "../scripts/collect-fp-fn-benchmarks.py"
 
 
+rule report_fp_fn:
+    input:
+        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
+        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
+        config=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
+    output:
+        report(
+            directory("results/report/fp-fn/genomes/{genome}/{cov}/{classification}"),
+            htmlindex="index.html",
+            category="{classification} variants per genome",
+            subcategory=lambda w: w.genome,
+            labels=lambda w: {
+                "coverage": w.cov,
+                "genome": w.genome,
+            },
+        ),
+    log:
+        "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
+    params:
+        labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
+        version=get_genome_version,
+        somatic=get_somatic_status,
+    wrapper:
+        "v9.12.0/utils/datavzrd"
+
+
+rule report_fp_fn_callset:
+    input:
+        table="results/fp-fn/callsets/{callset}.{classification}.tsv",
+        config=workflow.source_path(
+            "../resources/datavzrd/fp-fn-per-callset-config.yte.yaml"
+        ),
+    output:
+        report(
+            directory("results/report/fp-fn/callsets/{callset}/{classification}"),
+            htmlindex="index.html",
+            category="{classification} variants per benchmark",
+            subcategory=lambda w: config["variant-calls"][w.callset]["benchmark"],
+            labels=lambda w: {
+                "callset": w.callset,
+            },
+        ),
+    log:
+        "logs/datavzrd/fp-fn/{callset}/{classification}.log",
+    params:
+        labels=lambda w: get_callsets_labels(
+            get_benchmark_callsets(config["variant-calls"][w.callset]["benchmark"])
+        ),
+        genome=get_genome_name,
+        version=get_genome_version,
+        somatic=get_somatic_status,
+        high_coverage=get_high_coverage_status,
+    wrapper:
+        "v9.12.0/utils/datavzrd"
+
+
+# TODO: Add rules to include unique and shared fp / fn variants in the report
 rule filter_shared_fn:
     input:
         fn="results/fp-fn/benchmarks/{benchmark}.fn.tsv",
@@ -216,9 +273,6 @@ rule filter_shared_fn:
         "../envs/pysam.yaml"
     script:
         "../scripts/filter-shared-variants.py"
-
-
-# TODO: Add rule to filter shared FP variants
 
 
 rule filter_unique:
@@ -277,62 +331,3 @@ rule write_unique_fp_vcf:
         "../envs/pysam.yaml"
     script:
         "../scripts/write-fp-fn-vcf.py"
-
-
-rule report_fp_fn:
-    input:
-        main_dataset="results/fp-fn/genomes/{genome}/{cov}/{classification}/main.tsv",
-        dependency_sorting_datasets="results/fp-fn/genomes/{genome}/{cov}/{classification}/dependency-sorting",
-        config=workflow.source_path("../resources/datavzrd/fp-fn-config.yte.yaml"),
-    output:
-        report(
-            directory("results/report/fp-fn/genomes/{genome}/{cov}/{classification}"),
-            htmlindex="index.html",
-            category="{classification} variants per genome",
-            subcategory=lambda w: w.genome,
-            labels=lambda w: {
-                "coverage": w.cov,
-                "genome": w.genome,
-            },
-        ),
-    log:
-        "logs/datavzrd/fp-fn/{genome}/{cov}/{classification}.log",
-    params:
-        labels=lambda w: get_callsets_labels(get_genome_callsets(w.genome)),
-        version=get_genome_version,
-        somatic=get_somatic_status,
-    wrapper:
-        "v9.12.0/utils/datavzrd"
-
-
-rule report_fp_fn_callset:
-    input:
-        table="results/fp-fn/callsets/{callset}.{classification}.tsv",
-        config=workflow.source_path(
-            "../resources/datavzrd/fp-fn-per-callset-config.yte.yaml"
-        ),
-    output:
-        report(
-            directory("results/report/fp-fn/callsets/{callset}/{classification}"),
-            htmlindex="index.html",
-            category="{classification} variants per benchmark",
-            subcategory=lambda w: config["variant-calls"][w.callset]["benchmark"],
-            labels=lambda w: {
-                "callset": w.callset,
-            },
-        ),
-    log:
-        "logs/datavzrd/fp-fn/{callset}/{classification}.log",
-    params:
-        labels=lambda w: get_callsets_labels(
-            get_benchmark_callsets(config["variant-calls"][w.callset]["benchmark"])
-        ),
-        genome=get_genome_name,
-        version=get_genome_version,
-        somatic=get_somatic_status,
-        high_coverage=get_high_coverage_status,
-    wrapper:
-        "v9.12.0/utils/datavzrd"
-
-
-# TODO: Add rules to include unique and shared fp / fn variants in the report
