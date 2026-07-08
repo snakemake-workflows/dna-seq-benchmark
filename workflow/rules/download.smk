@@ -2,6 +2,11 @@ rule get_reads:
     output:
         r1="resources/reads/{benchmark}.1.fq",
         r2="resources/reads/{benchmark}.2.fq",
+    log:
+        "logs/download-reads/{benchmark}.log",
+    retries: 3
+    conda:
+        "../envs/pysam.yaml"
     params:
         limit=branch(
             lookup("limit-reads", within=config, default=False),
@@ -9,11 +14,6 @@ rule get_reads:
             otherwise=None,
         ),
         bam_url=get_benchmark_bam_url,
-    log:
-        "logs/download-reads/{benchmark}.log",
-    conda:
-        "../envs/pysam.yaml"
-    retries: 3
     script:
         "../scripts/get-reads.py"
 
@@ -21,13 +21,13 @@ rule get_reads:
 rule get_archive:
     output:
         directory("resources/archives/{genome}"),
-    params:
-        url=get_archive_url,
     log:
         "logs/get-archive/{genome}.log",
+    retries: 3
     conda:
         "../envs/tools.yaml"
-    retries: 3
+    params:
+        url=get_archive_url,
     shell:
         "(mkdir -p {output}; curl -L {params.url} | tar -x -C {output} --strip-components 1) 2> {log}"
 
@@ -39,11 +39,11 @@ rule get_truth:
         "resources/variants/{genome}/{truthset}.truth.bcf",
     log:
         "logs/get-truth/{genome}/{truthset}.log",
+    conda:
+        "../envs/tools.yaml"
     params:
         repl_chr=repl_chr,
         url=get_truth_url,
-    conda:
-        "../envs/tools.yaml"
     shell:
         "ls {input.archive}; (bcftools view {params.url}"
         " | sed {params.repl_chr} | bcftools view -Ob - > {output}"
@@ -86,10 +86,10 @@ rule normalize_truth:
         ref_index="resources/reference/genome.fasta.fai",
     output:
         "resources/variants/{genome}/all.truth.norm.bcf",
-    params:
-        extra=get_norm_params,
     log:
         "logs/normalize-truth/{genome}.log",
+    params:
+        extra=get_norm_params,
     wrapper:
         "v9.4.1/bio/bcftools/norm"
 
@@ -101,11 +101,11 @@ rule get_confidence_bed:
         "resources/regions/{genome}.confidence-regions.bed",
     log:
         "logs/get-confidence-regions/{genome}.log",
+    conda:
+        "../envs/tools.yaml"
     params:
         repl_chr=repl_chr,
         cmd=get_confidence_bed_cmd,
-    conda:
-        "../envs/tools.yaml"
     shell:
         "({params.cmd} | sed {params.repl_chr} > {output}) 2> {log}"
 
@@ -127,13 +127,13 @@ rule get_target_bed:
         liftover="resources/reference/liftover.chain.gz",
     output:
         "resources/regions/{benchmark}/target-regions.raw.bed",
-    params:
-        get_bed=get_target_bed_statement,
-        liftover=get_liftover_statement,
     log:
         "logs/get-target-bed/{benchmark}.log",
     conda:
         "../envs/tools.yaml"
+    params:
+        get_bed=get_target_bed_statement,
+        liftover=get_liftover_statement,
     shell:
         "({params.get_bed} {params.liftover}) 2> {log}"
 
@@ -145,10 +145,10 @@ rule postprocess_target_bed:
         "resources/regions/{benchmark}/target-regions.bed",
     log:
         "logs/fix-target-bed/{benchmark}.log",
-    params:
-        repl_chr=repl_chr,
     conda:
         "../envs/tools.yaml"
+    params:
+        repl_chr=repl_chr,
     shell:
         "sed {params.repl_chr} {input} > {output} 2> {log}"
 
@@ -156,15 +156,15 @@ rule postprocess_target_bed:
 rule get_reference:
     output:
         "resources/reference/genome.fasta",
+    log:
+        "logs/get-genome.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         species="homo_sapiens",
         datatype="dna",
         build=get_reference_genome_build(),
         release="104",
         chromosome="1" if config.get("limit-reads") else None,
-    log:
-        "logs/get-genome.log",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "v9.12.0/bio/reference/ensembl-sequence"
 
@@ -212,11 +212,11 @@ rule bwa_mem:
         "results/read-alignments/{benchmark}.bam",
     log:
         "logs/bwa-mem/{benchmark}.log",
+    threads: 8
     params:
         extra=r"-R '@RG\tID:{benchmark}\tSM:{benchmark}'",
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
-    threads: 8
     wrapper:
         "v9.9.0/bio/bwa/mem"
 
@@ -229,10 +229,10 @@ rule mark_duplicates:
         metrics="results/read-alignments/{benchmark}.dedup.metrics.txt",
     log:
         "logs/picard-dedup/{benchmark}.log",
-    params:
-        extra="--REMOVE_DUPLICATES true",
     resources:
         mem_mb=1024,
+    params:
+        extra="--REMOVE_DUPLICATES true",
     wrapper:
         "v9.4.2/bio/picard/markduplicates"
 
@@ -259,11 +259,11 @@ rule mosdepth:
         summary="results/coverage/{benchmark}/coverage.mosdepth.summary.txt",  # this named output is required for prefix parsing
     log:
         "logs/mosdepth/{benchmark}.log",
+    # additional decompression threads through `--threads`
+    threads: 4  # This value - 1 will be sent to `--threads`
     params:
         extra="--mapq 59",  # we do not want low MAPQ regions end up being marked as high coverage
         quantize=get_mosdepth_quantize,
-    # additional decompression threads through `--threads`
-    threads: 4  # This value - 1 will be sent to `--threads`
     wrapper:
         "v9.8.0/bio/mosdepth"
 
@@ -275,13 +275,13 @@ rule stratify_regions:
         coverage="results/coverage/{benchmark}/coverage.quantized.bed.gz",
     output:
         "resources/regions/{benchmark}/test-regions.cov-{cov}.bed",
-    params:
-        cov_label=get_cov_label,
-        intersect_target_regions=get_target_regions_intersect_statement,
     log:
         "logs/stratify-regions/{benchmark}/{cov}.log",
     conda:
         "../envs/tools.yaml"
+    params:
+        cov_label=get_cov_label,
+        intersect_target_regions=get_target_regions_intersect_statement,
     shell:
         # The intersection can generate duplicate or overlapping entries if
         # the target regions bed contains overlapping entries.
