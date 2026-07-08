@@ -1,0 +1,56 @@
+name: Autobump snakefmt
+
+# run every month
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+# cancel any in-progress runs if a new commit is pushed
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
+concurrency:
+  group: 'autobump-formatting'
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  autobump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install latest snakemake + snakefmt
+        run: pip install --upgrade snakemake
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          version=$(pip show snakemake | grep -E '^Version:' | cut -d' ' -f2)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Format with snakefmt
+        run: snakefmt .
+
+      - name: Check for formatting changes
+        id: check
+        shell: bash
+        run: |  
+          if ! git diff --quiet; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No formatting changes detected. Skipping PR."
+            exit 0
+          fi
+
+      - name: Create Pull Request
+        if: steps.check.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: chore/autobump-formatting
+          title: "chore: run snakefmt . with snakemake ${{ steps.version.outputs.version }}"
+          token: ${{ secrets.AUTOBUMP_PAT }}
+          commit-message: "chore: run snakefmt . with snakemake ${{ steps.version.outputs.version }}"

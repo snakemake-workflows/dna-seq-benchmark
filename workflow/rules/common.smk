@@ -496,9 +496,11 @@ def _get_nonempty_coverages(callset):
         coverages = low_coverages
 
     def isempty(cov):
-        with checkpoints.stat_truth.get(benchmark=benchmark, cov=cov).output[
-            0
-        ].open() as f:
+        with (
+            checkpoints.stat_truth.get(benchmark=benchmark, cov=cov)
+            .output[0]
+            .open() as f
+        ):
             stat = json.load(f)
         return stat["isempty"]
 
