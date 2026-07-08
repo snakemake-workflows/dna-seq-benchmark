@@ -673,6 +673,29 @@ def get_collect_stratifications_fp_fn_input(wildcards):
     )
 
 
+def get_fp_fn_reports(wildcards):
+    for genome in used_genomes:
+        yield from expand(
+            "results/report/fp-fn/genomes/{genome}/{cov}/{classification}",
+            genome=genome,
+            cov={
+                cov
+                for callset in get_genome_callsets(genome)
+                for cov in _get_nonempty_coverages(callset)
+            },
+            classification=["fp", "fn"],
+        )
+
+
+def get_fp_fn_reports_benchmarks(wildcards):
+    for genome in used_genomes:
+        yield from expand(
+            "results/report/fp-fn/benchmarks/{benchmark}/{classification}",
+            benchmark={benchmark for benchmark in used_benchmarks},
+            classification=["fp", "fn"],
+        )
+
+
 def get_benchmark_callsets(benchmark):
     return [
         callset
