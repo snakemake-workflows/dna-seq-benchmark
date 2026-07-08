@@ -122,7 +122,7 @@ rule convert_vaf_bcf:
     input:
         vcf="results/calculate-vaf/{callset}.added-vaf.vcf",
     output:
-        bcf="results/calculate-vaf/{callset}.added-vaf.bcf",
+        bcf=temp("results/calculate-vaf/{callset}.added-vaf.bcf"),
     log:
         "logs/convert-vaf-bcf/{callset}.log",
     wildcard_constraints:

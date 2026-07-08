@@ -569,8 +569,6 @@ def _normalise_vaf_field(value):
         return None
     if value == "tbc":
         return {"field": "FORMAT", "name": "VAF"}
-    if isinstance(value, dict):
-        return value
     return value
 
 
