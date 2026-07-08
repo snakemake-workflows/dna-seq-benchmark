@@ -29,18 +29,6 @@ if "variant-calls" in config:
                 classification=["fp", "fn"],
             ),
             get_fp_fn_reports,
-<<<<<<< feat/calculate-vaf
-            # expand(
-            #     "results/annotated/tsv/{benchmark}/{benchmark}.shared_fn.annotated.tsv",
-            #     benchmark=used_benchmarks,
-            # ),
-            # expand(
-            #     "results/annotated/tsv/{benchmark_callset[0]}/{benchmark_callset[1]}.unique_{classification}.annotated.tsv",
-            #     benchmark_callset=used_benchmarks_callsets,
-            #     classification=["fp", "fn"],
-            # ),
-=======
->>>>>>> main
 
     rule eval:
         input:
