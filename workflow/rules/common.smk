@@ -478,6 +478,16 @@ def get_coverages(wildcards):
     return coverages
 
 
+def get_coverages_of_callset(callset):
+    benchmark = config["variant-calls"][callset]["benchmark"]
+    high_cov_status = benchmarks[benchmark].get("high-coverage")
+    if high_cov_status:
+        coverages = high_coverages
+    else:
+        coverages = low_coverages
+    return coverages
+
+
 def get_somatic_status(wildcards):
     if hasattr(wildcards, "benchmark"):
         return genomes[benchmarks[wildcards.benchmark]["genome"]].get("somatic")
