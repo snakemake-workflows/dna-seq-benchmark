@@ -100,7 +100,7 @@ rule remove_non_pass:
 
 rule calculate_vaf:
     input:
-        vcf="results/filtered-variants/{callset}.bcf",
+        bcf="results/filtered-variants/{callset}.bcf",
         script=workflow.source_path("../scripts/calc-vaf.py"),
     output:
         vcf=temp("results/calculate-vaf/{callset}.added-vaf.vcf"),
@@ -113,26 +113,7 @@ rule calculate_vaf:
     params:
         vaf_args=calc_vaf_args,
     shell:
-        """
-        python {input.script} {input.vcf} {output.vcf} {params.vaf_args} 2>{log}
-        """
-
-
-rule convert_vaf_bcf:
-    input:
-        vcf="results/calculate-vaf/{callset}.added-vaf.vcf",
-    output:
-        bcf=temp("results/calculate-vaf/{callset}.added-vaf.bcf"),
-    log:
-        "logs/convert-vaf-bcf/{callset}.log",
-    wildcard_constraints:
-        callset=tbc_callset_constraint,
-    conda:
-        "../envs/tools.yaml"
-    shell:
-        """
-        bcftools view {input.vcf} -O b -o {output.bcf} 2>{log}
-        """
+        "python {input.script} {input.bcf} {output.vcf} {params.vaf_args} 2>{log}"
 
 
 rule intersect_calls_with_target_regions:
