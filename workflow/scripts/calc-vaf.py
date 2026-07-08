@@ -155,12 +155,11 @@ def calculate_vaf_from_fields(variant, samples, field, name, den_field=None, den
         den_arr = np.array(den_val, dtype=np.float32)
 
         if num_arr.shape == (n_samples,):
-            if den_arr.shape == ():
-                den_scalar = float(den_arr)
-            elif den_arr.shape == (n_samples,):
-                den_scalar = den_arr
-            else:
+            den_arr = np.atleast_1d(np.squeeze(den_arr))
+            if len(den_arr) == 1:
                 den_scalar = float(den_arr[0])
+            else:
+                den_scalar = den_arr
             for i in range(n_samples):
                 d = float(den_scalar[i]) if np.ndim(den_scalar) > 0 else float(den_scalar)
                 if d != 0:
@@ -179,11 +178,15 @@ def calculate_vaf_from_fields(variant, samples, field, name, den_field=None, den
                         if den_arr[i, j] != 0:
                             vaf_values[i, j] = float(num_arr[i, j]) / float(den_arr[i, j])
             else:
-                den_scalar = float(den_arr)
-                for i in range(n_samples):
-                    for j in range(n_alt_alleles):
-                        if den_scalar != 0:
-                            vaf_values[i, j] = float(num_arr[i, j]) / den_scalar
+                den_arr = np.atleast_1d(np.squeeze(den_arr))
+                if len(den_arr) == n_samples:
+                    for i in range(n_samples):
+                        d = float(den_arr[i])
+                        if d != 0:
+                            for j in range(n_alt_alleles):
+                                vaf_values[i, j] = float(num_arr[i, j]) / d
+                else:
+                    return None
 
     return vaf_values
 
