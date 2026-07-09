@@ -29,7 +29,7 @@ rule merge_callsets:
 
 rule liftover_callset:
     input:
-        callset=get_callset_correct_contigs,,
+        callset=get_callset_correct_contigs,
         liftover_chain="resources/liftover/GRCh37_to_GRCh38.chain.gz",
         reference="resources/reference/genome.fasta",
         reference_dict="resources/reference/genome.fasta.dict",
