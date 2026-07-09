@@ -223,7 +223,16 @@ def get_callset(wildcards):
         return get_raw_callset(wildcards)
 
 
-def get_callset_correct_contigs_liftover_merge(wildcards):
+def get_callset_merged(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    vcf = callset["path"]
+    if isinstance(vcf, dict):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
+    else:
+        return get_raw_callset(wildcards)
+
+
+def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
     if callset.get("rename-contigs", False):
