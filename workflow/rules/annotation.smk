@@ -24,7 +24,7 @@ rule get_vep_cache:
         build=get_reference_genome_build(),
         release="115",
     wrapper:
-        "v7.6.0/bio/vep/cache"
+        "v9.9.0/bio/vep/cache"
 
 
 rule get_vep_plugins:
@@ -114,7 +114,7 @@ rule annotate_shared_fn:
         plugins=["REVEL"],
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.9.0/bio/vep/annotate"
 
 
 rule annotate_unique_fp_fn:
@@ -140,7 +140,7 @@ rule annotate_unique_fp_fn:
         plugins=["REVEL"],
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.9.0/bio/vep/annotate"
 
 
 rule vembrane_table_shared_fn:
