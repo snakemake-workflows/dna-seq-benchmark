@@ -1,13 +1,44 @@
 from collections import defaultdict
-import sys, os
+import sys
+import numpy as np
 
-# sys.path.insert(0, os.path.dirname(__file__))
 sys.stderr = open(snakemake.log[0], "w")
 
 import csv
 import pysam
 
 from common.classification import CompareExistence, Class, is_het
+
+
+def get_vaf_from_record(record, field, name):
+    """Extract VAF value from a record, handling FORMAT and INFO fields."""
+    try:
+        if field == "INFO":
+            vaf = record.info.get(name)
+        else:
+            sample_name = list(record.samples.keys())[0]
+            vaf = record.samples[sample_name].get(name)
+    except (KeyError, IndexError, AttributeError):
+        return float('nan')
+
+    if isinstance(vaf, (list, tuple, np.ndarray, np.generic)):
+        if hasattr(vaf, 'item'):
+            vaf = vaf.item()
+        elif len(vaf) > 0:
+            vaf = vaf[0]
+        else:
+            return float('nan')
+
+    if isinstance(vaf, str):
+        vaf = float(vaf.replace("%", "")) / 100
+
+    if hasattr(vaf, 'item'):
+        vaf = vaf.item()
+
+    try:
+        return float(vaf)
+    except (ValueError, TypeError):
+        return float('nan')
 
 cmp = CompareExistence()
 varfile = pysam.VariantFile(snakemake.input.calls)
@@ -48,40 +79,29 @@ with open(snakemake.output[0], "w", newline="") as outfile:
                 classification = "FP"
                 truth_gt = "0/0"
                 query_gt = "0/1" if is_het(record, 1, c.variant) else "1/1"
-                if vaf_fields[0] is not None:
+                if vaf_field_query is not None:
                     r = list(query.fetch(record.contig, record.start, record.stop))
                     if len(r) > 0:
                         r = r[0]
-                    try:
-                        vaf = r.info[vaf_field_name_query] if vaf_field_query == "INFO" else r.samples[0][vaf_field_name_query]
-                    except (KeyError, IndexError):
-                        vaf = float('nan')
+                    vaf = get_vaf_from_record(r, vaf_field_query, vaf_field_name_query)
                 else:
-                    #No VAF information available -> float na
+                    # No VAF information available -> float na
                     vaf = float('nan')
 
             elif c.cls == Class.FN and snakemake.wildcards.classification == "fn":
                 classification = "FN"
                 truth_gt = "0/1" if is_het(record, 0, c.variant) else "1/1"
                 query_gt = ""
-                if vaf_fields[1] is not None:
+                if vaf_field_truth is not None:
                     r = list(truth.fetch(record.contig, record.start, record.stop))
                     if len(r) > 0:
                         r = r[0]
-                    try:
-                        vaf = r.info[vaf_field_name_truth] if vaf_field_truth == "INFO" else r.samples[0][vaf_field_name_truth]
-                    except (KeyError, IndexError):
-                        vaf = float('nan')
+                    vaf = get_vaf_from_record(r, vaf_field_truth, vaf_field_name_truth)
                 else:
-                    #No VAF information available -> float na
+                    # No VAF information available -> float na
                     vaf = float('nan')
             else:
                 continue
-
-            if isinstance(vaf, tuple):
-                vaf = vaf[0]
-            if isinstance(vaf, str):
-                vaf = float(vaf.replace("%", "")) / 100
 
             for alt in c.variant.alts:
                 writer.writerow(

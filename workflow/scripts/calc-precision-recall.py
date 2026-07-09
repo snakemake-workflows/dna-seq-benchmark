@@ -1,7 +1,6 @@
 from collections import defaultdict
-import sys, os
+import sys
 
-# sys.path.insert(0, os.path.dirname(__file__))
 sys.stderr = open(snakemake.log[0], "w")
 
 from abc import ABC, abstractmethod
@@ -153,12 +152,45 @@ def collect_results_somatic():
 # --- Germline helpers ---
 
 import pysam
+import numpy as np
 
 from common.classification import CompareExactGenotype, CompareExistence, Class
 
 
+def get_vaf_from_record(record, field, name):
+    """Extract VAF value from a record, handling FORMAT and INFO fields."""
+    try:
+        if field == "INFO":
+            vaf = record.info.get(name)
+        else:
+            sample_name = list(record.samples.keys())[0]
+            vaf = record.samples[sample_name].get(name)
+    except (KeyError, IndexError, AttributeError):
+        return float('nan')
+
+    if isinstance(vaf, (list, tuple, np.ndarray, np.generic)):
+        if hasattr(vaf, 'item'):
+            vaf = vaf.item()
+        elif len(vaf) > 0:
+            vaf = vaf[0]
+        else:
+            return float('nan')
+
+    if isinstance(vaf, str):
+        vaf = float(vaf.replace("%", "")) / 100
+
+    if hasattr(vaf, 'item'):
+        vaf = vaf.item()
+
+    try:
+        return float(vaf)
+    except (ValueError, TypeError):
+        return float('nan')
+
+
 class GermlineClassifications:
     def __init__(self, comparator, vaf_fields):
+        self._vaf_getter = get_vaf_from_record
         self.comparator = comparator
         # if vaf information is given: stratify results by vaf and add addtional counters for stratified tp, fp, fn
         if vaf_fields[0] is not None and vaf_fields[1] is not None:
@@ -185,22 +217,23 @@ class GermlineClassifications:
         self.fn = 0
         self.fp = 0
 
+    def _get_vaf_from_record(self, record, field, name):
+        """Extract VAF value from a record (delegates to common.vaf_utils)."""
+        return self._vaf_getter(record, field, name)
+
     def increment_counter(self, current_record, other_record, counter, counter_vaf, fp=False):
         if self.stratify_by_vaf:
             r = list(other_record.fetch(current_record.contig, current_record.start, current_record.stop))
             if len(r) > 0:
                 r = r[0]
                 if fp:
-                    vaf = r.info[self.vaf_field_name_query] if self.vaf_field_query == "INFO" else r.samples[0][self.vaf_field_name_query]
+                    vaf = self._get_vaf_from_record(r, self.vaf_field_query, self.vaf_field_name_query)
                 else:
-                    vaf = r.info[self.vaf_field_name_truth] if self.vaf_field_truth == "INFO" else r.samples[0][self.vaf_field_name_truth]
-                if isinstance(vaf, tuple):
-                    vaf = vaf[0]
-                if isinstance(vaf, str):
-                    vaf = float(vaf.replace("%", "")) / 100
+                    vaf = self._get_vaf_from_record(r, self.vaf_field_truth, self.vaf_field_name_truth)
                 # 10 equally sized bins
-                bin = max(0, int(vaf*10) - 1)
-                counter_vaf[bin] += 1
+                if not np.isnan(vaf):
+                    bin_idx = max(0, min(9, int(vaf * 10)))
+                    counter_vaf[bin_idx] += 1
 
         counter += 1
         return (counter, counter_vaf)
