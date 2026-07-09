@@ -8,3 +8,5 @@ logs/**
 data/**
 report/**
 test/**
+*.pyc
+__pycache__/

@@ -98,12 +98,40 @@ rule remove_non_pass:
         "v9.4.1/bio/bcftools/view"
 
 
-rule intersect_calls_with_target_regions:
+rule calculate_vaf:
     input:
         bcf="results/filtered-variants/{callset}.bcf",
+    output:
+        vcf=temp("results/calculate-vaf/{callset}.added-vaf.vcf"),
+    log:
+        "logs/calculate-vaf/{callset}.log",
+    wildcard_constraints:
+        callset=tbc_callset_constraint,
+    conda:
+        "../envs/cyvcf.yaml"
+    params:
+        vaf_args=calc_vaf_args,
+    script:
+        "../scripts/calc-vaf.py"
+
+
+rule vaf_vcf_to_bcf:
+    input:
+        "results/calculate-vaf/{callset}.added-vaf.vcf",
+    output:
+        "results/calculate-vaf/{callset}.added-vaf.bcf",
+    log:
+        "logs/vaf-vcf-to-bcf/{callset}.log",
+    wrapper:
+        "v9.4.1/bio/bcftools/view"
+
+
+rule intersect_calls_with_target_regions:
+    input:
+        bcf=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
         regions=get_target_regions,
     output:
-        pipe("results/normalized-variants/{callset}_intersected.vcf"),
+        "results/normalized-variants/{callset}_intersected.vcf",
     log:
         "logs/intersect-calls/{callset}.log",
     conda:
@@ -115,8 +143,12 @@ rule intersect_calls_with_target_regions:
 
 rule restrict_to_reference_contigs:
     input:
-        calls="results/filtered-variants/{callset}.bcf",
-        calls_index="results/filtered-variants/{callset}.bcf.csi",
+        calls=lambda wildcards: get_vaf_calculated_input(wildcards, wildcards.callset),
+        calls_index=lambda wildcards: (
+            f"results/calculate-vaf/{wildcards.callset}.bcf.csi"
+            if get_vaf_calc_status(wildcards)
+            else f"results/filtered-variants/{wildcards.callset}.bcf.csi"
+        ),
         ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/filtered-variants/{callset}_restricted.bcf",
@@ -131,13 +163,8 @@ rule restrict_to_reference_contigs:
 
 rule normalize_calls:
     input:
-        calls=branch(
-            intersect_calls,
-            then="results/normalized-variants/{callset}_intersected.vcf",
-            otherwise="results/filtered-variants/{callset}_restricted.bcf",
-        ),
+        calls=get_normalized_calls_input,
         ref="resources/reference/genome.fasta",
-        ref_index="resources/reference/genome.fasta.fai",
     output:
         "results/normalized-variants/{callset}.vcf.gz",
     log:
@@ -147,8 +174,10 @@ rule normalize_calls:
     params:
         extra=get_norm_params,
     shell:
-        "(bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} | "
-        "bcftools view -Oz > {output}) 2> {log}"
+        """
+        (bcftools norm {params.extra} --fasta-ref {input.ref} {input.calls} \
+            | bcftools view -Oz >{output}) 2>{log}
+        """
 
 
 rule stratify_truth:
