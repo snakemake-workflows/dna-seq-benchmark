@@ -53,7 +53,7 @@ rule liftover_callset:
 
 rule rename_contigs:
     input:
-        calls=get_callset_correct_contigs_liftover_merge,
+        calls=get_callset_merged,
         repl_file=get_rename_contig_file,
     output:
         "results/normalized-variants/{callset}.replaced-contigs.vcf.gz",
@@ -295,8 +295,7 @@ rule benchmark_variants_somatic:
     threads: 32
     params:
         output=lambda w, output: os.path.dirname(output[0]),
-        somatic=get_somatic_flag,
     shell:
         "rm -r {params.output}; rtg vcfeval --threads {threads} --ref-overlap --all-records --no-roc "
         "--output-mode split --baseline {input.truth} --calls {input.query} "
-        "--output {params.output} --template {input.genome} {params.somatic} &> {log}"
+        "--output {params.output} --template {input.genome} --sample ALT,ALT &> {log}"

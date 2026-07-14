@@ -26,7 +26,7 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             get_fp_fn_reports,
 
@@ -40,12 +40,12 @@ if "variant-calls" in config:
             expand(
                 "results/report/fp-fn/callsets/{callset}/{classification}",
                 callset=used_callsets,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             expand(
                 "results/fp-fn/benchmarks/{benchmark}.{classification}.tsv",
                 benchmark=used_benchmarks,
-                classification=["fp", "fn"],
+                classification=["fp", "fn", "tp", "tp-baseline"],
             ),
             get_fp_fn_reports,
             # collect the checkpoint inputs to avoid issues when

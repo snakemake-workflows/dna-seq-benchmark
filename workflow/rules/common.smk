@@ -213,11 +213,20 @@ def get_cov_interval(name, coverages):
 def get_callset(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
-    if callset.get("rename-contigs", False):
-        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif callset.get("genome-build", "grch38") == "grch37":
+    if callset.get("genome-build", "grch38") == "grch37":
         return "results/normalized-variants/{callset}.lifted.vcf.gz"
+    elif callset.get("rename-contigs", False):
+        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
     elif isinstance(vcf, dict):
+        return "results/merge-callsets/{callset}.merged.vcf.gz"
+    else:
+        return get_raw_callset(wildcards)
+
+
+def get_callset_merged(wildcards):
+    callset = config["variant-calls"][wildcards.callset]
+    vcf = callset["path"]
+    if isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -227,19 +236,8 @@ def get_callset_correct_contigs(wildcards):
     callset = config["variant-calls"][wildcards.callset]
     vcf = callset["path"]
     if callset.get("rename-contigs", False):
-        return "results/normalized-variants/{callset}.replaced-contigs.vcf.gz"
-    elif callset.get("genome-build", "grch38") == "grch37":
-        return "results/normalized-variants/{callset}.lifted.vcf.gz"
+        return ("results/normalized-variants/{callset}.replaced-contigs.vcf.gz",)
     elif isinstance(vcf, dict):
-        return "results/merge-callsets/{callset}.merged.vcf.gz"
-    else:
-        return get_raw_callset(wildcards)
-
-
-def get_callset_correct_contigs_liftover_merge(wildcards):
-    callset = config["variant-calls"][wildcards.callset]
-    vcf = callset["path"]
-    if isinstance(vcf, dict):
         return "results/merge-callsets/{callset}.merged.vcf.gz"
     else:
         return get_raw_callset(wildcards)
@@ -422,7 +420,7 @@ def get_norm_params(wildcards):
     target = ""
     if config.get("limit-reads"):
         target = "--targets 1"
-    return f"--atomize --check-ref s --rm-dup exact {target}"
+    return f"--atomize --atom-overlaps . --check-ref s --rm-dup exact -m-both {target}"
 
 
 def get_mosdepth_input(bai=False):
@@ -630,28 +628,24 @@ def get_precision_recall_input(wildcards):
 
 
 def get_fp_fn_expression(wildcards):
-    if get_vaf_status(wildcards):
-        vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
-        if (
-            wildcards.get("classification") == "fn"
-            or wildcards.get("classification") == "tp-baseline"
-        ):
-            vaf = vaf_benchmark
-        else:
-            vaf = vaf_callset
-        if vaf is not None:
-            vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
-            return f"CHROM, POS, ALT, REF, {vaf_expr}"
-        else:
-            return "CHROM, POS, ALT, REF"
+    vaf_callset, vaf_benchmark = get_vaf_fields(wildcards)
+    if hasattr(wildcards, "classification") and (
+        wildcards.classification == "fn" or wildcards.classification == "tp-baseline"
+    ):
+        vaf = vaf_benchmark
     else:
-        return "CHROM, POS, ALT, REF"
+        vaf = vaf_callset
+
+    if vaf is not None:
+        vaf_expr = f'{vaf["field"]}["{vaf["name"]}"]'
+        return f"CHROM, POS, ALT, REF, {vaf_expr}"
+    return "CHROM, POS, ALT, REF"
 
 
 def get_rename_expression(wildcards):
     fp_fn_expr = get_fp_fn_expression(wildcards)
     expr_list = fp_fn_expr.split(", ")
-    if get_vaf_status(wildcards):
+    if len(expr_list) == 5:
         rename_list = ["chromosome", "position", "alt_allele", "ref_allele", "vaf"]
     else:
         rename_list = ["chromosome", "position", "alt_allele", "ref_allele"]
@@ -676,10 +670,16 @@ def get_collect_stratifications_input(wildcards):
     )
 
 
+def _get_fp_fn_classifications(wildcards):
+    """Return the list of classifications to collect for the given callset/genome."""
+    return ["fp", "fn", "tp", "tp-baseline"]
+
+
 def get_collect_stratifications_fp_fn_input(wildcards):
     return expand(
         "results/fp-fn/callsets/{{callset}}/{cov}.{{classification}}.tsv",
         cov=get_nonempty_coverages(wildcards),
+        classification=_get_fp_fn_classifications(wildcards),
     )
 
 
@@ -734,7 +734,9 @@ def get_report_precision_recall_input(wildcards):
 def get_collect_fp_fn_benchmark_input(wildcards):
     callsets = get_benchmark_callsets(wildcards.benchmark)
     return expand(
-        "results/fp-fn/callsets/{callset}.{{classification}}.tsv", callset=callsets
+        "results/fp-fn/callsets/{callset}.{{classification}}.tsv",
+        callset=callsets,
+        classification=_get_fp_fn_classifications(wildcards),
     )
 
 
@@ -801,6 +803,7 @@ def get_collect_fp_fn_input(wildcards):
     return expand(
         "results/fp-fn/callsets/{callset}/{{cov}}.{{classification}}.tsv",
         callset=callsets,
+        classification=_get_fp_fn_classifications(wildcards),
     )
 
 

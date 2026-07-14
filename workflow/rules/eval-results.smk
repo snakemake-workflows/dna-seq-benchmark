@@ -9,7 +9,7 @@ rule extract_fp_fn:
         query="results/stratified-variants/{callset}/{cov}.vcf.gz",
         query_idx="results/stratified-variants/{callset}/{cov}.vcf.gz.tbi",
     output:
-        temp("results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv"),
+        "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     log:
         "logs/extract-fp-fn/{callset}/{cov}.{classification}.germline.log",
     wildcard_constraints:
@@ -47,9 +47,7 @@ rule reformat_fp_fn_tp_tables:
     input:
         table="results/intermediate/fp-fn/raw/callsets/{callset}/{cov}.{classification}.tsv",
     output:
-        renamed_table=temp(
-            "results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv"
-        ),
+        renamed_table="results/fp-fn/callsets/{callset}/{cov}.{classification}.tsv",
     log:
         "logs/reformat-fp-fn-tp-tables/{callset}/{cov}/{classification}.log",
     wildcard_constraints:
@@ -84,7 +82,7 @@ rule collect_stratifications:
     input:
         get_collect_stratifications_input,
     output:
-        temp("results/precision-recall/callsets/{callset}.{vartype}.{mode}.tsv"),
+        "results/precision-recall/callsets/{callset}.{vartype}.{mode}.tsv",
     log:
         "logs/collect-stratifications/{callset}/{vartype}.{mode}.log",
     # We want this to be determined before FP/FN collection in order to avoid memory
