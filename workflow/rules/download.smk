@@ -91,7 +91,7 @@ rule normalize_truth:
     params:
         extra=get_norm_params,
     wrapper:
-        "v9.4.1/bio/bcftools/norm"
+        "v9.15.0/bio/bcftools/norm"
 
 
 rule get_confidence_bed:
@@ -188,7 +188,7 @@ rule samtools_faidx:
     log:
         "logs/samtools-faidx.log",
     wrapper:
-        "v9.4.1/bio/samtools/faidx"
+        "v9.15.0/bio/samtools/faidx"
 
 
 rule bwa_index:
@@ -218,7 +218,7 @@ rule bwa_mem:
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     wrapper:
-        "v9.9.0/bio/bwa/mem"
+        "v9.15.0/bio/bwa/mem"
 
 
 rule mark_duplicates:
@@ -234,7 +234,7 @@ rule mark_duplicates:
     params:
         extra="--REMOVE_DUPLICATES true",
     wrapper:
-        "v9.4.2/bio/picard/markduplicates"
+        "v9.15.0/bio/picard/markduplicates"
 
 
 rule samtools_index:
@@ -246,7 +246,7 @@ rule samtools_index:
         "logs/samtools-index/{benchmark}.log",
     threads: 4  # This value - 1 will be sent to -@
     wrapper:
-        "v9.4.1/bio/samtools/index"
+        "v9.14.0/bio/samtools/index"
 
 
 rule mosdepth:
