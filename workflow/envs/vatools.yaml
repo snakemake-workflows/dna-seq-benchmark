@@ -3,8 +3,5 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - python =3.8
-  - pip =24.0
-  - bcftools
-  - pip:
-    - vatools
+  - bcftools =1.24
+  - vatools =6.0.1
