@@ -95,7 +95,7 @@ rule remove_non_pass:
     params:
         extra="-f 'PASS,.'",
     wrapper:
-        "v9.4.1/bio/bcftools/view"
+        "v9.15.0/bio/bcftools/view"
 
 
 rule calculate_vaf:
@@ -123,7 +123,7 @@ rule vaf_vcf_to_bcf:
     log:
         "logs/vaf-vcf-to-bcf/{callset}.log",
     wrapper:
-        "v9.4.1/bio/bcftools/view"
+        "v9.15.0/bio/bcftools/view"
 
 
 rule intersect_calls_with_target_regions:
@@ -220,7 +220,7 @@ rule index_stratified_truth:
     log:
         "logs/bcftools-index/{benchmark}.truth.{cov}.log",
     wrapper:
-        "v9.4.2/bio/bcftools/index"
+        "v9.15.0/bio/bcftools/index"
 
 
 checkpoint stat_truth:

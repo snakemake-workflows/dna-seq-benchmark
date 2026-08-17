@@ -22,9 +22,9 @@ rule get_vep_cache:
     params:
         species="homo_sapiens",
         build=get_reference_genome_build(),
-        release="115",
+        release="116",
     wrapper:
-        "v7.6.0/bio/vep/cache"
+        "v9.9.0/bio/vep/cache"
 
 
 rule get_vep_plugins:
@@ -33,7 +33,7 @@ rule get_vep_plugins:
     log:
         "logs/vep/plugins.log",
     params:
-        release="115",
+        release="116",
     wrapper:
         "v9.11.0/bio/vep/plugins"
 
@@ -88,7 +88,7 @@ rule tabix_revel_scores:
     params:
         get_tabix_revel_params(),
     wrapper:
-        "v9.4.1/bio/tabix/index"
+        "v9.14.0/bio/tabix/index"
 
 
 rule annotate_shared_fn:
@@ -114,7 +114,7 @@ rule annotate_shared_fn:
         plugins=["REVEL"],
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.14.0/bio/vep/annotate"
 
 
 rule annotate_unique_fp_fn:
@@ -140,7 +140,7 @@ rule annotate_unique_fp_fn:
         plugins=["REVEL"],
         extra="--everything --check_existing --vcf_info_field ANN --hgvsg --sift b --polyphen b ",
     wrapper:
-        "v8.0.0/bio/vep/annotate"
+        "v9.14.0/bio/vep/annotate"
 
 
 rule vembrane_table_shared_fn:
