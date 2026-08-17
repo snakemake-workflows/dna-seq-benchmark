@@ -22,7 +22,7 @@ rule get_vep_cache:
     params:
         species="homo_sapiens",
         build=get_reference_genome_build(),
-        release="115",
+        release="116",
     wrapper:
         "v9.9.0/bio/vep/cache"
 
@@ -33,7 +33,7 @@ rule get_vep_plugins:
     log:
         "logs/vep/plugins.log",
     params:
-        release="115",
+        release="116",
     wrapper:
         "v9.11.0/bio/vep/plugins"
 
