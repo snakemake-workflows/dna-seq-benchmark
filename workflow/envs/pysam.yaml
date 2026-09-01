@@ -3,7 +3,7 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - python =3.13.14
+  - python =3.13.15
   - pysam =0.24.0
   - pandas =3.0.5
   - dnaio =1.2.4
