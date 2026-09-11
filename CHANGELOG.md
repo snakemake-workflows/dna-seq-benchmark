@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.17.1](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.17.0...v1.17.1) (2026-09-11)
+
+
+### Performance Improvements
+
+* autobump conda envs ([#184](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/184)) ([bbe3107](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/bbe31075039164314884e718641bec0e9be13815))
+* autobump snakemake wrappers ([#183](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/183)) ([c4c6b89](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/c4c6b8933f0f7034e240bb6727757112113d61f9))
+* autobump snakemake wrappers ([#187](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/187)) ([c3419ac](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/c3419ac92b45ff32a437b7e54751f729c3007eb4))
+* swap vatools to conda package and enable auto-update of its env ([#185](https://github.com/snakemake-workflows/dna-seq-benchmark/issues/185)) ([f96375f](https://github.com/snakemake-workflows/dna-seq-benchmark/commit/f96375fe0e37aabad569ec42f145c1820b0c7a58))
+
 ## [1.17.0](https://github.com/snakemake-workflows/dna-seq-benchmark/compare/v1.16.0...v1.17.0) (2026-07-14)
 
 
