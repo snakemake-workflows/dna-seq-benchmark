@@ -139,7 +139,7 @@ rule report_precision_recall:
         genome=get_genome_name,
         version=get_genome_version,
     wrapper:
-        "v9.12.0/utils/datavzrd"
+        "v9.17.0/utils/datavzrd"
 
 
 # TODO: if one of the input callsets has all sites as FN, the resulting merged table
@@ -226,7 +226,7 @@ rule report_fp_fn:
         version=get_genome_version,
         somatic=get_somatic_status,
     wrapper:
-        "v9.12.0/utils/datavzrd"
+        "v9.17.0/utils/datavzrd"
 
 
 rule report_fp_fn_callset:
@@ -256,7 +256,7 @@ rule report_fp_fn_callset:
         somatic=get_somatic_status,
         high_coverage=get_high_coverage_status,
     wrapper:
-        "v9.12.0/utils/datavzrd"
+        "v9.17.0/utils/datavzrd"
 
 
 # TODO: Add rules to include unique and shared fp / fn variants in the report

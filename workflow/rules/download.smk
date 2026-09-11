@@ -218,7 +218,7 @@ rule bwa_mem:
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
     wrapper:
-        "v9.15.0/bio/bwa/mem"
+        "v9.16.0/bio/bwa/mem"
 
 
 rule mark_duplicates:
@@ -234,7 +234,7 @@ rule mark_duplicates:
     params:
         extra="--REMOVE_DUPLICATES true",
     wrapper:
-        "v9.15.0/bio/picard/markduplicates"
+        "v9.16.0/bio/picard/markduplicates"
 
 
 rule samtools_index:
