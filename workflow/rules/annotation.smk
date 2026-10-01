@@ -24,7 +24,7 @@ rule get_vep_cache:
         build=get_reference_genome_build(),
         release="116",
     wrapper:
-        "v9.16.0/bio/vep/cache"
+        "v9.18.0/bio/vep/cache"
 
 
 rule get_vep_plugins:
