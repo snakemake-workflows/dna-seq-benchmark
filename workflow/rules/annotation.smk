@@ -24,7 +24,7 @@ rule get_vep_cache:
         build=get_reference_genome_build(),
         release="116",
     wrapper:
-        "v9.16.0/bio/vep/cache"
+        "v9.19.4/bio/vep/cache"
 
 
 rule get_vep_plugins:
@@ -154,7 +154,7 @@ rule vembrane_table_shared_fn:
         expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
         extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     wrapper:
-        "v9.9.0/bio/vembrane/table"
+        "v9.19.4/bio/vembrane/table"
 
 
 rule vembrane_table_unique_fp_fn:
@@ -168,4 +168,4 @@ rule vembrane_table_unique_fp_fn:
         expression='CHROM, POS, REF, ALT, ANN["SYMBOL"], ANN["VARIANT_CLASS"], ANN["IMPACT"], ANN["Consequence"], (lambda d: next(iter(d.keys())) if d else "")(ANN["SIFT"]), (lambda d: next(iter(d.values())) if d else None)(ANN["SIFT"]), (lambda d: next(iter(d.keys())) if d else "")(ANN["PolyPhen"]), (lambda d: next(iter(d.values())) if d else None)(ANN["PolyPhen"]), ANN["REVEL"]',
         extra="--header 'CHROM,POS,REF,ALT,SYMBOL,VARIANT_CLASS,IMPACT,Consequence,SIFT,SIFT_SCORE,PolyPhen,PolyPhen_SCORE,REVEL'",
     wrapper:
-        "v9.9.0/bio/vembrane/table"
+        "v9.19.4/bio/vembrane/table"

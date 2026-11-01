@@ -39,7 +39,7 @@ rule extract_fp_fn_tp:
         expression=get_fp_fn_expression,
         extra="",
     wrapper:
-        "v9.9.0/bio/vembrane/table"
+        "v9.19.4/bio/vembrane/table"
 
 
 ## Reformat Somatic Tables
@@ -139,7 +139,7 @@ rule report_precision_recall:
         genome=get_genome_name,
         version=get_genome_version,
     wrapper:
-        "v9.17.0/utils/datavzrd"
+        "v9.19.3/utils/datavzrd"
 
 
 # TODO: if one of the input callsets has all sites as FN, the resulting merged table
@@ -226,7 +226,7 @@ rule report_fp_fn:
         version=get_genome_version,
         somatic=get_somatic_status,
     wrapper:
-        "v9.17.0/utils/datavzrd"
+        "v9.19.3/utils/datavzrd"
 
 
 rule report_fp_fn_callset:
@@ -256,7 +256,7 @@ rule report_fp_fn_callset:
         somatic=get_somatic_status,
         high_coverage=get_high_coverage_status,
     wrapper:
-        "v9.17.0/utils/datavzrd"
+        "v9.19.3/utils/datavzrd"
 
 
 # TODO: Add rules to include unique and shared fp / fn variants in the report
